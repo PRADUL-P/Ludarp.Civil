@@ -198,7 +198,10 @@ const contentKeysInput = document.getElementById('content-keys');
 const contentActionInput = document.getElementById('content-action');
 const contentDescInput = document.getElementById('content-desc');
 const contentProTipInput = document.getElementById('content-pro-tip');
-const stepInputs = document.querySelectorAll('.step-input');
+const contentHashtagsInput = document.getElementById('content-hashtags');
+const stepsContainer = document.getElementById('steps-container');
+const btnAddStep = document.getElementById('btn-add-step');
+const getStepInputs = () => document.querySelectorAll('.step-input');
 
 // Card Preview Elements
 const cardSoftwareName = document.getElementById('card-software-name');
@@ -211,6 +214,7 @@ const cardProTip = document.getElementById('card-pro-tip');
 
 // Action Buttons
 const btnExportImage = document.getElementById('btn-export-image');
+const btnExportCarousel = document.getElementById('btn-export-carousel');
 const btnCopyCaption = document.getElementById('btn-copy-caption');
 const stylePresetBtns = document.querySelectorAll('.style-preset-btn');
 const customColorsContainer = document.getElementById('custom-colors-container');
@@ -224,6 +228,7 @@ const pickerText = document.getElementById('color-text');
 // Public Hub Elements
 const hubSearchInput = document.getElementById('hub-search-input');
 const hubTabBtns = document.querySelectorAll('.hub-tab-btn');
+const hubPhaseTabBtns = document.querySelectorAll('#hub-phase-tabs .hub-tab-btn');
 const shortcutsGridContainer = document.getElementById('shortcuts-grid-container');
 
 // Modal Elements
@@ -232,6 +237,7 @@ const btnOpenAddModal = document.getElementById('btn-open-add-modal');
 const btnCloseModal = document.getElementById('btn-close-modal');
 const btnCancelModal = document.getElementById('btn-cancel-modal');
 const addShortcutForm = document.getElementById('add-shortcut-form');
+const modalPhaseSelect = document.getElementById('modal-phase');
 
 // Toast Notification Container
 const toastContainer = document.getElementById('toast-container');
@@ -284,7 +290,7 @@ function updateCardPreview() {
   // Update steps
   cardStepsList.innerHTML = '';
   let stepIndex = 1;
-  stepInputs.forEach(input => {
+  getStepInputs().forEach(input => {
     const text = input.value.trim();
     if (text) {
       const stepItem = document.createElement('div');
@@ -312,15 +318,73 @@ function updateCardPreview() {
 }
 
 // Bind event listeners to input elements for real-time visual syncing
-[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentActionInput, contentDescInput, contentProTipInput].forEach(el => {
-  el.addEventListener('input', updateCardPreview);
+[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput].forEach(el => {
+  if (el) el.addEventListener('input', updateCardPreview);
 });
 
-contentSoftwareSelect.addEventListener('change', updateCardPreview);
+if (contentSoftwareSelect) {
+  contentSoftwareSelect.addEventListener('change', updateCardPreview);
+}
 
-stepInputs.forEach(input => {
-  input.addEventListener('input', updateCardPreview);
-});
+// Dynamic Steps Management
+function bindStepRowEvents(row) {
+  const input = row.querySelector('.step-input');
+  const btnRemove = row.querySelector('.btn-remove-step');
+  
+  if (input) {
+    input.addEventListener('input', updateCardPreview);
+  }
+  
+  if (btnRemove) {
+    btnRemove.addEventListener('click', () => {
+      const rows = stepsContainer.querySelectorAll('.step-input-row');
+      if (rows.length <= 1) {
+        showToast("You must keep at least one instruction step.", "warning");
+        return;
+      }
+      row.remove();
+      reindexSteps();
+      updateCardPreview();
+    });
+  }
+}
+
+function reindexSteps() {
+  const rows = stepsContainer.querySelectorAll('.step-input-row');
+  rows.forEach((r, index) => {
+    r.querySelector('.step-number').textContent = index + 1;
+    const input = r.querySelector('.step-input');
+    if (input) input.placeholder = `Step ${index + 1}`;
+  });
+}
+
+if (btnAddStep) {
+  btnAddStep.addEventListener('click', () => {
+    const rows = stepsContainer.querySelectorAll('.step-input-row');
+    const newIndex = rows.length + 1;
+    
+    const newRow = document.createElement('div');
+    newRow.className = 'step-input-row';
+    newRow.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+    newRow.innerHTML = `
+      <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${newIndex}</span>
+      <input type="text" class="step-input" placeholder="Step ${newIndex}" value="" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+      <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+    `;
+    
+    stepsContainer.appendChild(newRow);
+    bindStepRowEvents(newRow);
+    newRow.querySelector('.step-input').focus();
+    updateCardPreview();
+  });
+}
+
+// Bind initial step rows on page load
+if (stepsContainer) {
+  stepsContainer.querySelectorAll('.step-input-row').forEach(row => {
+    bindStepRowEvents(row);
+  });
+}
 
 // ==========================================================================
 // 3. Tab Switching Navigation
@@ -517,7 +581,7 @@ btnCopyCaption.addEventListener('click', () => {
   
   // Gather non-empty steps
   let stepTextList = [];
-  stepInputs.forEach(input => {
+  getStepInputs().forEach(input => {
     const text = input.value.trim();
     if (text) stepTextList.push(text);
   });
@@ -546,8 +610,13 @@ btnCopyCaption.addEventListener('click', () => {
   caption += `💾 Save this post for your next project!\n\n`;
   
   // Append targeted hashtags
-  const tagSoftware = software.toLowerCase().replace(/\s+/g, '');
-  caption += `#CivilEngineering #StructuralEngineering #Architecture #CADTips #${tagSoftware}Tips #BIM #RevitTips #AutoCADTips #Civil3D #ETABS #SketchUpTips #LudarpCivil`;
+  const hashtagsVal = contentHashtagsInput ? contentHashtagsInput.value.trim() : '';
+  if (hashtagsVal) {
+    caption += hashtagsVal;
+  } else {
+    const tagSoftware = software.toLowerCase().replace(/\s+/g, '');
+    caption += `#CivilEngineering #StructuralEngineering #Architecture #CADTips #${tagSoftware}Tips #BIM #RevitTips #AutoCADTips #Civil3D #ETABS #SketchUpTips #LudarpCivil`;
+  }
   
   // Copy to clipboard
   navigator.clipboard.writeText(caption).then(() => {
@@ -563,19 +632,25 @@ btnCopyCaption.addEventListener('click', () => {
 
 function renderShortcutsHub() {
   const query = hubSearchInput.value.toLowerCase().trim();
-  const activeSoftwareTab = document.querySelector('.hub-tab-btn.active').getAttribute('data-software');
+  const activeSoftwareBtn = document.querySelector('.hub-tab-btn[data-software].active');
+  const activeSoftwareTab = activeSoftwareBtn ? activeSoftwareBtn.getAttribute('data-software') : 'all';
+  
+  const activePhaseBtn = document.querySelector('.hub-tab-btn[data-phase].active');
+  const activePhaseTab = activePhaseBtn ? activePhaseBtn.getAttribute('data-phase') : 'all';
   
   shortcutsGridContainer.innerHTML = '';
   
   const filtered = shortcutDb.filter(item => {
     const matchesSoftware = activeSoftwareTab === 'all' || item.software === activeSoftwareTab;
+    const matchesPhase = activePhaseTab === 'all' || (item.phase && item.phase === activePhaseTab);
     const matchesQuery = !query || 
       item.software.toLowerCase().includes(query) ||
+      (item.phase && item.phase.toLowerCase().includes(query)) ||
       item.keys.toLowerCase().includes(query) ||
       item.action.toLowerCase().includes(query) ||
       item.desc.toLowerCase().includes(query);
       
-    return matchesSoftware && matchesQuery;
+    return matchesSoftware && matchesPhase && matchesQuery;
   });
   
   if (filtered.length === 0) {
@@ -606,7 +681,10 @@ function renderShortcutsHub() {
     card.innerHTML = `
       <div>
         <div class="shortcut-card-header">
-          <span class="shortcut-card-badge">${item.software.toUpperCase()}</span>
+          <div style="display: flex; gap: 6px;">
+            <span class="shortcut-card-badge">${item.software.toUpperCase()}</span>
+            <span class="shortcut-card-badge" style="background-color: rgba(56,189,248,0.08); color: var(--accent-color); border-color: rgba(56,189,248,0.15);">${(item.phase || 'basics').toUpperCase()}</span>
+          </div>
           <span class="shortcut-card-key">${item.keys}</span>
         </div>
         <h4 class="shortcut-card-title">${item.action}</h4>
@@ -670,6 +748,7 @@ function renderShortcutsHub() {
 }
 
 // Load shortcut item properties into Creator Studio editor inputs
+// Load shortcut item properties into Creator Studio editor inputs
 function loadIntoCreatorStudio(item) {
   // Update inputs
   contentSoftwareSelect.value = item.software;
@@ -677,11 +756,27 @@ function loadIntoCreatorStudio(item) {
   contentActionInput.value = item.action;
   contentDescInput.value = item.desc;
   contentProTipInput.value = item.proTip || "";
-  
-  // Load steps into editor rows
-  for (let i = 0; i < stepInputs.length; i++) {
-    stepInputs[i].value = item.steps[i] || "";
+  if (contentHashtagsInput) {
+    contentHashtagsInput.value = item.hashtags ? item.hashtags.join(' ') : '';
   }
+  
+  // Re-generate steps container inputs based on item.steps
+  stepsContainer.innerHTML = '';
+  const steps = item.steps || [];
+  if (steps.length === 0) steps.push("");
+  
+  steps.forEach((stepText, index) => {
+    const row = document.createElement('div');
+    row.className = 'step-input-row';
+    row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+    row.innerHTML = `
+      <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${index + 1}</span>
+      <input type="text" class="step-input" placeholder="Step ${index + 1}" value="${stepText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+      <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+    `;
+    stepsContainer.appendChild(row);
+    bindStepRowEvents(row);
+  });
   
   // Trigger update
   updateCardPreview();
@@ -692,15 +787,28 @@ function loadIntoCreatorStudio(item) {
 }
 
 // Bind search and filter events
-hubSearchInput.addEventListener('input', renderShortcutsHub);
+if (hubSearchInput) {
+  hubSearchInput.addEventListener('input', renderShortcutsHub);
+}
 
 hubTabBtns.forEach(btn => {
   btn.addEventListener('click', () => {
-    hubTabBtns.forEach(b => b.classList.remove('active'));
+    if (!btn.hasAttribute('data-software')) return;
+    document.querySelectorAll('.hub-tab-btn[data-software]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderShortcutsHub();
   });
 });
+
+if (hubPhaseTabBtns) {
+  hubPhaseTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      hubPhaseTabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderShortcutsHub();
+    });
+  });
+}
 
 // ==========================================================================
 // 9. Add Shortcut Dialog / Modal & Data Saving
@@ -723,6 +831,7 @@ addShortcutForm.addEventListener('submit', (e) => {
   e.preventDefault();
   
   const software = document.getElementById('modal-software').value;
+  const phase = modalPhaseSelect ? modalPhaseSelect.value : 'basics';
   const keys = document.getElementById('modal-keys').value.trim();
   const action = document.getElementById('modal-action').value.trim();
   const desc = document.getElementById('modal-desc').value.trim();
@@ -738,7 +847,7 @@ addShortcutForm.addEventListener('submit', (e) => {
     `Complete your modeling action in the project grid.`
   ];
   
-  const newShortcut = { id, software, keys, action, desc, steps, proTip };
+  const newShortcut = { id, software, phase, keys, action, desc, steps, proTip };
   
   // Add to database & save to LocalStorage
   shortcutDb.unshift(newShortcut);
@@ -1403,6 +1512,141 @@ function parseAICopyPasteText(text) {
   return result;
 }
 
+// ==========================================================================
+// 10.9 Multi-slide Carousel ZIP Exporter
+// ==========================================================================
+
+if (btnExportCarousel) {
+  btnExportCarousel.addEventListener('click', async () => {
+    showToast("Preparing carousel slides...", "info");
+    
+    const steps = [];
+    getStepInputs().forEach(input => {
+      const text = input.value.trim();
+      if (text) steps.push(text);
+    });
+    
+    if (steps.length === 0) {
+      showToast("Please add at least one step to export a carousel.", "warning");
+      return;
+    }
+    
+    btnExportCarousel.disabled = true;
+    btnExportCarousel.style.opacity = '0.5';
+    
+    try {
+      const zip = new JSZip();
+      
+      // Clone the card offscreen to mutate styles without visual flickering
+      const originNode = document.getElementById('instagram-post-canvas');
+      const clone = originNode.cloneNode(true);
+      clone.style.transform = 'none';
+      clone.style.position = 'fixed';
+      clone.style.top = '-9999px';
+      clone.style.left = '-9999px';
+      document.body.appendChild(clone);
+      
+      const cloneDesc = clone.querySelector('#card-desc');
+      const cloneStepsList = clone.querySelector('#card-steps-list');
+      const cloneProTipBox = clone.querySelector('.pro-tip-box');
+      
+      let slideIdx = 1;
+      
+      // --- Slide 1: Hook / Title ---
+      if (cloneDesc) cloneDesc.style.display = 'block';
+      if (cloneStepsList) cloneStepsList.style.display = 'none';
+      if (cloneProTipBox) cloneProTipBox.style.display = 'none';
+      
+      // Small delay to ensure styles apply before capture
+      await new Promise(resolve => setTimeout(resolve, 100));
+      let canvas = await html2canvas(clone, { scale: 2, backgroundColor: null, logging: false });
+      zip.file(`slide_${slideIdx.toString().padStart(2, '0')}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
+      slideIdx++;
+      
+      // --- Slides 2..N: One Step per Slide ---
+      if (cloneDesc) cloneDesc.style.display = 'none';
+      if (cloneStepsList) {
+        cloneStepsList.style.display = 'flex';
+        cloneStepsList.style.flexDirection = 'column';
+        cloneStepsList.style.justifyContent = 'center';
+        cloneStepsList.style.height = '100%';
+      }
+      if (cloneProTipBox) cloneProTipBox.style.display = 'none';
+      
+      for (let i = 0; i < steps.length; i++) {
+        if (cloneStepsList) {
+          cloneStepsList.innerHTML = `
+            <div class="card-step-item" style="flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 40px 20px; height: 100%; justify-content: center;">
+              <div class="card-step-num" style="font-size: 3rem; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">${(i + 1).toString().padStart(2, '0')}</div>
+              <div class="card-step-text" style="font-size: 1.4rem; line-height: 1.6; max-width: 90%; font-weight: 600; text-align: center; margin-top: 10px;">${steps[i]}</div>
+            </div>
+          `;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        canvas = await html2canvas(clone, { scale: 2, backgroundColor: null, logging: false });
+        zip.file(`slide_${slideIdx.toString().padStart(2, '0')}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
+        slideIdx++;
+      }
+      
+      // --- Slide N+1: Pro Tip + CTA ---
+      if (cloneStepsList) cloneStepsList.style.display = 'none';
+      if (cloneProTipBox) {
+        cloneProTipBox.style.display = 'flex';
+        cloneProTipBox.style.flexDirection = 'column';
+        cloneProTipBox.style.alignItems = 'center';
+        cloneProTipBox.style.justifyContent = 'center';
+        cloneProTipBox.style.padding = '40px';
+        cloneProTipBox.style.margin = 'auto';
+        cloneProTipBox.style.width = '90%';
+        cloneProTipBox.style.minHeight = '250px';
+        cloneProTipBox.style.borderLeft = 'none';
+        cloneProTipBox.style.borderRadius = '16px';
+        cloneProTipBox.style.border = '2px dashed var(--accent-color)';
+        
+        const cloneProTipTag = cloneProTipBox.querySelector('.pro-tip-tag');
+        if (cloneProTipTag) {
+          cloneProTipTag.style.fontSize = '1.2rem';
+          cloneProTipTag.style.padding = '6px 16px';
+          cloneProTipTag.style.marginBottom = '16px';
+        }
+        
+        const cloneProTipText = cloneProTipBox.querySelector('#card-pro-tip');
+        if (cloneProTipText) {
+          cloneProTipText.style.fontSize = '1.4rem';
+          cloneProTipText.style.lineHeight = '1.6';
+          cloneProTipText.style.textAlign = 'center';
+          cloneProTipText.style.fontWeight = '600';
+        }
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+      canvas = await html2canvas(clone, { scale: 2, backgroundColor: null, logging: false });
+      zip.file(`slide_${slideIdx.toString().padStart(2, '0')}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
+      
+      document.body.removeChild(clone);
+      
+      const content = await zip.generateAsync({ type: "blob" });
+      const softwareName = contentSoftwareSelect.value.replace(/\s+/g, '_').toLowerCase();
+      const shortcutKeys = (contentKeysInput.value || 'shortcut').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      
+      const link = document.createElement('a');
+      link.download = `${softwareName}_${shortcutKeys}_carousel.zip`;
+      link.href = URL.createObjectURL(content);
+      link.click();
+      
+      showToast("Downloaded carousel slides successfully!");
+    } catch (err) {
+      console.error("Carousel Render Error: ", err);
+      showToast("Failed to render carousel slides.", "error");
+    } finally {
+      btnExportCarousel.disabled = false;
+      btnExportCarousel.style.opacity = '1';
+    }
+  });
+}
+
+
 if (btnParsePaste) {
   btnParsePaste.addEventListener('click', () => {
     const pasteText = aiPasteInput.value.trim();
@@ -1411,31 +1655,84 @@ if (btnParsePaste) {
       return;
     }
 
-    const data = parseAICopyPasteText(pasteText);
-
-    // Set form fields if parsed successfully
-    if (data.software) {
-      contentSoftwareSelect.value = data.software;
+    // Check if it's a batch paste split by ---
+    if (pasteText.includes('---')) {
+      const blocks = pasteText.split('---');
+      let importCount = 0;
+      
+      blocks.forEach(block => {
+        const trimmedBlock = block.trim();
+        if (!trimmedBlock) return;
+        
+        const data = parseAICopyPasteText(trimmedBlock);
+        if (data.keys && data.action) {
+          const id = `item-${Math.random().toString(36).substr(2, 9)}`;
+          const steps = data.steps.filter(s => s.trim() !== '');
+          if (steps.length === 0) {
+            steps.push(`Type '${data.keys}' in the command terminal.`);
+          }
+          
+          const newShortcut = {
+            id,
+            software: data.software || 'AutoCAD',
+            phase: 'basics', // Fallback to basics
+            keys: data.keys,
+            action: data.action,
+            desc: data.desc || 'Imported from AI draft',
+            steps,
+            proTip: data.proTip || ''
+          };
+          
+          shortcutDb.unshift(newShortcut);
+          importCount++;
+        }
+      });
+      
+      if (importCount > 0) {
+        localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+        renderShortcutsHub();
+        aiPasteInput.value = '';
+        showToast(`Successfully imported ${importCount} shortcuts to library! Go to Section 4 to export.`);
+      } else {
+        showToast("Could not find any valid shortcuts to parse. Check format.", "error");
+      }
     } else {
-      contentSoftwareSelect.value = "AutoCAD"; // Fallback
+      // Single post parse
+      const data = parseAICopyPasteText(pasteText);
+
+      if (data.software) {
+        contentSoftwareSelect.value = data.software;
+      } else {
+        contentSoftwareSelect.value = "AutoCAD";
+      }
+
+      contentKeysInput.value = data.keys || 'SHORTCUT';
+      contentActionInput.value = data.action || 'Command Action';
+      contentDescInput.value = data.desc || 'Auto-parsed from paste text';
+      contentProTipInput.value = data.proTip || '';
+
+      // Rebuild dynamic step inputs
+      stepsContainer.innerHTML = '';
+      const steps = data.steps.filter(s => s.trim() !== '');
+      if (steps.length === 0) steps.push("Execute the command.");
+      
+      steps.forEach((stepText, index) => {
+        const row = document.createElement('div');
+        row.className = 'step-input-row';
+        row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+        row.innerHTML = `
+          <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${index + 1}</span>
+          <input type="text" class="step-input" placeholder="Step ${index + 1}" value="${stepText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+          <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+        `;
+        stepsContainer.appendChild(row);
+        bindStepRowEvents(row);
+      });
+
+      updateCardPreview();
+      aiPasteInput.value = '';
+      showToast("Successfully parsed and populated card details!");
     }
-
-    contentKeysInput.value = data.keys || 'SHORTCUT';
-    contentActionInput.value = data.action || 'Command Action';
-    contentDescInput.value = data.desc || 'Auto-parsed from paste text';
-    contentProTipInput.value = data.proTip || '';
-
-    for (let i = 0; i < stepInputs.length; i++) {
-      stepInputs[i].value = data.steps[i] || '';
-    }
-
-    // Update card preview
-    updateCardPreview();
-    
-    // Clear textarea
-    aiPasteInput.value = '';
-    
-    showToast("Successfully parsed and populated card details!");
   });
 }
 
@@ -1448,6 +1745,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Sync live elements with inputs on page load
   updateCardPreview();
   renderShortcutsHub();
+  updateCalendarProgress(); // Fix Progress display showing 0/83 initially
   
   // Load saved API key
   aiApiKeyInput.value = localStorage.getItem('ludarp_gemini_api_key') || '';
