@@ -1,0 +1,1454 @@
+/* ==========================================================================
+   CivilCut Core Logic: Content Automation, Real-time Editor, & Export
+   ========================================================================== */
+
+// 1. Initial Shortcut Database (Preloaded)
+const defaultShortcuts = [
+  {
+    id: "ac-tr",
+    software: "AutoCAD",
+    keys: "TR",
+    action: "Trim Objects",
+    desc: "Trims elements to meet the edges of other selected elements in your drawing space.",
+    steps: [
+      "Type 'TR' on your keyboard and hit Enter.",
+      "Select cutting edges (optional) or press Enter to select all objects.",
+      "Click the parts of the lines you want to remove."
+    ],
+    proTip: "Hold SHIFT while using Trim to quickly extend lines instead!"
+  },
+  {
+    id: "ac-ex",
+    software: "AutoCAD",
+    keys: "EX",
+    action: "Extend Objects",
+    desc: "Extends elements to meet the boundary edges of other selected elements.",
+    steps: [
+      "Type 'EX' on your keyboard and hit Enter.",
+      "Select boundary edges (optional) or press Enter to select all.",
+      "Click the objects you want to extend."
+    ],
+    proTip: "Hold SHIFT while extending to trim objects instead of extending!"
+  },
+  {
+    id: "ac-pl",
+    software: "AutoCAD",
+    keys: "PL",
+    action: "Draw Polyline",
+    desc: "Draws a connected sequence of line segments as a single 2D object, allowing boundary area math.",
+    steps: [
+      "Type 'PL' on your keyboard and hit Enter.",
+      "Click in the workspace to start drawing line vertices.",
+      "Type 'C' and hit Enter to close the shape, or just hit Enter to finish."
+    ],
+    proTip: "Polylines are highly recommended because CAD can calculate their area instantly!"
+  },
+  {
+    id: "ac-mi",
+    software: "AutoCAD",
+    keys: "MI",
+    action: "Mirror Objects",
+    desc: "Creates a mirrored copy of selected AutoCAD objects across a custom axis of symmetry.",
+    steps: [
+      "Select the objects you want to mirror.",
+      "Type 'MI' on your keyboard and hit Enter.",
+      "Click two points to define the mirror line, then choose to erase source."
+    ],
+    proTip: "Hit Enter to keep original objects; type 'Y' and hit Enter to erase!"
+  },
+  {
+    id: "rv-wa",
+    software: "Revit",
+    keys: "WA",
+    action: "Create Wall",
+    desc: "Instantly starts the Wall tool to draw architectural or structural walls in your project model.",
+    steps: [
+      "Press 'W' followed by 'A' on your keyboard (do not press Enter).",
+      "Choose Wall type in the Properties palette on the left.",
+      "Click in the viewport to define the start and end points of the wall."
+    ],
+    proTip: "Press Spacebar while drawing to flip the wall orientation/location line."
+  },
+  {
+    id: "rv-bx",
+    software: "Revit",
+    keys: "BX",
+    action: "Section Box Selected",
+    desc: "Isolates selected elements in a 3D view with a crop section box, ideal for reviewing detailed structural joints.",
+    steps: [
+      "Select one or more elements in any 2D or 3D view.",
+      "Type 'BX' on your keyboard.",
+      "Revit will automatically open the default 3D view cropped around the selected items."
+    ],
+    proTip: "Uncheck 'Section Box' in the 3D View properties to reset the full view."
+  },
+  {
+    id: "rv-tg",
+    software: "Revit",
+    keys: "TG",
+    action: "Tag Category",
+    desc: "Applies structural or architectural annotation tags to components based on their category details.",
+    steps: [
+      "Type 'TG' on your keyboard.",
+      "Hover your cursor over a wall, beam, column, or door.",
+      "Click to place the tag annotation, then adjust lead lines as needed."
+    ],
+    proTip: "Use 'Tag All Not Tagged' in the Annotate menu to tag hundreds of elements in one click!"
+  },
+  {
+    id: "c3d-align",
+    software: "Civil 3D",
+    keys: "ALIGNMENT",
+    action: "Create Alignment",
+    desc: "Launches the Alignment Layout Tools to design roads, railways, or pipe networks.",
+    steps: [
+      "Go to the Home tab on the Ribbon, click 'Alignment'.",
+      "Select 'Alignment Creation Tools' from the dropdown.",
+      "Name the alignment, choose styles, and start drawing layout segments."
+    ],
+    proTip: "Use 'Create Alignment from Polyline' if you already drafted the path in CAD."
+  },
+  {
+    id: "c3d-surf",
+    software: "Civil 3D",
+    keys: "SURFACE",
+    action: "Create Surface",
+    desc: "Generates a digital terrain model (TIN Surface) from survey point groups or contours.",
+    steps: [
+      "Right-click 'Surfaces' in Prospector and select 'Create Surface'.",
+      "Give it a name (e.g., Existing Ground) and set contour styles.",
+      "Expand the Surface definition, right-click Point Groups, and select your survey data."
+    ],
+    proTip: "Add boundary lines under definition to trim extra triangles along surface borders."
+  },
+  {
+    id: "et-f5",
+    software: "ETABS",
+    keys: "F5",
+    action: "Run Analysis",
+    desc: "Launches the solver to analyze structural stresses, moments, displacements, and shear forces.",
+    steps: [
+      "Ensure all loads (Dead, Live, Wind, Seismic) are defined and applied.",
+      "Press the 'F5' shortcut key on your keyboard.",
+      "Wait for the ETABS solver to complete and check the deformed shape."
+    ],
+    proTip: "Unlock the model using the lock icon in the toolbar to make structural changes."
+  },
+  {
+    id: "et-slab",
+    software: "ETABS",
+    keys: "Draw Slab",
+    action: "Quick Draw Slab",
+    desc: "Quickly draws concrete structural slabs, floors, or deck elements by clicking inside grid lines.",
+    steps: [
+      "Select the 'Quick Draw Floor/Wall' tool in the left vertical toolbar.",
+      "Select your concrete Section type from the properties dropdown.",
+      "Click once inside any grid boundary to place the floor slab instantly."
+    ],
+    proTip: "Select multiple grid cells by dragging a selection box to draw slabs in bulk!"
+  },
+  {
+    id: "su-p",
+    software: "SketchUp",
+    keys: "P",
+    action: "Push / Pull",
+    desc: "Extrudes 2D faces into 3D geometry or subtracts volume by pushing faces inward.",
+    steps: [
+      "Draw any closed 2D shape (Rectangle, Circle, etc.).",
+      "Press 'P' on your keyboard to activate the tool.",
+      "Click the face and move your cursor to extrude, then click to set."
+    ],
+    proTip: "Double-click a new face to apply the exact same extrusion depth as before!"
+  },
+  {
+    id: "su-f",
+    software: "SketchUp",
+    keys: "F",
+    action: "Offset Face",
+    desc: "Creates concentric boundaries of a selected 2D face at a set offset distance.",
+    steps: [
+      "Press 'F' on your keyboard to activate the Offset tool.",
+      "Hover over the face or edges and click once.",
+      "Drag your cursor inside or outside, type the offset dimension, and hit Enter."
+    ],
+    proTip: "Double-click on any other face to repeat the exact same offset distance instantly!"
+  }
+];
+
+// Load from LocalStorage or fallback to defaults
+let shortcutDb = JSON.parse(localStorage.getItem('ludarp_shortcuts')) || defaultShortcuts;
+
+// State variables
+let currentFormat = "square"; // "square" or "story"
+let activeStylePreset = "blueprint";
+
+// DOM Elements
+const sidebarButtons = document.querySelectorAll('.nav-btn');
+const tabViews = document.querySelectorAll('.tab-view');
+const btnFormatSquare = document.getElementById('btn-format-square');
+const btnFormatStory = document.getElementById('btn-format-story');
+const canvasWrapper = document.querySelector('.canvas-outer-wrapper');
+const previewAspectLabel = document.getElementById('preview-aspect-label');
+const instagramCard = document.getElementById('instagram-post-canvas');
+
+// Input Controls Elements
+const brandHandleInput = document.getElementById('brand-handle');
+const contentSoftwareSelect = document.getElementById('content-software');
+const contentKeysInput = document.getElementById('content-keys');
+const contentActionInput = document.getElementById('content-action');
+const contentDescInput = document.getElementById('content-desc');
+const contentProTipInput = document.getElementById('content-pro-tip');
+const stepInputs = document.querySelectorAll('.step-input');
+
+// Card Preview Elements
+const cardSoftwareName = document.getElementById('card-software-name');
+const cardHandleText = document.getElementById('card-handle-text');
+const cardKeys = document.getElementById('card-keys');
+const cardAction = document.getElementById('card-action');
+const cardDesc = document.getElementById('card-desc');
+const cardStepsList = document.getElementById('card-steps-list');
+const cardProTip = document.getElementById('card-pro-tip');
+
+// Action Buttons
+const btnExportImage = document.getElementById('btn-export-image');
+const btnCopyCaption = document.getElementById('btn-copy-caption');
+const stylePresetBtns = document.querySelectorAll('.style-preset-btn');
+const customColorsContainer = document.getElementById('custom-colors-container');
+
+// Custom Color Pickers
+const pickerBgStart = document.getElementById('color-bg-start');
+const pickerBgEnd = document.getElementById('color-bg-end');
+const pickerAccent = document.getElementById('color-accent');
+const pickerText = document.getElementById('color-text');
+
+// Public Hub Elements
+const hubSearchInput = document.getElementById('hub-search-input');
+const hubTabBtns = document.querySelectorAll('.hub-tab-btn');
+const shortcutsGridContainer = document.getElementById('shortcuts-grid-container');
+
+// Modal Elements
+const addShortcutModal = document.getElementById('add-shortcut-modal');
+const btnOpenAddModal = document.getElementById('btn-open-add-modal');
+const btnCloseModal = document.getElementById('btn-close-modal');
+const btnCancelModal = document.getElementById('btn-cancel-modal');
+const addShortcutForm = document.getElementById('add-shortcut-form');
+
+// Toast Notification Container
+const toastContainer = document.getElementById('toast-container');
+
+// Bulk Export Elements
+const btnBulkExport = document.getElementById('btn-bulk-export');
+const bulkProgressContainer = document.getElementById('bulk-progress-container');
+const bulkProgressStatus = document.getElementById('bulk-progress-status');
+const bulkProgressPercent = document.getElementById('bulk-progress-percent');
+const bulkProgressBar = document.getElementById('bulk-progress-bar');
+
+// AI Research Assistant Elements
+const aiApiKeyInput = document.getElementById('ai-api-key');
+const aiPromptInput = document.getElementById('ai-prompt');
+const btnAiGenerate = document.getElementById('btn-ai-generate');
+const aiLoadingContainer = document.getElementById('ai-loading-container');
+const aiLoadingText = document.getElementById('ai-loading-text');
+
+// ChatGPT / Claude Importer Elements
+const aiPasteInput = document.getElementById('ai-paste-input');
+const btnParsePaste = document.getElementById('btn-parse-paste');
+
+// Content Calendar Elements
+const calendarPhaseSelect = document.getElementById('calendar-phase-select');
+const calendarGridContainer = document.getElementById('calendar-grid-container');
+const calendarProgressCount = document.getElementById('calendar-progress-count');
+const calendarProgressPercent = document.getElementById('calendar-progress-percent');
+const calendarProgressBar = document.getElementById('calendar-progress-bar');
+
+// ==========================================================================
+// 2. Real-Time Creator Studio Updates
+// ==========================================================================
+
+function updateCardPreview() {
+  // Update brand handle
+  const handleVal = brandHandleInput.value.trim() || "ludarp_civil";
+  cardHandleText.textContent = handleVal.startsWith('@') ? handleVal : `@${handleVal}`;
+  
+  // Update software badge
+  const softwareVal = contentSoftwareSelect.value;
+  cardSoftwareName.textContent = softwareVal.toUpperCase();
+  
+  // Update keys & action title
+  cardKeys.textContent = contentKeysInput.value.trim() || "KEY";
+  cardAction.textContent = contentActionInput.value.trim() || "Action Title";
+  
+  // Update description
+  cardDesc.textContent = contentDescInput.value.trim() || "Description of shortcut goes here.";
+  
+  // Update steps
+  cardStepsList.innerHTML = '';
+  let stepIndex = 1;
+  stepInputs.forEach(input => {
+    const text = input.value.trim();
+    if (text) {
+      const stepItem = document.createElement('div');
+      stepItem.className = 'card-step-item';
+      
+      const numFormatted = stepIndex.toString().padStart(2, '0');
+      stepItem.innerHTML = `
+        <div class="card-step-num">${numFormatted}</div>
+        <div class="card-step-text">${text}</div>
+      `;
+      cardStepsList.appendChild(stepItem);
+      stepIndex++;
+    }
+  });
+  
+  // Update Pro Tip
+  const proTipText = contentProTipInput.value.trim();
+  const proTipBox = instagramCard.querySelector('.pro-tip-box');
+  if (proTipText) {
+    proTipBox.style.display = 'flex';
+    cardProTip.textContent = proTipText;
+  } else {
+    proTipBox.style.display = 'none';
+  }
+}
+
+// Bind event listeners to input elements for real-time visual syncing
+[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentActionInput, contentDescInput, contentProTipInput].forEach(el => {
+  el.addEventListener('input', updateCardPreview);
+});
+
+contentSoftwareSelect.addEventListener('change', updateCardPreview);
+
+stepInputs.forEach(input => {
+  input.addEventListener('input', updateCardPreview);
+});
+
+// ==========================================================================
+// 3. Tab Switching Navigation
+// ==========================================================================
+
+sidebarButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Toggle active navigation buttons
+    sidebarButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Toggle visible views
+    const targetTab = btn.getAttribute('data-tab');
+    tabViews.forEach(view => {
+      view.classList.remove('active');
+      if (view.id === `${targetTab}-view`) {
+        view.classList.add('active');
+      }
+    });
+    
+    // If switching to hub view, reload grid
+    if (targetTab === 'hub') {
+      renderShortcutsHub();
+    } else if (targetTab === 'calendar') {
+      renderCalendarHub();
+    }
+  });
+});
+
+// ==========================================================================
+// 4. Visual Card Styles & Themes
+// ==========================================================================
+
+// Switch themes
+stylePresetBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    stylePresetBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    const themeName = btn.getAttribute('data-style');
+    activeStylePreset = themeName;
+    
+    // Reset classes
+    instagramCard.className = `instagram-card format-${currentFormat}`;
+    instagramCard.style.background = '';
+    instagramCard.style.color = '';
+    instagramCard.style.borderColor = '';
+    
+    // Apply selected theme class
+    if (themeName !== 'custom') {
+      customColorsContainer.classList.add('hidden');
+      instagramCard.classList.add(`theme-${themeName}`);
+    } else {
+      customColorsContainer.classList.remove('hidden');
+      instagramCard.classList.add('theme-custom');
+      applyCustomColors();
+    }
+  });
+});
+
+// Apply custom colors
+function applyCustomColors() {
+  if (activeStylePreset !== 'custom') return;
+  
+  const bgStart = pickerBgStart.value;
+  const bgEnd = pickerBgEnd.value;
+  const accent = pickerAccent.value;
+  const text = pickerText.value;
+  
+  // Update card styles inline
+  instagramCard.style.background = `linear-gradient(135deg, ${bgStart}, ${bgEnd})`;
+  instagramCard.style.color = text;
+  instagramCard.style.borderColor = `${accent}33`; // 20% opacity
+  
+  // Custom badges/pills updates inside custom theme
+  const softwareBadge = instagramCard.querySelector('.software-badge');
+  softwareBadge.style.backgroundColor = `${accent}26`; // 15% opacity
+  softwareBadge.style.borderColor = accent;
+  softwareBadge.style.color = accent;
+  
+  const keyPill = instagramCard.querySelector('.key-pill');
+  keyPill.style.background = `linear-gradient(135deg, ${accent}, ${accent}cc)`;
+  keyPill.style.borderColor = '#ffffff';
+  keyPill.style.color = '#000000';
+  
+  const stepNums = instagramCard.querySelectorAll('.card-step-num');
+  stepNums.forEach(num => num.style.color = accent);
+  
+  const proTipBox = instagramCard.querySelector('.pro-tip-box');
+  proTipBox.style.backgroundColor = `${accent}14`; // 8% opacity
+  proTipBox.style.borderLeft = `8px solid ${accent}`;
+  
+  const proTipTag = instagramCard.querySelector('.pro-tip-tag');
+  proTipTag.style.backgroundColor = accent;
+  proTipTag.style.color = '#000000';
+  
+  const ctaMessage = instagramCard.querySelector('.cta-message');
+  ctaMessage.style.color = accent;
+}
+
+[pickerBgStart, pickerBgEnd, pickerAccent, pickerText].forEach(picker => {
+  picker.addEventListener('input', applyCustomColors);
+});
+
+// ==========================================================================
+// 5. Canvas Format Swapping (Post aspect ratio scale)
+// ==========================================================================
+
+btnFormatSquare.addEventListener('click', () => {
+  currentFormat = "square";
+  btnFormatSquare.classList.add('active');
+  btnFormatStory.classList.remove('active');
+  
+  // Update Wrapper size for UI preview
+  canvasWrapper.id = "canvas-wrapper-square";
+  previewAspectLabel.textContent = "1080 x 1080 PX";
+  
+  // Re-class canvas
+  instagramCard.classList.remove('format-story');
+  instagramCard.classList.add('format-square');
+});
+
+btnFormatStory.addEventListener('click', () => {
+  currentFormat = "story";
+  btnFormatStory.classList.add('active');
+  btnFormatSquare.classList.remove('active');
+  
+  // Update Wrapper size for UI preview
+  canvasWrapper.id = "canvas-wrapper-story";
+  previewAspectLabel.textContent = "1080 x 1920 PX";
+  
+  // Re-class canvas
+  instagramCard.classList.remove('format-square');
+  instagramCard.classList.add('format-story');
+});
+
+// ==========================================================================
+// 6. Export Instagram Card Image (html2canvas Clone Render)
+// ==========================================================================
+
+btnExportImage.addEventListener('click', () => {
+  showToast("Rendering high-res card...", "info");
+  
+  // Create a high-fidelity clone of the target card offscreen
+  const originNode = document.getElementById('instagram-post-canvas');
+  const clone = originNode.cloneNode(true);
+  
+  // Reset scaling transforms on the clone so it renders at full 1080px resolution
+  clone.style.transform = 'none';
+  clone.style.position = 'fixed';
+  clone.style.top = '-9999px';
+  clone.style.left = '-9999px';
+  document.body.appendChild(clone);
+  
+  // Execute html2canvas rendering
+  html2canvas(clone, {
+    useCORS: true,
+    scale: 2, // Double-density scale renders crisp 2160px image
+    backgroundColor: null,
+    logging: false
+  }).then(canvas => {
+    // Generate file download link
+    const softwareName = contentSoftwareSelect.value.replace(/\s+/g, '_');
+    const shortcutKeys = (contentKeysInput.value || 'shortcut').replace(/[^a-zA-Z0-9]/g, '');
+    const filename = `${softwareName.toLowerCase()}_${shortcutKeys.toLowerCase()}_post.png`;
+    
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    // Clean up clone
+    document.body.removeChild(clone);
+    showToast("Downloaded graphic successfully!");
+  }).catch(err => {
+    console.error("html2canvas Render Error: ", err);
+    showToast("Failed to render graphic. Check console for details.", "error");
+    if (document.body.contains(clone)) {
+      document.body.removeChild(clone);
+    }
+  });
+});
+
+// ==========================================================================
+// 7. Caption and Hashtags Copy Generator
+// ==========================================================================
+
+btnCopyCaption.addEventListener('click', () => {
+  const software = contentSoftwareSelect.value;
+  const keys = contentKeysInput.value.trim() || 'SHORTCUT';
+  const action = contentActionInput.value.trim() || 'Command Action';
+  const desc = contentDescInput.value.trim();
+  const proTip = contentProTipInput.value.trim();
+  
+  // Gather non-empty steps
+  let stepTextList = [];
+  stepInputs.forEach(input => {
+    const text = input.value.trim();
+    if (text) stepTextList.push(text);
+  });
+  
+  // Build caption text
+  let caption = `🚀 CIVIL ENGINEERING SHORTCUT: ${keys.toUpperCase()} 🚀\n\n`;
+  caption += `💻 Software: ${software}\n`;
+  caption += `🛠️ Action: ${action}\n\n`;
+  
+  if (desc) {
+    caption += `💡 What it does:\n${desc}\n\n`;
+  }
+  
+  if (stepTextList.length > 0) {
+    caption += `👉 Step-by-Step Instructions:\n`;
+    stepTextList.forEach((step, idx) => {
+      caption += `${idx + 1}️⃣ ${step}\n`;
+    });
+    caption += `\n`;
+  }
+  
+  if (proTip) {
+    caption += `🔥 Value Pro Tip:\n${proTip}\n\n`;
+  }
+  
+  caption += `💾 Save this post for your next project!\n\n`;
+  
+  // Append targeted hashtags
+  const tagSoftware = software.toLowerCase().replace(/\s+/g, '');
+  caption += `#CivilEngineering #StructuralEngineering #Architecture #CADTips #${tagSoftware}Tips #BIM #RevitTips #AutoCADTips #Civil3D #ETABS #SketchUpTips #LudarpCivil`;
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(caption).then(() => {
+    showToast("Instagram caption copied to clipboard!");
+  }).catch(() => {
+    showToast("Could not copy caption automatically.", "error");
+  });
+});
+
+// ==========================================================================
+// 8. Public Shortcut Hub & Filters
+// ==========================================================================
+
+function renderShortcutsHub() {
+  const query = hubSearchInput.value.toLowerCase().trim();
+  const activeSoftwareTab = document.querySelector('.hub-tab-btn.active').getAttribute('data-software');
+  
+  shortcutsGridContainer.innerHTML = '';
+  
+  const filtered = shortcutDb.filter(item => {
+    const matchesSoftware = activeSoftwareTab === 'all' || item.software === activeSoftwareTab;
+    const matchesQuery = !query || 
+      item.software.toLowerCase().includes(query) ||
+      item.keys.toLowerCase().includes(query) ||
+      item.action.toLowerCase().includes(query) ||
+      item.desc.toLowerCase().includes(query);
+      
+    return matchesSoftware && matchesQuery;
+  });
+  
+  if (filtered.length === 0) {
+    shortcutsGridContainer.innerHTML = `
+      <div class="hub-empty-state card" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
+        <p>No shortcuts match your search or filter criteria.</p>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Try a different keyword or category.</span>
+      </div>
+    `;
+    return;
+  }
+  
+  filtered.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'shortcut-card card';
+    
+    // Check if there is a pro tip
+    const proTipSection = item.proTip 
+      ? `<div class="pro-tip-indicator">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+             <path d="m9 12 2 2 4-4"/>
+             <path d="M5 12a7 7 0 1 1 14 0 7 7 0 0 1-14 0z"/>
+           </svg>
+           Includes Pro Tip
+         </div>`
+      : '<div></div>';
+      
+    card.innerHTML = `
+      <div>
+        <div class="shortcut-card-header">
+          <span class="shortcut-card-badge">${item.software.toUpperCase()}</span>
+          <span class="shortcut-card-key">${item.keys}</span>
+        </div>
+        <h4 class="shortcut-card-title">${item.action}</h4>
+        <p class="shortcut-card-desc">${item.desc}</p>
+      </div>
+      
+      <div class="shortcut-card-footer">
+        ${proTipSection}
+        <div class="action-btn-group">
+          <!-- Copy shortcut code -->
+          <button class="card-action-btn copy-btn" title="Copy Shortcut Keys" data-copy="${item.keys}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+            </svg>
+          </button>
+          <!-- Load into creator studio -->
+          <button class="card-action-btn edit-btn" title="Edit in Creator Studio" data-id="${item.id}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `;
+    
+    // Copy Event
+    card.querySelector('.copy-btn').addEventListener('click', (e) => {
+      const btn = e.currentTarget;
+      const textToCopy = btn.getAttribute('data-copy');
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        btn.classList.add('copy-active');
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        `;
+        showToast(`Copied shortcut: "${textToCopy}"`);
+        
+        setTimeout(() => {
+          btn.classList.remove('copy-active');
+          btn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+            </svg>
+          `;
+        }, 1500);
+      });
+    });
+    
+    // Edit/Load Event
+    card.querySelector('.edit-btn').addEventListener('click', () => {
+      loadIntoCreatorStudio(item);
+    });
+    
+    shortcutsGridContainer.appendChild(card);
+  });
+}
+
+// Load shortcut item properties into Creator Studio editor inputs
+function loadIntoCreatorStudio(item) {
+  // Update inputs
+  contentSoftwareSelect.value = item.software;
+  contentKeysInput.value = item.keys;
+  contentActionInput.value = item.action;
+  contentDescInput.value = item.desc;
+  contentProTipInput.value = item.proTip || "";
+  
+  // Load steps into editor rows
+  for (let i = 0; i < stepInputs.length; i++) {
+    stepInputs[i].value = item.steps[i] || "";
+  }
+  
+  // Trigger update
+  updateCardPreview();
+  
+  // Switch tab visually back to Creator Studio
+  document.querySelector('.nav-btn[data-tab="studio"]').click();
+  showToast(`Loaded "${item.action}" into Creator Studio!`);
+}
+
+// Bind search and filter events
+hubSearchInput.addEventListener('input', renderShortcutsHub);
+
+hubTabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    hubTabBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderShortcutsHub();
+  });
+});
+
+// ==========================================================================
+// 9. Add Shortcut Dialog / Modal & Data Saving
+// ==========================================================================
+
+btnOpenAddModal.addEventListener('click', () => {
+  addShortcutModal.classList.remove('id-hidden');
+});
+
+function closeModal() {
+  addShortcutModal.classList.add('id-hidden');
+  addShortcutForm.reset();
+}
+
+btnCloseModal.addEventListener('click', closeModal);
+btnCancelModal.addEventListener('click', closeModal);
+
+// Form submit action
+addShortcutForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  const software = document.getElementById('modal-software').value;
+  const keys = document.getElementById('modal-keys').value.trim();
+  const action = document.getElementById('modal-action').value.trim();
+  const desc = document.getElementById('modal-desc').value.trim();
+  const proTip = document.getElementById('modal-pro-tip').value.trim();
+  
+  // Generate random ID
+  const id = `item-${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Build default steps based on user input
+  const steps = [
+    `Type '${keys}' in the command terminal or workspace.`,
+    `Execute the tool prompts accordingly.`,
+    `Complete your modeling action in the project grid.`
+  ];
+  
+  const newShortcut = { id, software, keys, action, desc, steps, proTip };
+  
+  // Add to database & save to LocalStorage
+  shortcutDb.unshift(newShortcut);
+  localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+  
+  closeModal();
+  renderShortcutsHub();
+  showToast("New shortcut saved to library!");
+});
+
+// ==========================================================================
+// 10. Lightweight Toast Notifications
+// ==========================================================================
+
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  // Checkmark or Info Icon
+  let iconSvg = '';
+  if (type === 'success') {
+    iconSvg = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px; color: var(--success);">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    `;
+  } else if (type === 'info') {
+    iconSvg = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px; color: var(--accent-color);">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+    `;
+  } else {
+    iconSvg = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px; color: var(--error);">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    `;
+  }
+  
+  toast.innerHTML = `
+    ${iconSvg}
+    <span>${message}</span>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  // Slide out after 3 seconds
+  setTimeout(() => {
+    toast.style.animation = 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
+    setTimeout(() => {
+      if (toastContainer.contains(toast)) {
+        toastContainer.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// ==========================================================================
+// 10.5 Bulk Export Automation (Sequential Queueing & ZIP bundling)
+// ==========================================================================
+
+btnBulkExport.addEventListener('click', async () => {
+  // 1. Validate checked software categories
+  const selectedSoftwares = Array.from(document.querySelectorAll('.bulk-software-checkbox:checked')).map(cb => cb.value);
+  
+  if (selectedSoftwares.length === 0) {
+    showToast("Please check at least one software platform to export.", "warning");
+    return;
+  }
+  
+  // 2. Filter shortcuts list
+  const itemsToExport = shortcutDb.filter(item => selectedSoftwares.includes(item.software));
+  
+  if (itemsToExport.length === 0) {
+    showToast("No shortcuts found in database for the selected software categories.", "warning");
+    return;
+  }
+  
+  // 3. Update UI states
+  btnBulkExport.disabled = true;
+  btnBulkExport.style.opacity = '0.5';
+  bulkProgressContainer.classList.remove('id-hidden');
+  showToast("Starting bulk generation process...", "info");
+  
+  const zip = new JSZip();
+  let captionsCatalog = "==================================================\n";
+  captionsCatalog += "  LUDARP CIVIL AUTOMATED INSTAGRAM CAPTION CATALOG\n";
+  captionsCatalog += "==================================================\n\n";
+  
+  const total = itemsToExport.length;
+  
+  try {
+    for (let index = 0; index < total; index++) {
+      const item = itemsToExport[index];
+      
+      // Update UI Progress bar
+      const percent = Math.round((index / total) * 100);
+      bulkProgressPercent.textContent = `${percent}%`;
+      bulkProgressBar.style.width = `${percent}%`;
+      bulkProgressStatus.textContent = `Rendering: [${item.software}] ${item.keys}`;
+      
+      // A. Temporarily update the DOM preview card elements
+      cardSoftwareName.textContent = item.software.toUpperCase();
+      cardKeys.textContent = item.keys;
+      cardAction.textContent = item.action;
+      cardDesc.textContent = item.desc;
+      
+      cardStepsList.innerHTML = '';
+      item.steps.forEach((stepText, sIdx) => {
+        if (stepText.trim()) {
+          const stepItem = document.createElement('div');
+          stepItem.className = 'card-step-item';
+          const numFormatted = (sIdx + 1).toString().padStart(2, '0');
+          stepItem.innerHTML = `
+            <div class="card-step-num">${numFormatted}</div>
+            <div class="card-step-text">${stepText}</div>
+          `;
+          cardStepsList.appendChild(stepItem);
+        }
+      });
+      
+      const proTipBox = instagramCard.querySelector('.pro-tip-box');
+      if (item.proTip) {
+        proTipBox.style.display = 'flex';
+        cardProTip.textContent = item.proTip;
+      } else {
+        proTipBox.style.display = 'none';
+      }
+      
+      // Re-trigger custom colors dynamically if on custom style theme
+      if (activeStylePreset === 'custom') {
+        applyCustomColors();
+      }
+      
+      // Wait for DOM paint tick
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      // B. Render via html2canvas Clone
+      const originNode = document.getElementById('instagram-post-canvas');
+      const clone = originNode.cloneNode(true);
+      clone.style.transform = 'none';
+      clone.style.position = 'fixed';
+      clone.style.top = '-9999px';
+      clone.style.left = '-9999px';
+      document.body.appendChild(clone);
+      
+      const canvas = await html2canvas(clone, {
+        useCORS: true,
+        scale: 2,
+        backgroundColor: null,
+        logging: false
+      });
+      
+      document.body.removeChild(clone);
+      
+      // C. Base64 file mapping
+      const base64Image = canvas.toDataURL('image/png').split(',')[1];
+      
+      // Generate clean filename
+      const fileIdx = (index + 1).toString().padStart(2, '0');
+      const softwareName = item.software.replace(/\s+/g, '_').toLowerCase();
+      const shortcutName = item.keys.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      const imgFilename = `${fileIdx}_${softwareName}_${shortcutName}.png`;
+      
+      // Add to zip file
+      zip.file(imgFilename, base64Image, { base64: true });
+      
+      // D. Build Instagram Caption for catalog text
+      let caption = `==================================================\n`;
+      caption += `FILE: ${imgFilename}\n`;
+      caption += `==================================================\n\n`;
+      caption += `🚀 CIVIL ENGINEERING SHORTCUT: ${item.keys.toUpperCase()} 🚀\n\n`;
+      caption += `💻 Software: ${item.software}\n`;
+      caption += `🛠️ Action: ${item.action}\n\n`;
+      
+      if (item.desc) {
+        caption += `💡 What it does:\n${item.desc}\n\n`;
+      }
+      
+      if (item.steps.length > 0) {
+        caption += `👉 Step-by-Step Instructions:\n`;
+        item.steps.forEach((step, sIdx) => {
+          caption += `${sIdx + 1}️⃣ ${step}\n`;
+        });
+        caption += `\n`;
+      }
+      
+      if (item.proTip) {
+        caption += `🔥 Value Pro Tip:\n${item.proTip}\n\n`;
+      }
+      
+      caption += `💾 Save this post for your next project!\n\n`;
+      
+      const tagSoftware = item.software.toLowerCase().replace(/\s+/g, '');
+      caption += `#CivilEngineering #StructuralEngineering #Architecture #CADTips #${tagSoftware}Tips #BIM #RevitTips #AutoCADTips #Civil3D #ETABS #SketchUpTips #LudarpCivil\n\n\n`;
+      
+      captionsCatalog += caption;
+    }
+    
+    // 4. Update UI complete progress
+    bulkProgressPercent.textContent = `100%`;
+    bulkProgressBar.style.width = `100%`;
+    bulkProgressStatus.textContent = `Compressing files...`;
+    
+    // Add captions text file to zip
+    zip.file("captions.txt", captionsCatalog);
+    
+    // 5. Generate and download ZIP file
+    const content = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement('a');
+    link.download = `ludarp_instagram_pack.zip`;
+    link.href = URL.createObjectURL(content);
+    link.click();
+    
+    showToast("Downloaded bulk ZIP archive successfully!");
+  } catch (error) {
+    console.error("Bulk Generator Error: ", error);
+    showToast("Error generating batch files. Check console.", "error");
+  } finally {
+    // 6. Reset visual preview to the current form inputs
+    updateCardPreview();
+    
+    // Hide progress bar & enable button
+    btnBulkExport.disabled = false;
+    btnBulkExport.style.opacity = '1';
+    bulkProgressContainer.classList.add('id-hidden');
+  }
+});
+
+// ==========================================================================
+// 10.6 Web-Grounded AI Generation Handler (Gemini API with Google Search)
+// ==========================================================================
+
+aiApiKeyInput.addEventListener('input', () => {
+  localStorage.setItem('ludarp_gemini_api_key', aiApiKeyInput.value.trim());
+});
+
+btnAiGenerate.addEventListener('click', async () => {
+  const apiKey = aiApiKeyInput.value.trim();
+  const topic = aiPromptInput.value.trim();
+  
+  if (!apiKey) {
+    showToast("Please enter a valid Gemini API Key in section 5.", "warning");
+    return;
+  }
+  
+  if (!topic) {
+    showToast("Please enter an engineering topic or search query.", "warning");
+    return;
+  }
+  
+  // Update UI loading states
+  btnAiGenerate.disabled = true;
+  btnAiGenerate.style.opacity = '0.5';
+  aiLoadingContainer.classList.remove('id-hidden');
+  aiLoadingText.textContent = "Searching the web for engineering tools...";
+  
+  const systemPrompt = `You are a professional Civil Engineering content writer. The user wants to generate an Instagram post for a shortcut related to: "${topic}".
+  
+  YOUR INSTRUCTIONS:
+  1. Use the googleSearch tool to perform search queries to find the exact software, official command name, and keyboard shortcut keys used for this topic.
+  2. Identify the most popular and industry-standard software (AutoCAD, Revit, Civil 3D, ETABS, or SketchUp).
+  3. Extract or deduce the primary keyboard shortcut (e.g. TR for Trim in AutoCAD, WA for Wall in Revit, F5 for Run Analysis in ETABS, or ALIGNMENT for Civil 3D alignments).
+  4. Generate a detailed, engaging description of what the tool does.
+  5. Provide 3 simple, sequential steps to use this shortcut.
+  6. Include a high-value "Pro Tip" related to this shortcut.
+  7. You MUST return ONLY a JSON object that matches the following schema. Do not wrap in markdown tags or include any trailing text:
+  {
+    "software": "AutoCAD | Revit | Civil 3D | ETABS | SketchUp",
+    "keys": "keyboard shortcut keys (capitalized, e.g. TR or F5)",
+    "action": "action name (e.g., Trim Lines)",
+    "desc": "brief description of what it does",
+    "steps": [
+      "Step 1 text",
+      "Step 2 text",
+      "Step 3 text"
+    ],
+    "proTip": "expert tip or value addition"
+  }`;
+  
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: systemPrompt
+          }]
+        }],
+        tools: [{
+          googleSearch: {}
+        }],
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error?.message || "Gemini API Request failed");
+    }
+    
+    const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!responseText) {
+      throw new Error("No response content returned from Gemini. Please verify your query or key.");
+    }
+    
+    // Parse response JSON
+    const data = JSON.parse(responseText);
+    
+    // Populate form fields
+    // A. Handle software selection option mapping
+    const softwareOptions = Array.from(contentSoftwareSelect.options).map(opt => opt.value);
+    let matchedSoftware = data.software;
+    
+    if (!softwareOptions.includes(matchedSoftware)) {
+      // Create new option dynamically if not present
+      const newOpt = new Option(matchedSoftware, matchedSoftware);
+      contentSoftwareSelect.add(newOpt);
+    }
+    contentSoftwareSelect.value = matchedSoftware;
+    
+    // B. Set input texts
+    contentKeysInput.value = data.keys || '';
+    contentActionInput.value = data.action || '';
+    contentDescInput.value = data.desc || '';
+    contentProTipInput.value = data.proTip || '';
+    
+    // C. Set steps
+    for (let i = 0; i < stepInputs.length; i++) {
+      stepInputs[i].value = data.steps?.[i] || '';
+    }
+    
+    // D. Trigger live update
+    updateCardPreview();
+    showToast(`AI successfully generated card details for ${data.software}!`);
+    aiPromptInput.value = ''; // clear prompt input
+    
+  } catch (error) {
+    console.error("AI Generation Error: ", error);
+    showToast(error.message || "Failed to generate shortcut. Check console.", "error");
+  } finally {
+    // Restore button and hide loading status
+    btnAiGenerate.disabled = false;
+    btnAiGenerate.style.opacity = '1';
+    aiLoadingContainer.classList.add('id-hidden');
+  }
+});
+
+// ==========================================================================
+// 10.7 Content Calendar Manager Logic
+// ==========================================================================
+
+let completedCalendarDays = new Set(JSON.parse(localStorage.getItem('ludarp_completed_calendar')) || []);
+
+function renderCalendarHub() {
+  const selectedPhase = calendarPhaseSelect.value;
+  calendarGridContainer.innerHTML = '';
+  
+  // Filter posts
+  const filteredPosts = autocadCalendar.filter(post => {
+    return selectedPhase === 'all' || post.phase === selectedPhase;
+  });
+  
+  if (filteredPosts.length === 0) {
+    calendarGridContainer.innerHTML = `
+      <div class="hub-empty-state card" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
+        <p>No calendar posts match your filter criteria.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  filteredPosts.forEach(post => {
+    const isCompleted = completedCalendarDays.has(post.day);
+    
+    // Determine card phase color theme class
+    let phaseClass = 'phase-basics';
+    if (post.phase.includes('Advanced')) {
+      phaseClass = 'phase-advanced';
+    } else if (post.phase.includes('Workflow')) {
+      phaseClass = 'phase-workflow';
+    }
+    
+    // Set snippet preview
+    let snippet = '';
+    if (post.bullets && post.bullets.length > 0) {
+      snippet = post.bullets.slice(0, 3).map(b => `• ${b}`).join('\n');
+    } else if (post.script) {
+      snippet = `Script: ${post.script}`;
+    } else if (post.caption) {
+      snippet = post.caption;
+    }
+    
+    const card = document.createElement('div');
+    card.className = `calendar-card ${phaseClass} ${isCompleted ? 'completed' : ''}`;
+    card.setAttribute('data-day', post.day);
+    
+    card.innerHTML = `
+      <div>
+        <div class="calendar-card-header">
+          <span class="calendar-day-badge">DAY ${post.day}</span>
+          <span class="calendar-format-badge format-${post.format}-badge">
+            ${post.format === 'carousel' ? '🎠 Carousel' : post.format === 'reel' ? '🎥 Reel' : '🖼️ Post'}
+          </span>
+        </div>
+        <h4 class="calendar-card-title">${post.title}</h4>
+        <pre class="calendar-card-snippet" style="font-family: inherit; white-space: pre-wrap; margin: 8px 0; max-height: 80px; overflow: hidden; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">${snippet}</pre>
+      </div>
+      
+      <div class="calendar-card-footer">
+        <label class="calendar-complete-label">
+          <input type="checkbox" class="calendar-complete-checkbox" ${isCompleted ? 'checked' : ''} data-day="${post.day}">
+          <span>${isCompleted ? 'Posted ✓' : 'Mark Done'}</span>
+        </label>
+        <button class="calendar-load-btn" data-day="${post.day}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; vertical-align: middle;">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+          </svg>
+          Load Card
+        </button>
+      </div>
+    `;
+    
+    // Bind toggle completed status
+    const checkbox = card.querySelector('.calendar-complete-checkbox');
+    checkbox.addEventListener('change', (e) => {
+      const dayNum = post.day;
+      if (e.target.checked) {
+        completedCalendarDays.add(dayNum);
+        card.classList.add('completed');
+        card.querySelector('.calendar-complete-label span').textContent = 'Posted ✓';
+        showToast(`Day ${dayNum} marked as Completed!`);
+      } else {
+        completedCalendarDays.delete(dayNum);
+        card.classList.remove('completed');
+        card.querySelector('.calendar-complete-label span').textContent = 'Mark Done';
+        showToast(`Day ${dayNum} marked as Pending.`);
+      }
+      localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
+      updateCalendarProgress();
+    });
+    
+    // Bind load into creator studio
+    const loadBtn = card.querySelector('.calendar-load-btn');
+    loadBtn.addEventListener('click', () => {
+      loadCalendarItemToEditor(post);
+    });
+    
+    calendarGridContainer.appendChild(card);
+  });
+  
+  updateCalendarProgress();
+}
+
+function updateCalendarProgress() {
+  const totalDays = 83; // Total calendar items
+  const completedCount = completedCalendarDays.size;
+  const percent = totalDays > 0 ? Math.round((completedCount / totalDays) * 100) : 0;
+  
+  if (calendarProgressCount) calendarProgressCount.textContent = `${completedCount} / ${totalDays}`;
+  if (calendarProgressPercent) calendarProgressPercent.textContent = `(${percent}%)`;
+  if (calendarProgressBar) calendarProgressBar.style.width = `${percent}%`;
+}
+
+function loadCalendarItemToEditor(item) {
+  // Reset software and select AutoCAD since this is AutoCAD calendar
+  contentSoftwareSelect.value = 'AutoCAD';
+  
+  // Clean titles to separate keys and action
+  let keys = `DAY ${item.day}`;
+  let action = item.title;
+  
+  const colonMatch = item.title.match(/^([^:]+):\s*(.*)$/);
+  if (colonMatch) {
+    keys = colonMatch[1].trim();
+    action = colonMatch[2].trim();
+  }
+  
+  // Set values in Creator Studio inputs
+  contentKeysInput.value = keys;
+  contentActionInput.value = action;
+  
+  // Build description
+  let descText = '';
+  if (item.caption) {
+    descText = item.caption;
+  } else if (item.script) {
+    descText = item.script;
+  } else if (item.bullets && item.bullets.length > 0) {
+    descText = item.bullets.join(' | ');
+  }
+  contentDescInput.value = descText;
+  
+  // Set pro-tip if any
+  contentProTipInput.value = (item.hashtags && item.hashtags.length > 0) ? `Tags: ${item.hashtags.join(' ')}` : 'Save this post for your next project!';
+  
+  // Map steps
+  if (item.bullets && item.bullets.length > 0) {
+    // Bullets are steps
+    for (let i = 0; i < stepInputs.length; i++) {
+      stepInputs[i].value = item.bullets[i] || '';
+    }
+  } else if (item.script) {
+    // Reel script mapping
+    stepInputs[0].value = `Hook: ${action}`;
+    stepInputs[1].value = `Demo: ${item.script.substring(0, 70)}...`;
+    stepInputs[2].value = `Caption tip: ${item.caption ? item.caption.substring(0, 70) : 'Learn this!'}`;
+  } else {
+    // General steps fallback
+    stepInputs[0].value = `Launch AutoCAD software.`;
+    stepInputs[1].value = `Type command: ${keys} and press Enter.`;
+    stepInputs[2].value = `Execute the drawing action on screen.`;
+  }
+  
+  // Sync view
+  updateCardPreview();
+  
+  // Switch to studio tab
+  document.querySelector('.nav-btn[data-tab="studio"]').click();
+  showToast(`Loaded Day ${item.day}: "${action}" into Creator Studio!`);
+}
+
+if (calendarPhaseSelect) {
+  calendarPhaseSelect.addEventListener('change', renderCalendarHub);
+}
+
+
+// ==========================================================================
+// 10.8 ChatGPT / Claude Paste Importer Parser
+// ==========================================================================
+
+function matchSoftware(val) {
+  const normalized = val.toLowerCase();
+  if (normalized.includes('autocad')) return 'AutoCAD';
+  if (normalized.includes('revit')) return 'Revit';
+  if (normalized.includes('civil 3d') || normalized.includes('civil3d')) return 'Civil 3D';
+  if (normalized.includes('etabs')) return 'ETABS';
+  if (normalized.includes('sketchup')) return 'SketchUp';
+  return '';
+}
+
+function parseAICopyPasteText(text) {
+  const result = {
+    software: '',
+    keys: '',
+    action: '',
+    desc: '',
+    steps: ['', '', ''],
+    proTip: ''
+  };
+
+  const lines = text.split('\n');
+  let stepIndex = 0;
+  let inStepsList = false;
+
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+
+    // Remove markdown bold marks (**), backticks (`), and asterisks (*)
+    const cleanLine = line.replace(/\*\*|`|__|\*/g, '').trim();
+    const lowerCleanLine = cleanLine.toLowerCase();
+
+    // 1. Software Match
+    if (lowerCleanLine.startsWith('software:')) {
+      const val = cleanLine.substring(cleanLine.indexOf(':') + 1).trim();
+      result.software = matchSoftware(val);
+      continue;
+    }
+
+    // 2. Shortcut Keys Match
+    if (lowerCleanLine.startsWith('shortcut:') || lowerCleanLine.startsWith('key:') || lowerCleanLine.startsWith('keys:') || lowerCleanLine.startsWith('shortcut keys:')) {
+      const val = cleanLine.substring(cleanLine.indexOf(':') + 1).trim();
+      result.keys = val;
+      continue;
+    }
+
+    // 3. Command Action Match
+    if (lowerCleanLine.startsWith('action:') || lowerCleanLine.startsWith('command:') || lowerCleanLine.startsWith('command action:') || lowerCleanLine.startsWith('title:')) {
+      const val = cleanLine.substring(cleanLine.indexOf(':') + 1).trim();
+      result.action = val;
+      continue;
+    }
+
+    // 4. Pro Tip Match
+    if (lowerCleanLine.startsWith('pro tip:') || lowerCleanLine.startsWith('pro-tip:') || lowerCleanLine.startsWith('value pro tip:') || lowerCleanLine.startsWith('tip:')) {
+      const val = cleanLine.substring(cleanLine.indexOf(':') + 1).trim();
+      result.proTip = val;
+      continue;
+    }
+
+    // 5. Description Match
+    if (lowerCleanLine.startsWith('description:') || lowerCleanLine.startsWith('what it does:') || lowerCleanLine.startsWith('what does this shortcut do:')) {
+      const val = cleanLine.substring(cleanLine.indexOf(':') + 1).trim();
+      result.desc = val;
+      continue;
+    }
+
+    // 6. Step Header check
+    if (lowerCleanLine.startsWith('steps:') || lowerCleanLine.startsWith('instructions:') || lowerCleanLine.startsWith('how to use:')) {
+      inStepsList = true;
+      continue;
+    }
+
+    // 7. Check if line is a numbered/bulleted step
+    const stepMatch = cleanLine.match(/^(?:[0-9]+️⃣?|[0-9]+\.|step\s+[0-9]+:?|[-*•])\s*(.*)/i);
+    if (stepMatch && stepMatch[1]) {
+      if (stepIndex < 3) {
+        result.steps[stepIndex] = stepMatch[1].trim();
+        stepIndex++;
+      }
+      continue;
+    }
+    
+    // Heuristics fallbacks (if no prefix tags are matched)
+    const softwareMatch = matchSoftware(cleanLine);
+    if (softwareMatch && !result.software) {
+      result.software = softwareMatch;
+      continue;
+    }
+
+    // If it's a short 1-4 word line in uppercase, it might be the keys
+    if (cleanLine.length <= 10 && cleanLine === cleanLine.toUpperCase() && !result.keys && /^[A-Z0-9\s/&+-]+$/.test(cleanLine)) {
+      result.keys = cleanLine;
+      continue;
+    }
+  }
+
+  // Final Heuristic: if description is empty, find the longest line that isn't a step or software or keys or pro-tip
+  if (!result.desc) {
+    let longestLine = '';
+    for (let line of lines) {
+      line = line.replace(/\*\*|`|__|\*/g, '').trim();
+      if (!line) continue;
+      
+      const lower = line.toLowerCase();
+      if (lower.startsWith('software:') || lower.startsWith('shortcut:') || lower.startsWith('action:') || lower.startsWith('pro tip:') || lower.startsWith('steps:') || lower.match(/^(?:[0-9]+\.|[-*•])\s*/)) {
+        continue;
+      }
+      if (line.length > longestLine.length && line.length < 150) {
+        longestLine = line;
+      }
+    }
+    if (longestLine) result.desc = longestLine;
+  }
+
+  return result;
+}
+
+if (btnParsePaste) {
+  btnParsePaste.addEventListener('click', () => {
+    const pasteText = aiPasteInput.value.trim();
+    if (!pasteText) {
+      showToast("Please paste ChatGPT or Claude text first.", "warning");
+      return;
+    }
+
+    const data = parseAICopyPasteText(pasteText);
+
+    // Set form fields if parsed successfully
+    if (data.software) {
+      contentSoftwareSelect.value = data.software;
+    } else {
+      contentSoftwareSelect.value = "AutoCAD"; // Fallback
+    }
+
+    contentKeysInput.value = data.keys || 'SHORTCUT';
+    contentActionInput.value = data.action || 'Command Action';
+    contentDescInput.value = data.desc || 'Auto-parsed from paste text';
+    contentProTipInput.value = data.proTip || '';
+
+    for (let i = 0; i < stepInputs.length; i++) {
+      stepInputs[i].value = data.steps[i] || '';
+    }
+
+    // Update card preview
+    updateCardPreview();
+    
+    // Clear textarea
+    aiPasteInput.value = '';
+    
+    showToast("Successfully parsed and populated card details!");
+  });
+}
+
+
+// ==========================================================================
+// 11. Initializer Hook
+// ==========================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Sync live elements with inputs on page load
+  updateCardPreview();
+  renderShortcutsHub();
+  
+  // Load saved API key
+  aiApiKeyInput.value = localStorage.getItem('ludarp_gemini_api_key') || '';
+});

@@ -1,0 +1,5 @@
+scratch/
+.gemini/
+.agents/
+*.zip
+*.png
