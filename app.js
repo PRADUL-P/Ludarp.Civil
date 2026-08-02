@@ -402,48 +402,13 @@ function updateCardPreview() {
   }
 
   const carouselBadge = document.getElementById('card-carousel-id-badge');
-  const slideChipsContainer = document.getElementById('carousel-slide-chips');
-  if (slideChipsContainer) {
-    const activeChip = slideChipsContainer.querySelector('.btn-slide-chip.active');
-    const activeSlideVal = activeChip ? (activeChip.dataset ? activeChip.dataset.slide : activeChip.getAttribute('data-slide')) : null;
-    const currentSlide = detectedLetter || activeSlideVal || 'A';
-    if (carouselBadge) carouselBadge.textContent = `${baseCode}${currentSlide}`;
-
-    slideChipsContainer.querySelectorAll('.btn-slide-chip').forEach(chip => {
-      const chipSlideVal = chip.dataset ? chip.dataset.slide : (chip.getAttribute('data-slide') || 'A');
-      const isCur = chipSlideVal === currentSlide;
-      chip.textContent = `${baseCode}${chipSlideVal} (${chipSlideVal === 'A' ? 'Title' : chipSlideVal === 'B' ? 'Steps' : 'ProTip'})`;
-      chip.onclick = () => {
-        const slideLetter = chip.dataset ? chip.dataset.slide : (chip.getAttribute('data-slide') || 'A');
-        const descEl = document.getElementById('card-desc');
-        const stepsEl = document.getElementById('card-steps-list');
-        const proTipEl = document.querySelector('.pro-tip-box');
-        
-        slideChipsContainer.querySelectorAll('.btn-slide-chip').forEach(c => {
-          const isActive = c === chip;
-          c.classList.toggle('active', isActive);
-          c.style.background = isActive ? 'var(--accent)' : 'var(--bg-tertiary)';
-          c.style.color = isActive ? '#000' : 'var(--text-primary)';
-          c.style.border = isActive ? 'none' : '1px solid var(--border)';
-        });
-
-        if (carouselBadge) carouselBadge.textContent = `${baseCode}${slideLetter}`;
-
-        if (slideLetter === 'A') {
-          if (descEl) descEl.style.display = 'block';
-          if (stepsEl) stepsEl.style.display = 'none';
-          if (proTipEl) proTipEl.style.display = 'none';
-        } else if (slideLetter === 'B') {
-          if (descEl) descEl.style.display = 'none';
-          if (stepsEl) stepsEl.style.display = 'flex';
-          if (proTipEl) proTipEl.style.display = 'none';
-        } else if (slideLetter === 'C') {
-          if (descEl) descEl.style.display = 'none';
-          if (stepsEl) stepsEl.style.display = 'none';
-          if (proTipEl) proTipEl.style.display = 'flex';
-        }
-      };
-    });
+  if (carouselBadge) {
+    const activeChip = document.querySelector('#carousel-slide-chips .btn-slide-chip.active');
+    if (activeChip && activeChip.getAttribute('data-slide-id')) {
+      carouselBadge.textContent = activeChip.getAttribute('data-slide-id');
+    } else {
+      carouselBadge.textContent = rawCode;
+    }
   }
   
   // Update keys, symbol & action title
@@ -3839,8 +3804,9 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
           chip.type = 'button';
           chip.className = `btn-slide-chip ${idx === 0 ? 'active' : ''}`;
           chip.setAttribute('data-slide', slideId.slice(-1));
-          chip.textContent = `${slideId} (${pItem.shortcut || pItem.action || ('Slide ' + (idx + 1))})`;
-          chip.style.cssText = `padding:3px 10px; font-size:0.75rem; font-weight:800; border-radius:6px; cursor:pointer; ${idx === 0 ? 'background:var(--accent); color:#000; border:none;' : 'background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border);'}`;
+          chip.setAttribute('data-slide-id', slideId);
+          chip.textContent = `${slideId} (${pItem.keys || pItem.action || ('Slide ' + (idx + 1))})`;
+          chip.style.cssText = `padding:4px 10px; font-size:0.75rem; font-weight:800; border-radius:6px; cursor:pointer; font-family:var(--font-mono); ${idx === 0 ? 'background:var(--accent); color:#000; border:none; box-shadow:0 0 10px rgba(56,189,248,0.4);' : 'background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border);'}`;
 
           chip.onclick = () => {
             if (pItem.day) activeCalendarDayNum = pItem.day;
@@ -3851,6 +3817,7 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
               c.style.background = isActive ? 'var(--accent)' : 'var(--bg-tertiary)';
               c.style.color = isActive ? '#000' : 'var(--text-primary)';
               c.style.border = isActive ? 'none' : '1px solid var(--border)';
+              c.style.boxShadow = isActive ? '0 0 10px rgba(56,189,248,0.4)' : 'none';
             });
           };
           slideChipsContainer.appendChild(chip);
