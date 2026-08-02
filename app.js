@@ -3366,25 +3366,44 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
     const stepsContainer = document.getElementById('steps-container');
     if (!stepsContainer) return;
     stepsContainer.innerHTML = '';
-    if (bullets && bullets.length > 0) {
-      bullets.forEach(text => {
-        if (typeof addStepInput === 'function') addStepInput(text);
-      });
-    } else {
-      if (typeof addStepInput === 'function') {
-        addStepInput('');
-        addStepInput('');
-        addStepInput('');
-      }
-    }
+    const listMarkerSelect = document.getElementById('list-marker-style');
+    const markerStyle = listMarkerSelect ? listMarkerSelect.value : 'number';
+
+    const itemsToRender = (bullets && bullets.length > 0) ? bullets : ['Step 1: Execute command on keyboard', 'Step 2: Pick selection boundary', 'Step 3: Press Enter to execute'];
+
+    itemsToRender.forEach((bulletText, index) => {
+      const markerSymbol = getMarkerSymbol(markerStyle, index);
+      const row = document.createElement('div');
+      row.className = 'step-input-row';
+      row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+      row.innerHTML = `
+        <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${markerSymbol}</span>
+        <input type="text" class="step-input" placeholder="Item ${index + 1}" value="${bulletText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+        <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+      `;
+      stepsContainer.appendChild(row);
+      if (typeof bindStepRowEvents === 'function') bindStepRowEvents(row);
+    });
   }
 
   function syncScriptTextToFormFields() {
     if (!liveScriptInput || !liveScriptInput.value.trim()) return;
-    const parsed = parseRawTextToPosts(liveScriptInput.value.trim());
+    const rawText = liveScriptInput.value.trim();
+    const parsed = parseRawTextToPosts(rawText);
     if (parsed.length > 0) {
       const item = parsed[0];
-      if (item.software && contentSoftwareSelect) contentSoftwareSelect.value = item.software;
+
+      if (item.software && contentSoftwareSelect) {
+        let optExists = Array.from(contentSoftwareSelect.options).some(opt => opt.value.toLowerCase() === item.software.toLowerCase());
+        if (!optExists) {
+          const newOpt = document.createElement('option');
+          newOpt.value = item.software;
+          newOpt.textContent = item.software;
+          contentSoftwareSelect.appendChild(newOpt);
+        }
+        contentSoftwareSelect.value = item.software;
+      }
+
       if (item.keys && contentKeysInput) contentKeysInput.value = item.keys;
       if (item.symbol && document.getElementById('content-symbol')) document.getElementById('content-symbol').value = item.symbol;
       if (item.action && contentActionInput) contentActionInput.value = item.action;
@@ -3395,6 +3414,9 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
       if (item.category && document.getElementById('content-category')) document.getElementById('content-category').value = item.category;
       if (item.hashtags && contentHashtagsInput) contentHashtagsInput.value = item.hashtags;
 
+      if (item.imageUrl && document.getElementById('content-image-url')) document.getElementById('content-image-url').value = item.imageUrl;
+      if (item.imagePos && document.getElementById('image-position-select')) document.getElementById('image-position-select').value = item.imagePos;
+
       if (item.bullets && item.bullets.length > 0) {
         setStepValues(item.bullets);
       }
@@ -3403,6 +3425,8 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
 
       // Upsert full item into calendarDb & LocalStorage
       const updatedItem = getActiveEditorAsItem();
+      if (item.id) updatedItem.id = item.id;
+
       const existingIdx = calendarDb.findIndex(i => (i.id && i.id === updatedItem.id) || Number(i.day) === Number(updatedItem.day));
       if (existingIdx >= 0) {
         calendarDb[existingIdx] = { ...calendarDb[existingIdx], ...updatedItem };
@@ -3417,13 +3441,16 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
   }
 
   if (liveScriptInput) {
-    liveScriptInput.addEventListener('input', () => {
-      syncScriptTextToFormFields();
+    ['input', 'change', 'paste'].forEach(evt => {
+      liveScriptInput.addEventListener(evt, () => {
+        setTimeout(syncScriptTextToFormFields, 50);
+      });
     });
   }
 
   if (btnSyncScriptToForm) {
-    btnSyncScriptToForm.addEventListener('click', () => {
+    btnSyncScriptToForm.addEventListener('click', (e) => {
+      e.preventDefault();
       syncScriptTextToFormFields();
       showToast("✅ Form, Card & Database JSON updated!", "success");
 
