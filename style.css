@@ -1448,11 +1448,11 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
 /* ═══════════════════════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════════════════════ */
-@media (max-width: 1200px) {
+@media (max-width: 800px) {
   .studio-layout { grid-template-columns: 1fr; }
-  .preview-panel { align-items: center; position: sticky; top: 10px; z-index: 25; order: -1; margin-bottom: 16px; }
-  #canvas-wrapper-square { width: 380px; height: 380px; }
-  #canvas-wrapper-square #instagram-post-canvas { transform: scale(0.35185); }
+  .preview-panel { align-items: center; position: relative; order: -1; margin-bottom: 16px; }
+  #canvas-wrapper-square { width: 320px; height: 320px; }
+  #canvas-wrapper-square #instagram-post-canvas { transform: scale(0.29629); }
 }
 @media (max-width: 900px) {
   body { overflow-y: auto; height: auto; }
