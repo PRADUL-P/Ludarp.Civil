@@ -2922,6 +2922,53 @@ function resetCreatorStudioForm() {
     });
   }
 
+  // ── Custom Software Adder ──────────────────────────────────────────────────
+  const btnAddSoftware = document.getElementById('btn-add-software');
+  const contentSoftware = document.getElementById('content-software');
+
+  function loadCustomSoftwares() {
+    const customList = JSON.parse(localStorage.getItem('ludarp_custom_softwares')) || [];
+    customList.forEach(swName => {
+      if (contentSoftware && !contentSoftware.querySelector(`option[value="${swName}"]`)) {
+        const opt = document.createElement('option');
+        opt.value = swName;
+        opt.textContent = swName;
+        contentSoftware.appendChild(opt);
+      }
+
+      const dbFilterSoftware = document.getElementById('db-filter-software');
+      if (dbFilterSoftware && !dbFilterSoftware.querySelector(`option[value="${swName}"]`)) {
+        const opt = document.createElement('option');
+        opt.value = swName;
+        opt.textContent = swName;
+        dbFilterSoftware.appendChild(opt);
+      }
+    });
+  }
+
+  if (btnAddSoftware && contentSoftware) {
+    btnAddSoftware.addEventListener('click', () => {
+      const newSoftware = prompt("Enter new software name (e.g. Rhino, STAAD Pro, Blender, Tekla, Archicad):");
+      if (!newSoftware || !newSoftware.trim()) return;
+
+      const swName = newSoftware.trim();
+      const customList = JSON.parse(localStorage.getItem('ludarp_custom_softwares')) || [];
+
+      if (!customList.includes(swName)) {
+        customList.push(swName);
+        localStorage.setItem('ludarp_custom_softwares', JSON.stringify(customList));
+      }
+
+      loadCustomSoftwares();
+      contentSoftware.value = swName;
+      contentSoftware.dispatchEvent(new Event('change'));
+
+      showToast(`✅ Added "${swName}" to Software list!`, 'success');
+    });
+  }
+
+  loadCustomSoftwares();
+
   // Overlay & Pattern Controls Initialization
   const overlayGridPattern = document.getElementById('overlay-grid-pattern');
   const overlayToggleCropmarks = document.getElementById('overlay-toggle-cropmarks');

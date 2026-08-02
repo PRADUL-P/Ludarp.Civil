@@ -316,7 +316,12 @@
 
               <div class="form-row">
                 <div class="form-group">
-                  <label for="content-software">Software</label>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <label for="content-software" style="margin:0;">Software</label>
+                    <button type="button" id="btn-add-software" title="Add Custom Software" style="padding:2px 8px; font-size:0.75rem; font-weight:800; background:var(--accent); color:#000; border:none; border-radius:6px; cursor:pointer;">
+                      + Add
+                    </button>
+                  </div>
                   <select id="content-software">
                     <option value="AutoCAD">AutoCAD</option>
                     <option value="Revit">Revit</option>
