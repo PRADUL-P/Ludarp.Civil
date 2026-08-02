@@ -175,17 +175,24 @@ const defaultShortcuts = [
   }
 ];
 
-// Purge old cached sample data from localStorage on load if needed
-if (localStorage.getItem('ludarp_calendar_db_v2_cleared') !== 'true') {
-  localStorage.removeItem('ludarp_calendar_db');
-  localStorage.removeItem('ludarp_shortcuts');
-  localStorage.removeItem('ludarp_completed_calendar');
-  localStorage.setItem('ludarp_calendar_db_v2_cleared', 'true');
+function safeJsonParse(key, fallback = []) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed !== null && parsed !== undefined ? parsed : fallback;
+  } catch (e) {
+    console.warn(`Failed to parse localStorage key '${key}', using fallback:`, e);
+    return fallback;
+  }
 }
 
+<<<<<<< HEAD
 // Load clean single database array
 let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || JSON.parse(localStorage.getItem('ludarp_shortcuts')) || [];
 
+=======
+>>>>>>> 27b165e (Add safeJsonParse protection for all localStorage reads to prevent corrupted cache load crashes)
 // Fallback to preloaded data if local storage is empty
 const defaultData = (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar) && autocadCalendar.length > 0)
   ? autocadCalendar
@@ -193,16 +200,31 @@ const defaultData = (typeof autocadCalendar !== 'undefined' && Array.isArray(aut
     ? CALENDAR_DATA_FROM_FILE
     : []);
 
+// Load clean database arrays safely
+let calendarDb = safeJsonParse('ludarp_calendar_db', []);
+if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
+  calendarDb = safeJsonParse('ludarp_shortcuts', []);
+}
+
 if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
   if (defaultData.length > 0) {
     calendarDb = JSON.parse(JSON.stringify(defaultData));
   }
 }
 
+<<<<<<< HEAD
 // Single Unified Database: shortcutDb references calendarDb
 let shortcutDb = calendarDb;
 localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
 localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
+=======
+// Single Unified Database: shortcutDb references calendarDb directly
+let shortcutDb = calendarDb;
+try {
+  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+  localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
+} catch(e) {}
+>>>>>>> 27b165e (Add safeJsonParse protection for all localStorage reads to prevent corrupted cache load crashes)
 
 // State variables
 let currentFormat = "square"; // "square" or "story"
@@ -1832,7 +1854,9 @@ if (btnSaveResearchToHub) {
 // 10.7 Content Calendar Manager Logic
 // ==========================================================================
 
-let completedCalendarDays = new Set(JSON.parse(localStorage.getItem('ludarp_completed_calendar')) || []);
+let rawCompleted = safeJsonParse('ludarp_completed_calendar', []);
+if (!Array.isArray(rawCompleted)) rawCompleted = [];
+let completedCalendarDays = new Set(rawCompleted.map(String));
 
 function renderCalendarHub() {
   const selectedPhase = calendarPhaseSelect.value;
