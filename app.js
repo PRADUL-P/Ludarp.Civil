@@ -2993,7 +2993,7 @@ function duplicateCurrentCalendarItem() {
     software: currentItem ? currentItem.software : (contentSoftwareSelect ? contentSoftwareSelect.value : 'AutoCAD'),
     format: currentItem ? currentItem.format : 'post',
     phase: currentItem ? currentItem.phase : 'basics',
-    creatorHandle: currentItem ? currentItem.creatorHandle : 'civilcut',
+    creatorHandle: currentItem ? currentItem.creatorHandle : 'ludarp.civil',
     hashtags: currentItem ? currentItem.hashtags : '#autocad #civilengineering #drafting',
     proTip: currentItem ? currentItem.proTip : 'Save for later!',
     bullets: ['Step 1: Enter command key on keyboard', 'Step 2: Pick selection boundary', 'Step 3: Press Enter to execute']
