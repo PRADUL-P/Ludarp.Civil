@@ -3304,56 +3304,23 @@ const importerParsedCount = document.getElementById('importer-parsed-count');
 
 let currentParsedPosts = [];
 
+// Format skeleton only — no content. User provides their own posts.
 const EXAMPLE_POST_TEXT = `ID: AC-001
 Software: AutoCAD
-Shortcut: F8 / ORTHO
-Action: Turn On Ortho Mode
+Shortcut: 
+Action: 
 Category: Drawing
 Difficulty: Beginner
 Version: AutoCAD 2025
-Description: Locks your cursor to perfectly horizontal or vertical movement — the first thing every beginner should learn before drawing anything.
+Description: 
 Steps:
-1. Press F8 to toggle Ortho mode on or off.
-2. With Ortho on, start any draw command like LINE.
-3. Move your mouse — notice it only snaps to 0°, 90°, 180°, or 270°.
-Pro Tip: Ortho is great for walls and straight layouts, but turn it off (F8 again) when you need angled lines.
-Common Mistake: Leaving Ortho ON while trying to draw angled lines.
-Related Commands: LINE, POLAR, OSNAP
-Hashtags: #autocad #autocadbasics #beginnertips #cadforbeginners
----
-ID: AC-002
-Software: AutoCAD
-Shortcut: F3 / OSNAP
-Action: Turn On Object Snap
-Category: Drawing
-Difficulty: Beginner
-Version: AutoCAD 2025
-Description: Makes your cursor automatically snap to precise points like endpoints, midpoints, and intersections — essential for accurate drawings.
-Steps:
-1. Press F3 to toggle Object Snap on or off.
-2. Right-click the OSNAP icon in the status bar and choose snap points.
-3. Start drawing — your cursor will show a colored marker when snapping.
-Pro Tip: Beginners should start with just Endpoint, Midpoint, and Intersection enabled.
-Common Mistake: Keeping all 14 snap points active at once, causing cursor jumping.
-Related Commands: LINE, ORTHO, AUTOSNAP
-Hashtags: #autocad #osnap #cadbasics #beginnertips #drafting
----
-ID: AC-003
-Software: AutoCAD
-Shortcut: L
-Action: Draw a Line
-Category: Drawing
-Difficulty: Beginner
-Version: AutoCAD 2025
-Description: Creates a straight line segment between two or more points — the single most-used command in AutoCAD.
-Steps:
-1. Type 'L' and hit Enter (or Spacebar).
-2. Click your starting point in the drawing area.
-3. Click your endpoint, then press Enter to finish.
-Pro Tip: Hold Shift while drawing to temporarily snap to orthogonal (90°) angles.
-Common Mistake: Forgetting to press Enter or Spacebar to confirm the command.
-Related Commands: PLINE, RAY, XLINE
-Hashtags: #autocad #linecommand #cadbasics #beginnertips`;
+1. 
+2. 
+3. 
+Pro Tip: 
+Common Mistake: 
+Related Commands: 
+Hashtags: #autocad`;
 
 if (btnImporterLoadExample) {
   btnImporterLoadExample.addEventListener('click', () => {
