@@ -502,6 +502,29 @@
               </div>
             </div>
 
+            <!-- Live Script Editor Section -->
+            <div class="live-script-section" style="padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px;">
+              <div class="settings-section-header" id="toggle-live-script-settings" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                <label class="theme-section-label" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                  <span>📜</span> Live Script Code Editor
+                </label>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:0.7rem; color:var(--accent); font-weight:700;">TOGGLE SCRIPT</span>
+                  <svg id="arrow-live-script" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
+
+              <div id="live-script-body" style="display:none; margin-top:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600;">Edit script below to update card live:</span>
+                  <button type="button" id="btn-sync-script-to-form" style="padding:2px 8px; font-size:0.72rem; font-weight:800; background:var(--accent); color:#000; border:none; border-radius:6px; cursor:pointer;">
+                    🔄 Sync to Form
+                  </button>
+                </div>
+                <textarea id="live-script-editor-input" rows="12" style="width:100%; font-family:var(--font-mono); font-size:0.8rem; line-height:1.5; background:var(--bg-tertiary); color:var(--accent-green); border:1px solid var(--border); border-radius:var(--r-md); padding:10px;" placeholder="Raw script text..."></textarea>
+              </div>
+            </div>
+
             <!-- Style Themes -->
             <div class="style-themes-section">
               <label class="theme-section-label">Visual Theme</label>

@@ -476,6 +476,10 @@ function updateCardPreview() {
   if (cardWatermark) {
     cardWatermark.textContent = watermarkMap[softwareVal] || softwareVal.charAt(0).toUpperCase();
   }
+
+  if (typeof refreshLiveScriptEditor === 'function') {
+    refreshLiveScriptEditor();
+  }
 }
 
 // Bind event listeners to input elements for real-time visual syncing and database auto-saving
@@ -3192,6 +3196,65 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
       contentProTipInput.focus();
       contentProTipInput.dispatchEvent(new Event('input'));
       showToast("💡 Added extra Pro Tip line!");
+    });
+  }
+
+  // ── Live Script Code Editor Toggle & Bi-directional Sync Engine ──────────
+  const toggleLiveScriptSettings = document.getElementById('toggle-live-script-settings');
+  const liveScriptBody = document.getElementById('live-script-body');
+  const arrowLiveScript = document.getElementById('arrow-live-script');
+  const liveScriptInput = document.getElementById('live-script-editor-input');
+  const btnSyncScriptToForm = document.getElementById('btn-sync-script-to-form');
+
+  window.refreshLiveScriptEditor = function() {
+    if (liveScriptBody && liveScriptBody.style.display !== 'none' && liveScriptInput && document.activeElement !== liveScriptInput) {
+      const activeItem = getActiveEditorAsItem();
+      liveScriptInput.value = generateScriptTextFromItem(activeItem);
+    }
+  };
+
+  if (toggleLiveScriptSettings && liveScriptBody) {
+    toggleLiveScriptSettings.addEventListener('click', () => {
+      const isHidden = liveScriptBody.style.display === 'none';
+      liveScriptBody.style.display = isHidden ? 'block' : 'none';
+      if (arrowLiveScript) arrowLiveScript.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+      if (isHidden) window.refreshLiveScriptEditor();
+    });
+  }
+
+  function syncScriptTextToFormFields() {
+    if (!liveScriptInput || !liveScriptInput.value.trim()) return;
+    const parsed = parseRawTextToPosts(liveScriptInput.value.trim());
+    if (parsed.length > 0) {
+      const item = parsed[0];
+      if (item.software && contentSoftwareSelect) contentSoftwareSelect.value = item.software;
+      if (item.keys && contentKeysInput) contentKeysInput.value = item.keys;
+      if (item.symbol && document.getElementById('content-symbol')) document.getElementById('content-symbol').value = item.symbol;
+      if (item.action && contentActionInput) contentActionInput.value = item.action;
+      if (item.desc && contentDescInput) contentDescInput.value = item.desc;
+      if (item.proTip && contentProTipInput) contentProTipInput.value = item.proTip;
+      if (item.commonMistake && document.getElementById('content-common-mistake')) document.getElementById('content-common-mistake').value = item.commonMistake;
+      if (item.difficulty && document.getElementById('content-difficulty')) document.getElementById('content-difficulty').value = item.difficulty;
+      if (item.category && document.getElementById('content-category')) document.getElementById('content-category').value = item.category;
+
+      if (item.bullets && item.bullets.length > 0) {
+        setStepValues(item.bullets);
+      }
+
+      updateCardPreview();
+    }
+  }
+
+  if (liveScriptInput) {
+    liveScriptInput.addEventListener('input', () => {
+      syncScriptTextToFormFields();
+    });
+  }
+
+  if (btnSyncScriptToForm) {
+    btnSyncScriptToForm.addEventListener('click', () => {
+      syncScriptTextToFormFields();
+      showToast("✅ Form & Card updated from Raw Script!", "success");
     });
   }
 
