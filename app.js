@@ -3362,6 +3362,23 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
     });
   }
 
+  function setStepValues(bullets) {
+    const stepsContainer = document.getElementById('steps-container');
+    if (!stepsContainer) return;
+    stepsContainer.innerHTML = '';
+    if (bullets && bullets.length > 0) {
+      bullets.forEach(text => {
+        if (typeof addStepInput === 'function') addStepInput(text);
+      });
+    } else {
+      if (typeof addStepInput === 'function') {
+        addStepInput('');
+        addStepInput('');
+        addStepInput('');
+      }
+    }
+  }
+
   function syncScriptTextToFormFields() {
     if (!liveScriptInput || !liveScriptInput.value.trim()) return;
     const parsed = parseRawTextToPosts(liveScriptInput.value.trim());
@@ -3376,6 +3393,7 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
       if (item.commonMistake && document.getElementById('content-common-mistake')) document.getElementById('content-common-mistake').value = item.commonMistake;
       if (item.difficulty && document.getElementById('content-difficulty')) document.getElementById('content-difficulty').value = item.difficulty;
       if (item.category && document.getElementById('content-category')) document.getElementById('content-category').value = item.category;
+      if (item.hashtags && contentHashtagsInput) contentHashtagsInput.value = item.hashtags;
 
       if (item.bullets && item.bullets.length > 0) {
         setStepValues(item.bullets);
@@ -3937,9 +3955,9 @@ function parseRawTextToPosts(rawText) {
   if (!rawText || !rawText.trim()) return [];
   let blocks = rawText.split(/---+/);
 
-  // Auto-split multi-post blocks if '---' separators are omitted
-  if (blocks.length === 1 && (rawText.match(/(?:ID|Software|Shortcut|Action):/gi) || []).length > 1) {
-    blocks = rawText.split(/(?=(?:ID|Software|Shortcut|Action):)/i);
+  // Auto-split multi-post blocks if '---' separators are omitted (ONLY split on ID:)
+  if (blocks.length === 1 && (rawText.match(/(?:^|\n)ID:\s*/gi) || []).length > 1) {
+    blocks = rawText.split(/(?=(?:^|\n)ID:\s*)/i);
   }
 
   const parsed = [];
