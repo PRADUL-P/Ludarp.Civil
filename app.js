@@ -3382,6 +3382,19 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
       }
 
       updateCardPreview();
+
+      // Upsert full item into calendarDb & LocalStorage
+      const updatedItem = getActiveEditorAsItem();
+      const existingIdx = calendarDb.findIndex(i => (i.id && i.id === updatedItem.id) || Number(i.day) === Number(updatedItem.day));
+      if (existingIdx >= 0) {
+        calendarDb[existingIdx] = { ...calendarDb[existingIdx], ...updatedItem };
+      } else {
+        calendarDb.push(updatedItem);
+      }
+      localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+      if (typeof renderDatabaseManagerTable === 'function') {
+        renderDatabaseManagerTable();
+      }
     }
   }
 
@@ -3394,7 +3407,12 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
   if (btnSyncScriptToForm) {
     btnSyncScriptToForm.addEventListener('click', () => {
       syncScriptTextToFormFields();
-      showToast("✅ Form & Card updated from Raw Script!", "success");
+      showToast("✅ Form, Card & Database JSON updated!", "success");
+
+      // Auto-push updated JSON payload to Google Sheet Cloud
+      if (typeof window.pushPostsToGoogleSheet === 'function') {
+        window.pushPostsToGoogleSheet(false);
+      }
     });
   }
 
@@ -4607,62 +4625,60 @@ if (btnGsheetFetch) {
 
 // Push posts TO Google Sheet
 // Google Apps Script blocks direct CORS POST from browsers.
-// Strategy: send as a form POST via a hidden iframe which bypasses CORS entirely.
+window.pushPostsToGoogleSheet = function(silent = false) {
+  const gsheetApiUrlInput = document.getElementById('gsheet-api-url');
+  const url = (gsheetApiUrlInput && gsheetApiUrlInput.value.trim()) ? gsheetApiUrlInput.value.trim() : (localStorage.getItem('ludarp_gsheet_url') || LUDARP_GSHEET_DEFAULT_URL);
+  if (!url) {
+    if (!silent) showToast('⚠️ Please enter your Google Apps Script Web App URL first.', 'error');
+    return;
+  }
+  if (calendarDb.length === 0) {
+    if (!silent) showToast('⚠️ No posts to push. Add posts first!', 'error');
+    return;
+  }
+
+  try {
+    if (!silent) showToast('⏳ Pushing updated JSON data to Google Sheet...', 'info');
+
+    const oldForm = document.getElementById('gsheet-push-form');
+    const oldFrame = document.getElementById('gsheet-push-frame');
+    if (oldForm) oldForm.remove();
+    if (oldFrame) oldFrame.remove();
+
+    const iframe = document.createElement('iframe');
+    iframe.name = 'gsheet-push-frame';
+    iframe.id = 'gsheet-push-frame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.id = 'gsheet-push-form';
+    form.method = 'POST';
+    form.action = url;
+    form.target = 'gsheet-push-frame';
+    form.style.display = 'none';
+
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'data';
+    input.value = JSON.stringify(calendarDb);
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit();
+
+    setTimeout(() => {
+      showToast(`📊 Updated JSON (${calendarDb.length} posts) synced to Google Sheet!`, 'success');
+    }, 2000);
+
+  } catch (err) {
+    console.error('Google Sheet Push Error:', err);
+    if (!silent) showToast('❌ Push failed: ' + err.message, 'error');
+  }
+};
+
 if (btnGsheetPush) {
-  btnGsheetPush.onclick = () => {
-    const url = gsheetApiUrlInput ? gsheetApiUrlInput.value.trim() : '';
-    if (!url) {
-      showToast('⚠️ Please enter your Google Apps Script Web App URL first.', 'error');
-      return;
-    }
-    if (calendarDb.length === 0) {
-      showToast('⚠️ No posts to push. Add posts first!', 'error');
-      return;
-    }
-
-    try {
-      showToast('⏳ Pushing posts to Google Sheet via form bridge...', 'info');
-
-      // Remove any old hidden form/iframe
-      const oldForm = document.getElementById('gsheet-push-form');
-      const oldFrame = document.getElementById('gsheet-push-frame');
-      if (oldForm) oldForm.remove();
-      if (oldFrame) oldFrame.remove();
-
-      // Create a hidden iframe as target (avoids page navigation)
-      const iframe = document.createElement('iframe');
-      iframe.name = 'gsheet-push-frame';
-      iframe.id = 'gsheet-push-frame';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-
-      // Create a hidden form that posts to the Apps Script URL
-      const form = document.createElement('form');
-      form.id = 'gsheet-push-form';
-      form.method = 'POST';
-      form.action = url;
-      form.target = 'gsheet-push-frame';
-      form.style.display = 'none';
-
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'data';
-      input.value = JSON.stringify(calendarDb);
-      form.appendChild(input);
-
-      document.body.appendChild(form);
-      form.submit();
-
-      // Show success after short delay (form submission is fire-and-forget)
-      setTimeout(() => {
-        showToast(`📤 Pushed ${calendarDb.length} posts to Google Sheet! Check your sheet to confirm rows appeared.`, 'success');
-      }, 2500);
-
-    } catch (err) {
-      console.error('Google Sheet Push Error:', err);
-      showToast('❌ Push failed: ' + err.message, 'error');
-    }
-  };
+  btnGsheetPush.onclick = () => window.pushPostsToGoogleSheet(false);
 }
 
 // ==========================================================================
