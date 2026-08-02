@@ -2602,14 +2602,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Layout Adjuster Controls Initialization
   const layoutTitleFont = document.getElementById('layout-title-font');
   const layoutTitleSize = document.getElementById('layout-title-size');
+  const layoutGridSize = document.getElementById('layout-grid-size');
   const layoutProtipRot = document.getElementById('layout-protip-rot');
   const layoutWatermarkOp = document.getElementById('layout-watermark-op');
   const layoutWatermarkSize = document.getElementById('layout-watermark-size');
+  const layoutToggleGrid = document.getElementById('layout-toggle-grid');
   const layoutToggleProtip = document.getElementById('layout-toggle-protip');
   const layoutToggleWatermark = document.getElementById('layout-toggle-watermark');
   const layoutToggleBookmark = document.getElementById('layout-toggle-bookmark');
 
   const valTitleSize = document.getElementById('val-title-size');
+  const valGridSize = document.getElementById('val-grid-size');
   const valProtipRot = document.getElementById('val-protip-rot');
   const valWatermarkOp = document.getElementById('val-watermark-op');
   const valWatermarkSize = document.getElementById('val-watermark-size');
@@ -2624,6 +2627,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     layoutTitleSize.addEventListener('input', () => {
       if (valTitleSize) valTitleSize.textContent = layoutTitleSize.value;
       if (cardAction) cardAction.style.fontSize = `${layoutTitleSize.value}px`;
+    });
+  }
+
+  if (layoutGridSize) {
+    layoutGridSize.addEventListener('input', () => {
+      if (valGridSize) valGridSize.textContent = layoutGridSize.value;
+      const bgGrid = instagramCard ? instagramCard.querySelector('.card-bg-grid') : null;
+      if (bgGrid) bgGrid.style.backgroundSize = `${layoutGridSize.value}px ${layoutGridSize.value}px`;
     });
   }
 
@@ -2646,6 +2657,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     layoutWatermarkSize.addEventListener('input', () => {
       if (valWatermarkSize) valWatermarkSize.textContent = layoutWatermarkSize.value;
       if (cardWatermark) cardWatermark.style.fontSize = `${layoutWatermarkSize.value}px`;
+    });
+  }
+
+  if (layoutToggleGrid) {
+    layoutToggleGrid.addEventListener('change', () => {
+      const bgGrid = instagramCard ? instagramCard.querySelector('.card-bg-grid') : null;
+      if (bgGrid) bgGrid.style.display = layoutToggleGrid.checked ? 'block' : 'none';
     });
   }
 

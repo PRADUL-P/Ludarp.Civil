@@ -987,7 +987,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
 }
 .theme-amber .card-bg-grid { background-image: linear-gradient(to right, rgba(245,158,11,0.12) 1.5px, transparent 1.5px), linear-gradient(to bottom, rgba(245,158,11,0.12) 1.5px, transparent 1.5px); background-size: 45px 45px; }
 .theme-amber .software-badge { background: rgba(245,158,11,0.15); border: 2px solid #f59e0b; color: #f59e0b; font-family: 'Big Shoulders Stencil Text', sans-serif; font-weight: 900; }
-.theme-amber .action-title { color: #fef3c7; font-family: 'Big Shoulders Stencil Text', sans-serif; font-weight: 900; }
+.theme-amber .action-title { color: #fef3c7; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-transform: uppercase; }
 .theme-amber .card-step-num { border: 2px solid #f59e0b; color: #f59e0b; background: #1c1407; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; box-shadow: 0 0 0 6px #1c1407; z-index: 2; }
 .theme-amber .card-steps { position: relative; }
 .theme-amber .card-steps::before { content: ''; position: absolute; left: 22px; top: 15px; bottom: 15px; width: 2px; background: rgba(245,158,11,0.25); z-index: 1; }
@@ -995,12 +995,61 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
 .theme-amber .pro-tip-tag { background: #f59e0b; color: #000; border: 1px solid #f59e0b; }
 .theme-amber .pro-tip-text { font-family: 'Chakra Petch', sans-serif; font-weight: 700; color: #1e293b !important; }
 .theme-amber .cta-message { color: #f59e0b; }
-.theme-amber .cad-title-block { border-color: #92400e; }
-.theme-amber .tb-cell { border-color: #92400e; }
-.theme-amber .tb-row { border-color: #92400e; }
-.theme-amber .tb-label { color: rgba(254,243,199,0.5); }
-.theme-amber .tb-value { color: #fef3c7; }
 .theme-amber .card-description { color: rgba(254,243,199,0.7); }
+
+/* Emerald Matrix */
+.instagram-card.theme-emerald {
+  background: linear-gradient(160deg, #061d15, #0b3425) !important;
+  color: #ecfdf5 !important;
+  border: 3px solid #059669;
+}
+.theme-emerald .card-bg-grid { background-image: linear-gradient(to right, rgba(16,185,129,0.15) 1.5px, transparent 1.5px), linear-gradient(to bottom, rgba(16,185,129,0.15) 1.5px, transparent 1.5px); background-size: 45px 45px; }
+.theme-emerald .software-badge { background: rgba(16,185,129,0.15); border: 2px solid #10b981; color: #10b981; font-family: 'Big Shoulders Stencil Text', sans-serif; font-weight: 900; }
+.theme-emerald .action-title { color: #ecfdf5; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-transform: uppercase; }
+.theme-emerald .card-step-num { border: 2px solid #10b981; color: #10b981; background: #061d15; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; box-shadow: 0 0 0 6px #061d15; z-index: 2; }
+.theme-emerald .card-steps { position: relative; }
+.theme-emerald .card-steps::before { content: ''; position: absolute; left: 22px; top: 15px; bottom: 15px; width: 2px; background: rgba(16,185,129,0.3); z-index: 1; }
+.theme-emerald .pro-tip-box { background: #fef08a !important; color: #1e1b4b !important; box-shadow: 5px 15px 30px rgba(0,0,0,0.35); transform: rotate(-0.8deg); border-radius: 4px; }
+.theme-emerald .pro-tip-tag { background: #10b981; color: #000; border: 1px solid #10b981; }
+.theme-emerald .pro-tip-text { font-family: 'Chakra Petch', sans-serif; font-weight: 700; color: #1e293b !important; }
+.theme-emerald .cta-message { color: #10b981; }
+.theme-emerald .card-description { color: rgba(236,253,245,0.75); }
+
+/* Cyber Neon */
+.instagram-card.theme-cyber {
+  background: linear-gradient(160deg, #13091e, #230f38) !important;
+  color: #f5f3ff !important;
+  border: 3px solid #9333ea;
+}
+.theme-cyber .card-bg-grid { background-image: linear-gradient(to right, rgba(192,132,252,0.15) 1.5px, transparent 1.5px), linear-gradient(to bottom, rgba(192,132,252,0.15) 1.5px, transparent 1.5px); background-size: 45px 45px; }
+.theme-cyber .software-badge { background: rgba(192,132,252,0.15); border: 2px solid #c084fc; color: #c084fc; font-family: 'Big Shoulders Stencil Text', sans-serif; font-weight: 900; }
+.theme-cyber .action-title { color: #38bdf8; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-transform: uppercase; text-shadow: 0 0 15px rgba(56,189,248,0.4); }
+.theme-cyber .card-step-num { border: 2px solid #c084fc; color: #c084fc; background: #13091e; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; box-shadow: 0 0 0 6px #13091e; z-index: 2; }
+.theme-cyber .card-steps { position: relative; }
+.theme-cyber .card-steps::before { content: ''; position: absolute; left: 22px; top: 15px; bottom: 15px; width: 2px; background: rgba(192,132,252,0.3); z-index: 1; }
+.theme-cyber .pro-tip-box { background: #fef08a !important; color: #1e1b4b !important; box-shadow: 5px 15px 30px rgba(0,0,0,0.4); transform: rotate(1deg); border-radius: 4px; }
+.theme-cyber .pro-tip-tag { background: #c084fc; color: #000; border: 1px solid #c084fc; }
+.theme-cyber .pro-tip-text { font-family: 'Chakra Petch', sans-serif; font-weight: 700; color: #1e293b !important; }
+.theme-cyber .cta-message { color: #38bdf8; }
+.theme-cyber .card-description { color: rgba(245,243,255,0.8); }
+
+/* Parchment Sand */
+.instagram-card.theme-parchment {
+  background: #f8f6f0 !important;
+  color: #1e293b !important;
+  border: 3px solid #d97706;
+}
+.theme-parchment .card-bg-grid { background-image: linear-gradient(to right, rgba(180,140,90,0.15) 1.5px, transparent 1.5px), linear-gradient(to bottom, rgba(180,140,90,0.15) 1.5px, transparent 1.5px); background-size: 45px 45px; }
+.theme-parchment .software-badge { background: rgba(217,119,6,0.12); border: 2px solid #d97706; color: #b45309; font-family: 'Big Shoulders Stencil Text', sans-serif; font-weight: 900; }
+.theme-parchment .action-title { color: #0f172a; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-transform: uppercase; }
+.theme-parchment .card-step-num { border: 2px solid #d97706; color: #d97706; background: #f8f6f0; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; box-shadow: 0 0 0 6px #f8f6f0; z-index: 2; }
+.theme-parchment .card-steps { position: relative; }
+.theme-parchment .card-steps::before { content: ''; position: absolute; left: 22px; top: 15px; bottom: 15px; width: 2px; background: rgba(217,119,6,0.3); z-index: 1; }
+.theme-parchment .pro-tip-box { background: #fef08a !important; color: #1e1b4b !important; box-shadow: 4px 12px 25px rgba(0,0,0,0.2); transform: rotate(-1deg); border-radius: 4px; }
+.theme-parchment .pro-tip-tag { background: #d97706; color: #fff; border: 1px solid #d97706; }
+.theme-parchment .pro-tip-text { font-family: 'Chakra Petch', sans-serif; font-weight: 700; color: #1e293b !important; }
+.theme-parchment .cta-message { color: #b45309; }
+.theme-parchment .card-description { color: #475569; }
 
 /* Custom */
 .instagram-card.theme-custom { /* Inline JS styles */ }
