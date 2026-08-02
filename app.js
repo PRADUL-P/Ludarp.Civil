@@ -3545,8 +3545,8 @@ function parseRawTextToPosts(rawText) {
   let blocks = rawText.split(/---+/);
 
   // Auto-split multi-post blocks if '---' separators are omitted
-  if (blocks.length === 1 && (rawText.match(/Software:|Shortcut:|Action:/gi) || []).length > 1) {
-    blocks = rawText.split(/(?=(?:Software|Shortcut|Action):)/i);
+  if (blocks.length === 1 && (rawText.match(/(?:ID|Software|Shortcut|Action):/gi) || []).length > 1) {
+    blocks = rawText.split(/(?=(?:ID|Software|Shortcut|Action):)/i);
   }
 
   const parsed = [];
@@ -3555,78 +3555,130 @@ function parseRawTextToPosts(rawText) {
     const lines = block.split('\n').map(l => l.trim()).filter(l => l);
     if (lines.length === 0) return;
 
-    let sw = 'AutoCAD';
+    let sw = 'Ludarp Civil Studio';
     let shortcut = '';
     let action = '';
-    let desc = '';
+    let descLines = [];
     let steps = [];
-    let protip = '';
-    let commonMistake = '';
-    let category = 'Drawing';
-    let difficulty = 'Beginner';
+    let protipLines = [];
+    let mistakeLines = [];
+    let category = 'Introduction';
+    let difficulty = 'Everyone';
     let relatedCommands = [];
-    let version = 'AutoCAD 2025';
-    let hashtags = '';
+    let version = '2026';
+    let hashtagLines = [];
     let customId = '';
 
-    let inSteps = false;
+    let currentField = '';
 
     lines.forEach(line => {
+      // Field Header Detectors
       if (/^id:/i.test(line)) {
-        customId = line.split(/:(.+)/)[1].trim();
+        currentField = 'id';
+        const val = line.replace(/^id:\s*/i, '').trim();
+        if (val) customId = val;
       } else if (/^software:/i.test(line)) {
-        sw = line.split(/:(.+)/)[1].trim();
+        currentField = 'software';
+        const val = line.replace(/^software:\s*/i, '').trim();
+        if (val) sw = val;
       } else if (/^shortcut:/i.test(line)) {
-        shortcut = line.split(/:(.+)/)[1].trim();
+        currentField = 'shortcut';
+        const val = line.replace(/^shortcut:\s*/i, '').trim();
+        if (val) shortcut = val;
       } else if (/^action:/i.test(line)) {
-        action = line.split(/:(.+)/)[1].trim();
+        currentField = 'action';
+        const val = line.replace(/^action:\s*/i, '').trim();
+        if (val) action = val;
       } else if (/^category:/i.test(line)) {
-        category = line.split(/:(.+)/)[1].trim();
+        currentField = 'category';
+        const val = line.replace(/^category:\s*/i, '').trim();
+        if (val) category = val;
       } else if (/^difficulty:/i.test(line)) {
-        difficulty = line.split(/:(.+)/)[1].trim();
-      } else if (/^description:/i.test(line)) {
-        desc = line.split(/:(.+)/)[1].trim();
-        inSteps = false;
-      } else if (/^steps:/i.test(line)) {
-        inSteps = true;
-      } else if (/^pro tip:/i.test(line) || /^protip:/i.test(line)) {
-        protip = line.split(/:(.+)/)[1].trim();
-        inSteps = false;
-      } else if (/^common mistake:/i.test(line) || /^mistake:/i.test(line)) {
-        commonMistake = line.split(/:(.+)/)[1].trim();
-        inSteps = false;
-      } else if (/^related commands:/i.test(line) || /^related:/i.test(line)) {
-        const rawRel = line.split(/:(.+)/)[1].trim();
-        relatedCommands = rawRel.split(',').map(s => s.trim()).filter(s => s);
-        inSteps = false;
+        currentField = 'difficulty';
+        const val = line.replace(/^difficulty:\s*/i, '').trim();
+        if (val) difficulty = val;
       } else if (/^version:/i.test(line)) {
-        version = line.split(/:(.+)/)[1].trim();
-        inSteps = false;
+        currentField = 'version';
+        const val = line.replace(/^version:\s*/i, '').trim();
+        if (val) version = val;
+      } else if (/^description:/i.test(line) || /^desc:/i.test(line)) {
+        currentField = 'description';
+        const val = line.replace(/^(?:description|desc):\s*/i, '').trim();
+        if (val) descLines.push(val);
+      } else if (/^steps:/i.test(line)) {
+        currentField = 'steps';
+        const val = line.replace(/^steps:\s*/i, '').trim();
+        if (val) {
+          const cleanStep = val.replace(/^\d+[\.\)]\s*/, '').trim();
+          if (cleanStep) steps.push(cleanStep);
+        }
+      } else if (/^pro\s*tip:/i.test(line) || /^protip:/i.test(line)) {
+        currentField = 'protip';
+        const val = line.replace(/^(?:pro\s*tip|protip):\s*/i, '').trim();
+        if (val) protipLines.push(val);
+      } else if (/^common\s*mistake:/i.test(line) || /^mistake:/i.test(line)) {
+        currentField = 'commonMistake';
+        const val = line.replace(/^(?:common\s*mistake|mistake):\s*/i, '').trim();
+        if (val) mistakeLines.push(val);
+      } else if (/^related\s*commands:/i.test(line) || /^related:/i.test(line)) {
+        currentField = 'related';
+        const val = line.replace(/^(?:related\s*commands|related):\s*/i, '').trim();
+        if (val) {
+          val.split(/[\n,]/).forEach(s => {
+            const clean = s.trim();
+            if (clean) relatedCommands.push(clean);
+          });
+        }
       } else if (/^hashtags:/i.test(line)) {
-        hashtags = line.split(/:(.+)/)[1].trim();
-        inSteps = false;
-      } else if (inSteps) {
-        const cleanStep = line.replace(/^\d+[\.\)]\s*/, '').trim();
-        if (cleanStep) steps.push(cleanStep);
+        currentField = 'hashtags';
+        const val = line.replace(/^hashtags:\s*/i, '').trim();
+        if (val) hashtagLines.push(val);
+      } else {
+        // Line continuations for multi-line headers
+        if (currentField === 'software' && !sw) {
+          sw = line;
+        } else if (currentField === 'shortcut' && !shortcut) {
+          shortcut = line;
+        } else if (currentField === 'action' && !action) {
+          action = line;
+        } else if (currentField === 'description') {
+          descLines.push(line);
+        } else if (currentField === 'steps') {
+          const cleanStep = line.replace(/^\d+[\.\)]\s*/, '').trim();
+          if (cleanStep) steps.push(cleanStep);
+        } else if (currentField === 'protip') {
+          protipLines.push(line);
+        } else if (currentField === 'commonMistake') {
+          mistakeLines.push(line);
+        } else if (currentField === 'related') {
+          if (line) relatedCommands.push(line);
+        } else if (currentField === 'hashtags') {
+          if (line) hashtagLines.push(line);
+        }
       }
     });
 
-    if (action || shortcut || desc) {
+    const desc = descLines.join(' ');
+    const protip = protipLines.join(' ');
+    const commonMistake = mistakeLines.join(' ');
+    const hashtags = hashtagLines.join(' ');
+
+    if (action || shortcut || desc || sw) {
       parsed.push({
-        id: customId || `AC-${String(idx + 1).padStart(3, '0')}`,
-        software: sw || 'AutoCAD',
-        keys: shortcut || 'CAD',
+        id: customId || `LCS-${String(idx + 1).padStart(3, '0')}`,
+        software: sw || 'Ludarp Civil Studio',
+        keys: shortcut || 'START',
         action: action || 'Shortcut Action',
         title: shortcut ? `${shortcut}: ${action}` : action,
-        category: category,
-        difficulty: difficulty,
+        category: category || 'Introduction',
+        difficulty: difficulty || 'Everyone',
         desc: desc || 'Description goes here.',
         bullets: steps.length > 0 ? steps : ['Step 1: Execute command on keyboard'],
         proTip: protip || '',
         commonMistake: commonMistake || '',
         relatedCommands: relatedCommands,
-        version: version,
-        hashtags: hashtags || '#autocad #civilengineering #drafting',
+        version: version || '2026',
+        hashtags: hashtags || '#autocad #civilengineering #ludarpcivil',
         format: 'post',
         markerStyle: 'number',
         creatorHandle: 'ludarp.civil'
