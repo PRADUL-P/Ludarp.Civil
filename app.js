@@ -3813,52 +3813,57 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
     const rawText = liveScriptInput.value.trim();
     const parsed = parseRawTextToPosts(rawText);
     if (parsed.length > 0) {
-      const item = parsed[0];
+      if (parsed.length > 1 || rawText.includes('---')) {
+        setType('carousel', false);
+      }
 
-      if (item.software && contentSoftwareSelect) {
-        let optExists = Array.from(contentSoftwareSelect.options).some(opt => opt.value.toLowerCase() === item.software.toLowerCase());
-        if (!optExists) {
-          const newOpt = document.createElement('option');
-          newOpt.value = item.software;
-          newOpt.textContent = item.software;
-          contentSoftwareSelect.appendChild(newOpt);
+      // Upsert ALL parsed slides into calendarDb
+      parsed.forEach(pItem => {
+        const existingIdx = calendarDb.findIndex(i => (i.id && pItem.id && i.id === pItem.id) || (pItem.day && Number(i.day) === Number(pItem.day)));
+        if (existingIdx >= 0) {
+          calendarDb[existingIdx] = { ...calendarDb[existingIdx], ...pItem };
+        } else {
+          calendarDb.push(pItem);
         }
-        contentSoftwareSelect.value = item.software;
-      }
-
-      if (item.keys && contentKeysInput) contentKeysInput.value = item.keys;
-      if (item.symbol && document.getElementById('content-symbol')) document.getElementById('content-symbol').value = item.symbol;
-      if (item.action && contentActionInput) contentActionInput.value = item.action;
-      if (item.desc && contentDescInput) contentDescInput.value = item.desc;
-      if (item.proTip && contentProTipInput) contentProTipInput.value = item.proTip;
-      if (item.commonMistake && document.getElementById('content-common-mistake')) document.getElementById('content-common-mistake').value = item.commonMistake;
-      if (item.difficulty && document.getElementById('content-difficulty')) document.getElementById('content-difficulty').value = item.difficulty;
-      if (item.category && document.getElementById('content-category')) document.getElementById('content-category').value = item.category;
-      if (item.hashtags && contentHashtagsInput) contentHashtagsInput.value = item.hashtags;
-
-      if (item.imageUrl && document.getElementById('content-image-url')) document.getElementById('content-image-url').value = item.imageUrl;
-      if (item.imagePos && document.getElementById('image-position-select')) document.getElementById('image-position-select').value = item.imagePos;
-
-      if (item.bullets && item.bullets.length > 0) {
-        setStepValues(item.bullets);
-      }
-
-      updateCardPreview();
-
-      // Upsert full item into calendarDb & LocalStorage
-      const updatedItem = getActiveEditorAsItem();
-      if (item.id) updatedItem.id = item.id;
-
-      const existingIdx = calendarDb.findIndex(i => (i.id && i.id === updatedItem.id) || Number(i.day) === Number(updatedItem.day));
-      if (existingIdx >= 0) {
-        calendarDb[existingIdx] = { ...calendarDb[existingIdx], ...updatedItem };
-      } else {
-        calendarDb.push(updatedItem);
-      }
+      });
       localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
-      if (typeof renderDatabaseManagerTable === 'function') {
-        renderDatabaseManagerTable();
+      shortcutDb = calendarDb;
+
+      // Render dynamic slide chips for all parsed slides in header
+      const slideChipsContainer = document.getElementById('carousel-slide-chips');
+      if (slideChipsContainer && parsed.length > 1) {
+        slideChipsContainer.innerHTML = '';
+        parsed.forEach((pItem, idx) => {
+          const slideId = pItem.id || ('AC-003' + String.fromCharCode(65 + idx));
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = `btn-slide-chip ${idx === 0 ? 'active' : ''}`;
+          chip.setAttribute('data-slide', slideId.slice(-1));
+          chip.textContent = `${slideId} (${pItem.shortcut || pItem.action || ('Slide ' + (idx + 1))})`;
+          chip.style.cssText = `padding:3px 10px; font-size:0.75rem; font-weight:800; border-radius:6px; cursor:pointer; ${idx === 0 ? 'background:var(--accent); color:#000; border:none;' : 'background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border);'}`;
+
+          chip.onclick = () => {
+            if (pItem.day) activeCalendarDayNum = pItem.day;
+            loadCalendarItemToEditor(pItem);
+            slideChipsContainer.querySelectorAll('.btn-slide-chip').forEach(c => {
+              const isActive = c === chip;
+              c.classList.toggle('active', isActive);
+              c.style.background = isActive ? 'var(--accent)' : 'var(--bg-tertiary)';
+              c.style.color = isActive ? '#000' : 'var(--text-primary)';
+              c.style.border = isActive ? 'none' : '1px solid var(--border)';
+            });
+          };
+          slideChipsContainer.appendChild(chip);
+        });
       }
+
+      // Load Slide 1 into Editor
+      const item = parsed[0];
+      loadCalendarItemToEditor(item);
+
+      if (typeof renderSidebarDaysList === 'function') renderSidebarDaysList();
+      if (typeof renderDatabaseManagerTable === 'function') renderDatabaseManagerTable();
+      saveAllDataToSyncFile();
     }
   }
 
