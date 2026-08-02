@@ -2539,12 +2539,24 @@ async function saveAllDataToSyncFile() {
   }
 }
 
-// Render dynamic day-by-day checklist in sidebar (Production Line)
+// Render dynamic post checklist in sidebar (Post Library)
 function renderSidebarDaysList() {
   if (!sidebarDaysList) return;
   sidebarDaysList.innerHTML = '';
   
-  const phases = [...new Set(calendarDb.map(post => post.phase))];
+  if (calendarDb.length === 0) {
+    sidebarDaysList.innerHTML = `
+      <div style="padding: 20px 10px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+        <p style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">No Content Posts Yet</p>
+        <p style="font-size: 0.72rem; line-height: 1.4;">Paste your fresh posts in the <b>Bulk Post Importer</b> tab to start building your library!</p>
+      </div>
+    `;
+    if (sidebarProgressCount) sidebarProgressCount.textContent = `0 / 0`;
+    if (sidebarProgressBar) sidebarProgressBar.style.width = `0%`;
+    return;
+  }
+
+  const phases = [...new Set(calendarDb.map(post => post.phase || 'General Posts'))];
   
   phases.forEach(phase => {
     const label = document.createElement('div');
@@ -2554,7 +2566,7 @@ function renderSidebarDaysList() {
     sidebarDaysList.appendChild(label);
     
     calendarDb.forEach(post => {
-      if (post.phase !== phase) return;
+      if ((post.phase || 'General Posts') !== phase) return;
       
       const isCompleted = completedCalendarDays.has(String(post.day));
       const isActive = String(activeCalendarDayNum) === String(post.day);
@@ -2563,7 +2575,7 @@ function renderSidebarDaysList() {
       
       item.innerHTML = `
         <span class="dchk">${isCompleted ? '✓' : ''}</span>
-        <span class="dtitle">${post.title}</span>
+        <span class="dtitle">${post.title || post.action || 'Untitled Post'}</span>
       `;
       
       item.addEventListener('click', () => {
