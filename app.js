@@ -727,6 +727,7 @@ stylePresetBtns.forEach(btn => {
       instagramCard.classList.add('theme-custom');
       applyCustomColors();
     }
+    saveCurrentDayData();
   });
 });
 
@@ -773,7 +774,7 @@ function applyCustomColors() {
 }
 
 [pickerBgStart, pickerBgEnd, pickerAccent, pickerText].forEach(picker => {
-  if (picker) picker.addEventListener('input', applyCustomColors);
+  if (picker) picker.addEventListener('input', () => { applyCustomColors(); saveCurrentDayData(); });
 });
 
 // ==========================================================================
@@ -2025,6 +2026,67 @@ function loadCalendarItemToEditor(item) {
     });
   }
   
+  // ── Restore Style / Theme State ──────────────────────────────────────────
+  const canvas = document.getElementById('instagram-post-canvas');
+
+  // Restore theme
+  if (item._theme && canvas) {
+    // Remove existing theme classes and apply saved one
+    [...canvas.classList].filter(c => c.startsWith('theme-')).forEach(c => canvas.classList.remove(c));
+    canvas.classList.add(item._theme);
+    // Sync the theme preset buttons
+    document.querySelectorAll('.style-preset-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === item._theme);
+    });
+  }
+
+  // Restore custom color pickers + apply CSS vars
+  if (item._colors) {
+    Object.entries(item._colors).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) { el.value = val; el.dispatchEvent(new Event('input')); }
+    });
+  }
+
+  // Restore font size sliders
+  if (item._fontSizes) {
+    Object.entries(item._fontSizes).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) { el.value = val; el.dispatchEvent(new Event('input')); }
+    });
+  }
+
+  // Restore layout/overlay sliders
+  if (item._layoutSettings) {
+    Object.entries(item._layoutSettings).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) { el.value = val; el.dispatchEvent(new Event('input')); }
+    });
+  }
+
+  // Restore element visibility checkboxes
+  if (item._visibility) {
+    Object.entries(item._visibility).forEach(([id, checked]) => {
+      const el = document.getElementById(id);
+      if (el) { el.checked = checked; el.dispatchEvent(new Event('change')); }
+    });
+  }
+
+  // Restore image sliders and alignment
+  if (item._imgHeight) { const el = document.getElementById('image-height-slider'); if (el) { el.value = item._imgHeight; el.dispatchEvent(new Event('input')); } }
+  if (item._imgOffsetX) { const el = document.getElementById('image-offset-x-slider'); if (el) { el.value = item._imgOffsetX; el.dispatchEvent(new Event('input')); } }
+  if (item._imgOffsetY) { const el = document.getElementById('image-offset-y-slider'); if (el) { el.value = item._imgOffsetY; el.dispatchEvent(new Event('input')); } }
+  if (item._imgAlign) {
+    document.querySelectorAll('#image-align-group .btn-img-align').forEach(btn => {
+      const isActive = (btn.dataset.align || btn.textContent.trim().toLowerCase()) === item._imgAlign;
+      btn.classList.toggle('active', isActive);
+      btn.style.background = isActive ? 'var(--accent)' : 'var(--bg-tertiary)';
+      btn.style.color = isActive ? '#000' : 'var(--text-primary)';
+      btn.style.fontWeight = isActive ? '800' : 'normal';
+    });
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
   // Sync view
   updateCardPreview();
   
@@ -2530,6 +2592,59 @@ async function saveCurrentDayData() {
     d.bullets = [];
     d.items = steps;
   }
+
+  // ── Save Style / Theme State ──────────────────────────────────────────────
+  // Capture the active theme class on the canvas
+  const canvasEl = document.getElementById('instagram-post-canvas');
+  const themeClass = canvasEl ? [...canvasEl.classList].find(c => c.startsWith('theme-')) : null;
+  if (themeClass) d._theme = themeClass;
+
+  // Capture custom color pickers
+  const colorIds = ['color-bg-start','color-bg-end','color-accent','color-text','color-keycap-bg','color-keycap-text','color-header-bg','color-header-text'];
+  d._colors = {};
+  colorIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) d._colors[id] = el.value;
+  });
+
+  // Capture font size sliders
+  const sliderIds = ['font-size-title','font-size-keycap','font-size-desc','font-size-steps','font-size-protip'];
+  d._fontSizes = {};
+  sliderIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) d._fontSizes[id] = el.value;
+  });
+
+  // Capture layout/overlay sliders
+  const layoutIds = ['layout-opacity','layout-vignette','layout-watermark-size'];
+  d._layoutSettings = {};
+  layoutIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) d._layoutSettings[id] = el.value;
+  });
+
+  // Capture element visibility checkboxes
+  const checkIds = ['toggle-elem-software','toggle-elem-handle','toggle-elem-symbol','toggle-elem-image','toggle-elem-keycap','toggle-elem-title','toggle-elem-desc','toggle-elem-steps','layout-toggle-protip','toggle-elem-mistake','layout-toggle-bookmark','layout-toggle-grid','layout-toggle-watermark'];
+  d._visibility = {};
+  checkIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) d._visibility[id] = el.checked;
+  });
+
+  // Capture image settings
+  const imgUrl = document.getElementById('content-image-url');
+  const imgPos = document.getElementById('image-position-select');
+  const imgHeight = document.getElementById('image-height-slider');
+  const imgOffsetX = document.getElementById('image-offset-x-slider');
+  const imgOffsetY = document.getElementById('image-offset-y-slider');
+  const imgAlignActive = document.querySelector('#image-align-group .btn-img-align.active');
+  if (imgUrl) d.imageUrl = imgUrl.value;
+  if (imgPos) d.imagePos = imgPos.value;
+  if (imgHeight) d._imgHeight = imgHeight.value;
+  if (imgOffsetX) d._imgOffsetX = imgOffsetX.value;
+  if (imgOffsetY) d._imgOffsetY = imgOffsetY.value;
+  if (imgAlignActive) d._imgAlign = imgAlignActive.dataset.align || imgAlignActive.textContent.trim().toLowerCase();
+  // ──────────────────────────────────────────────────────────────────────────
   
   // Always cache back to browser storage
   localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
@@ -3061,6 +3176,7 @@ function resetCreatorStudioForm() {
     toggleElemSoftware.addEventListener('change', () => {
       const el = instagramCard ? instagramCard.querySelector('.software-badge') : null;
       if (el) el.style.display = toggleElemSoftware.checked ? 'inline-block' : 'none';
+      saveCurrentDayData();
     });
   }
 
@@ -3068,6 +3184,7 @@ function resetCreatorStudioForm() {
     toggleElemHandle.addEventListener('change', () => {
       const el = instagramCard ? instagramCard.querySelector('.creator-tag') : null;
       if (el) el.style.display = toggleElemHandle.checked ? 'flex' : 'none';
+      saveCurrentDayData();
     });
   }
 
@@ -3075,6 +3192,7 @@ function resetCreatorStudioForm() {
     toggleElemKeycap.addEventListener('change', () => {
       const el = instagramCard ? instagramCard.querySelector('.keycap-container') : null;
       if (el) el.style.display = toggleElemKeycap.checked ? 'block' : 'none';
+      saveCurrentDayData();
     });
   }
 
@@ -3082,6 +3200,7 @@ function resetCreatorStudioForm() {
     toggleElemTitle.addEventListener('change', () => {
       const el = document.getElementById('card-action');
       if (el) el.style.display = toggleElemTitle.checked ? 'block' : 'none';
+      saveCurrentDayData();
     });
   }
 
@@ -3089,6 +3208,7 @@ function resetCreatorStudioForm() {
     toggleElemDesc.addEventListener('change', () => {
       const el = document.getElementById('card-desc');
       if (el) el.style.display = toggleElemDesc.checked ? 'block' : 'none';
+      saveCurrentDayData();
     });
   }
 
@@ -3096,6 +3216,7 @@ function resetCreatorStudioForm() {
     toggleElemSteps.addEventListener('change', () => {
       const el = document.getElementById('card-steps-list');
       if (el) el.style.display = toggleElemSteps.checked ? 'block' : 'none';
+      saveCurrentDayData();
     });
   }
 
@@ -3103,6 +3224,7 @@ function resetCreatorStudioForm() {
     toggleElemMistake.addEventListener('change', () => {
       const el = document.getElementById('card-common-mistake-box');
       if (el) el.style.display = toggleElemMistake.checked ? 'block' : 'none';
+      saveCurrentDayData();
     });
   }
 
