@@ -244,6 +244,15 @@ const stepsContainer = document.getElementById('steps-container');
 const btnAddStep = document.getElementById('btn-add-step');
 const getStepInputs = () => document.querySelectorAll('.step-input');
 
+// Format & Type Toggle Elements
+const typeCommandBtn = document.getElementById('type-command');
+const typeListBtn = document.getElementById('type-list');
+const typeCarouselBtn = document.getElementById('type-carousel');
+const keyField = document.getElementById('key-field');
+const stepsLabel = document.getElementById('steps-label');
+const carouselScriptGroup = document.getElementById('carousel-script-group');
+const carouselMultiScriptInput = document.getElementById('carousel-multi-script');
+
 // Card Preview Elements
 const cardSoftwareName = document.getElementById('card-software-name');
 const cardHandleText = document.getElementById('card-handle-text');
@@ -2581,31 +2590,38 @@ const carouselScriptGroup = document.getElementById('carousel-script-group');
 const carouselMultiScriptInput = document.getElementById('carousel-multi-script');
 
 function setType(type, triggerSync = true) {
+  const btnCmd = typeCommandBtn || document.getElementById('type-command');
+  const btnLst = typeListBtn || document.getElementById('type-list');
+  const btnCar = typeCarouselBtn || document.getElementById('type-carousel');
+  const fieldKey = keyField || document.getElementById('key-field');
+  const lblSteps = stepsLabel || document.getElementById('steps-label');
+  const grpCarScript = carouselScriptGroup || document.getElementById('carousel-script-group');
+
   if (type === 'carousel') {
-    if (typeCommandBtn) typeCommandBtn.classList.remove('active');
-    if (typeListBtn) typeListBtn.classList.remove('active');
-    if (typeCarouselBtn) typeCarouselBtn.classList.add('active');
-    if (keyField) keyField.style.display = 'block';
-    if (stepsLabel) stepsLabel.textContent = 'Carousel Slide Items';
-    if (carouselScriptGroup) carouselScriptGroup.style.display = 'block';
+    if (btnCmd) btnCmd.classList.remove('active');
+    if (btnLst) btnLst.classList.remove('active');
+    if (btnCar) btnCar.classList.add('active');
+    if (fieldKey) fieldKey.style.display = 'block';
+    if (lblSteps) lblSteps.textContent = 'Carousel Slide Items';
+    if (grpCarScript) grpCarScript.style.display = 'block';
     const cardKeysWrapper = document.querySelector('.keycap-container');
     if (cardKeysWrapper) cardKeysWrapper.style.display = 'flex';
   } else if (type === 'command') {
-    if (typeCommandBtn) typeCommandBtn.classList.add('active');
-    if (typeListBtn) typeListBtn.classList.remove('active');
-    if (typeCarouselBtn) typeCarouselBtn.classList.remove('active');
-    if (keyField) keyField.style.display = 'block';
-    if (stepsLabel) stepsLabel.textContent = 'Steps';
-    if (carouselScriptGroup) carouselScriptGroup.style.display = 'none';
+    if (btnCmd) btnCmd.classList.add('active');
+    if (btnLst) btnLst.classList.remove('active');
+    if (btnCar) btnCar.classList.remove('active');
+    if (fieldKey) fieldKey.style.display = 'block';
+    if (lblSteps) lblSteps.textContent = 'Steps';
+    if (grpCarScript) grpCarScript.style.display = 'none';
     const cardKeysWrapper = document.querySelector('.keycap-container');
     if (cardKeysWrapper) cardKeysWrapper.style.display = 'flex';
   } else {
-    if (typeCommandBtn) typeCommandBtn.classList.remove('active');
-    if (typeListBtn) typeListBtn.classList.add('active');
-    if (typeCarouselBtn) typeCarouselBtn.classList.remove('active');
-    if (keyField) keyField.style.display = 'none';
-    if (stepsLabel) stepsLabel.textContent = 'Shortcut List Items';
-    if (carouselScriptGroup) carouselScriptGroup.style.display = 'none';
+    if (btnCmd) btnCmd.classList.remove('active');
+    if (btnLst) btnLst.classList.add('active');
+    if (btnCar) btnCar.classList.remove('active');
+    if (fieldKey) fieldKey.style.display = 'none';
+    if (lblSteps) lblSteps.textContent = 'Shortcut List Items';
+    if (grpCarScript) grpCarScript.style.display = 'none';
     const cardKeysWrapper = document.querySelector('.keycap-container');
     if (cardKeysWrapper) cardKeysWrapper.style.display = 'none';
   }
@@ -2615,9 +2631,16 @@ function setType(type, triggerSync = true) {
   }
 }
 
-if (typeCommandBtn) typeCommandBtn.onclick = () => setType('command');
-if (typeListBtn) typeListBtn.onclick = () => setType('list');
-if (typeCarouselBtn) typeCarouselBtn.onclick = () => setType('carousel');
+const bindTypeButtons = () => {
+  const btnCmd = document.getElementById('type-command');
+  const btnLst = document.getElementById('type-list');
+  const btnCar = document.getElementById('type-carousel');
+  if (btnCmd) btnCmd.onclick = () => setType('command');
+  if (btnLst) btnLst.onclick = () => setType('list');
+  if (btnCar) btnCar.onclick = () => setType('carousel');
+};
+bindTypeButtons();
+document.addEventListener('DOMContentLoaded', bindTypeButtons);
 
 // Multi-Slide Script Parser for '---' dividers
 function parseMultiSlideScript(scriptText) {
