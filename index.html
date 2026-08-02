@@ -73,6 +73,15 @@
           </svg>
           Database Manager
         </button>
+        <button class="nav-btn" data-tab="feed">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <rect width="7" height="7" x="3" y="3" rx="1"/>
+            <rect width="7" height="7" x="14" y="3" rx="1"/>
+            <rect width="7" height="7" x="14" y="14" rx="1"/>
+            <rect width="7" height="7" x="3" y="14" rx="1"/>
+          </svg>
+          Feed Grid
+        </button>
       </nav>
 
       <!-- Production Line (Calendar Days Sidebar) -->
@@ -156,7 +165,11 @@
               </button>
             </div>
           </div>
-          <div class="studio-header-right">
+          <div class="studio-header-right" style="display:flex; gap:10px; align-items:center;">
+            <button class="btn-action btn-secondary-action" id="btn-duplicate-card" style="padding:6px 12px; font-size:0.78rem;" title="Duplicate active card as new entry (Ctrl+D)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><rect width="13" height="13" x="9" y="9" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Duplicate
+            </button>
             <div class="canvas-toggle-group">
               <button class="toggle-btn active" id="btn-format-square">1:1 Post</button>
               <button class="toggle-btn" id="btn-format-story">9:16 Reel</button>
@@ -242,6 +255,22 @@
               <div class="form-group">
                 <label for="content-hashtags">Hashtags</label>
                 <textarea id="content-hashtags" rows="2" placeholder="#autocad ...">#autocad #cadhacks #drafting #civilengineering</textarea>
+              </div>
+
+              <!-- Post Date & Performance Log -->
+              <div class="form-row" style="margin-top:10px; display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                  <label for="content-date" style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">Post Date</label>
+                  <input type="date" id="content-date" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
+                </div>
+                <div class="form-group" style="flex:1;">
+                  <label for="content-saves" style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">Saves 💾</label>
+                  <input type="number" id="content-saves" min="0" placeholder="0" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
+                </div>
+                <div class="form-group" style="flex:1;">
+                  <label for="content-likes" style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">Likes ❤️</label>
+                  <input type="number" id="content-likes" min="0" placeholder="0" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
+                </div>
               </div>
             </div>
 
@@ -788,6 +817,38 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 6: INSTAGRAM PROFILE FEED GRID            ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="feed-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>📱 Instagram Profile Feed Grid</h2>
+            <p>Visual 3-column feed thumbnail wall to verify color rhythm, visual layout & post type balance</p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <select id="feed-filter-software" style="padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
+              <option value="all">All Softwares</option>
+              <option value="AutoCAD">AutoCAD</option>
+              <option value="Revit">Revit</option>
+              <option value="Civil 3D">Civil 3D</option>
+              <option value="ETABS">ETABS</option>
+              <option value="SketchUp">SketchUp</option>
+            </select>
+            <select id="feed-sort-by" style="padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
+              <option value="day">Order by Day #</option>
+              <option value="saves">Sort by Most Saved 💾</option>
+              <option value="likes">Sort by Most Liked ❤️</option>
+            </select>
+          </div>
+        </header>
+
+        <!-- 3-Column Instagram Profile Grid Container -->
+        <div id="feed-grid-container" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:16px;">
+          <!-- Dynamically populated thumbnails by app.js -->
         </div>
       </section>
 

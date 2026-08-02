@@ -508,6 +508,8 @@ sidebarButtons.forEach(btn => {
       renderCalendarHub();
     } else if (targetTab === 'database') {
       renderDatabaseManagerTable();
+    } else if (targetTab === 'feed') {
+      renderInstagramFeedGrid();
     }
   });
 });
@@ -1678,13 +1680,22 @@ function renderCalendarHub() {
 }
 
 function updateCalendarProgress() {
-  const totalDays = 83; // Total calendar items
-  const completedCount = completedCalendarDays.size;
+  const totalDays = calendarDb ? calendarDb.length : 84;
+  const completedCount = calendarDb ? calendarDb.filter(item => completedCalendarDays.has(String(item.day))).length : completedCalendarDays.size;
   const percent = totalDays > 0 ? Math.round((completedCount / totalDays) * 100) : 0;
   
   if (calendarProgressCount) calendarProgressCount.textContent = `${completedCount} / ${totalDays}`;
   if (calendarProgressPercent) calendarProgressPercent.textContent = `(${percent}%)`;
   if (calendarProgressBar) calendarProgressBar.style.width = `${percent}%`;
+  
+  const sidebarCount = document.getElementById('sidebar-progress-count');
+  if (sidebarCount) sidebarCount.textContent = `${completedCount} / ${totalDays}`;
+  
+  const dbStatPosted = document.getElementById('db-stat-posted-count');
+  if (dbStatPosted) dbStatPosted.textContent = `${completedCount} / ${totalDays}`;
+  
+  const dbStatCal = document.getElementById('db-stat-calendar-count');
+  if (dbStatCal) dbStatCal.textContent = totalDays;
 }
 
 function loadCalendarItemToEditor(item) {
@@ -1750,6 +1761,14 @@ function loadCalendarItemToEditor(item) {
   if (contentHashtagsInput) {
     contentHashtagsInput.value = item.hashtags ? (Array.isArray(item.hashtags) ? item.hashtags.join(' ') : item.hashtags) : '#autocad #civilengineering #drafting';
   }
+
+  // Set Date & Performance fields
+  const contentDateInput = document.getElementById('content-date');
+  const contentSavesInput = document.getElementById('content-saves');
+  const contentLikesInput = document.getElementById('content-likes');
+  if (contentDateInput) contentDateInput.value = item.scheduledDate || '';
+  if (contentSavesInput) contentSavesInput.value = item.saves || '';
+  if (contentLikesInput) contentLikesInput.value = item.likes || '';
 
   // Auto-detect command type (Single Command vs List)
   const isList = item.type === 'list' || (item.bullets && item.bullets.length > 5);
@@ -2959,3 +2978,181 @@ if (dbBtnResetFactory) {
     }
   });
 }
+
+// ==========================================================================
+// 13. Duplicate / Clone Entry Engine
+// ==========================================================================
+function duplicateCurrentCalendarItem() {
+  const currentItem = calendarDb.find(item => Number(item.day) === Number(activeCalendarDayNum));
+  const maxDay = calendarDb.reduce((max, item) => Math.max(max, Number(item.day) || 0), 0);
+  const newDay = maxDay + 1;
+  
+  const newItem = {
+    day: newDay,
+    title: currentItem ? `${currentItem.title} (Copy)` : `New Shortcut Entry`,
+    software: currentItem ? currentItem.software : (contentSoftwareSelect ? contentSoftwareSelect.value : 'AutoCAD'),
+    format: currentItem ? currentItem.format : 'post',
+    phase: currentItem ? currentItem.phase : 'basics',
+    creatorHandle: currentItem ? currentItem.creatorHandle : 'civilcut',
+    hashtags: currentItem ? currentItem.hashtags : '#autocad #civilengineering #drafting',
+    proTip: currentItem ? currentItem.proTip : 'Save for later!',
+    bullets: ['Step 1: Enter command key on keyboard', 'Step 2: Pick selection boundary', 'Step 3: Press Enter to execute']
+  };
+  
+  calendarDb.push(newItem);
+  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+  activeCalendarDayNum = newDay;
+  
+  updateCalendarProgress();
+  renderSidebarDaysList();
+  loadCalendarItemToEditor(newItem);
+  saveAllDataToSyncFile();
+  
+  showToast(`📋 Duplicated as Day ${newDay}!`, 'success');
+}
+
+const btnDuplicateCard = document.getElementById('btn-duplicate-card');
+if (btnDuplicateCard) {
+  btnDuplicateCard.addEventListener('click', duplicateCurrentCalendarItem);
+}
+
+// ==========================================================================
+// 14. Instagram 3-Column Profile Feed Grid Engine
+// ==========================================================================
+const feedGridContainer = document.getElementById('feed-grid-container');
+const feedFilterSoftware = document.getElementById('feed-filter-software');
+const feedSortBy = document.getElementById('feed-sort-by');
+
+function renderInstagramFeedGrid() {
+  if (!feedGridContainer) return;
+  
+  const filterSw = feedFilterSoftware ? feedFilterSoftware.value : 'all';
+  const sortBy = feedSortBy ? feedSortBy.value : 'day';
+  
+  let items = calendarDb.filter(item => filterSw === 'all' || (item.software || 'AutoCAD') === filterSw);
+  
+  if (sortBy === 'saves') {
+    items = [...items].sort((a, b) => (Number(b.saves) || 0) - (Number(a.saves) || 0));
+  } else if (sortBy === 'likes') {
+    items = [...items].sort((a, b) => (Number(b.likes) || 0) - (Number(a.likes) || 0));
+  } else {
+    items = [...items].sort((a, b) => Number(a.day) - Number(b.day));
+  }
+  
+  feedGridContainer.innerHTML = '';
+  
+  if (items.length === 0) {
+    feedGridContainer.innerHTML = `<div style="grid-column:span 3; text-align:center; padding:48px; color:var(--text-muted);">No feed items found.</div>`;
+    return;
+  }
+  
+  items.forEach(item => {
+    const isCompleted = completedCalendarDays.has(String(item.day));
+    
+    // Parse keys and action
+    let keys = item.keys || 'CAD';
+    let action = item.title;
+    const colonMatch = item.title.match(/^([^:]+):\s*(.*)$/);
+    if (colonMatch) {
+      keys = colonMatch[1].trim();
+      action = colonMatch[2].trim();
+    }
+    
+    const cardEl = document.createElement('div');
+    cardEl.className = 'feed-card-item';
+    cardEl.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; z-index:2;">
+        <span class="status-pill ${isCompleted ? 'status-posted' : 'status-scheduled'}">${isCompleted ? 'Posted ✓' : 'Day ' + item.day}</span>
+        <span style="font-size:0.65rem; font-weight:800; text-transform:uppercase; color:var(--accent);">${item.software || 'AutoCAD'}</span>
+      </div>
+      
+      <div style="text-align:center; margin:auto 0; z-index:2;">
+        <div style="font-family:var(--font-mono); font-size:1.4rem; font-weight:900; color:var(--accent); letter-spacing:1px; margin-bottom:4px;">${keys}</div>
+        <div style="font-size:0.82rem; font-weight:700; color:var(--text-primary); line-height:1.2; max-width:90%; margin:0 auto; font-family:'Chakra Petch', sans-serif;">${action}</div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:var(--text-muted); z-index:2;">
+        <span>💾 ${item.saves || 0}</span>
+        <span>❤️ ${item.likes || 0}</span>
+      </div>
+
+      <div class="feed-card-overlay">
+        <h4 style="font-size:0.95rem; font-weight:800; color:#fff;">Day ${item.day}: ${action}</h4>
+        <p style="font-size:0.75rem; color:rgba(255,255,255,0.7); max-width:85%;">${item.proTip || 'Pro Tip Available'}</p>
+        <button class="btn-action btn-primary-action" style="font-size:0.75rem; padding:6px 14px; margin-top:6px;">Load in Studio</button>
+      </div>
+    `;
+    
+    cardEl.onclick = () => {
+      activeCalendarDayNum = item.day;
+      loadCalendarItemToEditor(item);
+      document.querySelector('.nav-btn[data-tab="studio"]').click();
+      showToast(`Loaded Day ${item.day}: "${action}" into Studio!`);
+    };
+    
+    feedGridContainer.appendChild(cardEl);
+  });
+}
+
+if (feedFilterSoftware) feedFilterSoftware.addEventListener('change', renderInstagramFeedGrid);
+if (feedSortBy) feedSortBy.addEventListener('change', renderInstagramFeedGrid);
+
+// Bind Date, Saves, and Likes input changes to active calendar item
+['content-date', 'content-saves', 'content-likes'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', () => {
+      const activeItem = calendarDb.find(i => Number(i.day) === Number(activeCalendarDayNum));
+      if (activeItem) {
+        if (id === 'content-date') activeItem.scheduledDate = el.value;
+        if (id === 'content-saves') activeItem.saves = Number(el.value) || 0;
+        if (id === 'content-likes') activeItem.likes = Number(el.value) || 0;
+        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+        saveAllDataToSyncFile();
+      }
+    });
+  }
+});
+
+// ==========================================================================
+// 15. Global Application Keyboard Shortcuts (Hotkeys)
+// ==========================================================================
+document.addEventListener('keydown', (e) => {
+  const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+  if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
+    if (e.key === 'Escape') document.activeElement.blur();
+    return;
+  }
+  
+  // Ctrl+S or Cmd+S -> Quick Save / Sync
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+    e.preventDefault();
+    saveAllDataToSyncFile();
+    showToast("💾 Disk Sync file saved!", "success");
+  }
+  
+  // Ctrl+D or Cmd+D -> Duplicate active entry
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+    e.preventDefault();
+    duplicateCurrentCalendarItem();
+  }
+  
+  // Ctrl+E or Cmd+E -> Export Image
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
+    e.preventDefault();
+    const btnExport = document.getElementById('btn-export-image');
+    if (btnExport) btnExport.click();
+  }
+  
+  // Arrow Left -> Previous Day
+  if (e.key === 'ArrowLeft') {
+    const btnPrev = document.getElementById('btn-prev');
+    if (btnPrev) btnPrev.click();
+  }
+  
+  // Arrow Right -> Next Day
+  if (e.key === 'ArrowRight') {
+    const btnNext = document.getElementById('btn-next');
+    if (btnNext) btnNext.click();
+  }
+});
