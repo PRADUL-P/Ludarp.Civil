@@ -2590,7 +2590,6 @@ function setType(type, triggerSync = true) {
   const btnCar = typeCarouselBtn || document.getElementById('type-carousel');
   const fieldKey = keyField || document.getElementById('key-field');
   const lblSteps = stepsLabel || document.getElementById('steps-label');
-  const grpCarScript = carouselScriptGroup || document.getElementById('carousel-script-group');
   const grpCarId = document.getElementById('carousel-id-field');
   const grpSlideChips = document.getElementById('carousel-slide-chips-header');
 
@@ -2600,7 +2599,6 @@ function setType(type, triggerSync = true) {
     if (btnCar) btnCar.classList.add('active');
     if (fieldKey) fieldKey.style.display = 'block';
     if (lblSteps) lblSteps.textContent = 'Carousel Slide Items';
-    if (grpCarScript) grpCarScript.style.display = 'block';
     if (grpCarId) grpCarId.style.display = 'block';
     if (grpSlideChips) grpSlideChips.style.display = 'flex';
     const cardKeysWrapper = document.querySelector('.keycap-container');
@@ -2611,7 +2609,6 @@ function setType(type, triggerSync = true) {
     if (btnCar) btnCar.classList.remove('active');
     if (fieldKey) fieldKey.style.display = 'block';
     if (lblSteps) lblSteps.textContent = 'Steps';
-    if (grpCarScript) grpCarScript.style.display = 'none';
     if (grpCarId) grpCarId.style.display = 'none';
     if (grpSlideChips) grpSlideChips.style.display = 'none';
     const cardKeysWrapper = document.querySelector('.keycap-container');
@@ -2622,7 +2619,6 @@ function setType(type, triggerSync = true) {
     if (btnCar) btnCar.classList.remove('active');
     if (fieldKey) fieldKey.style.display = 'none';
     if (lblSteps) lblSteps.textContent = 'Shortcut List Items';
-    if (grpCarScript) grpCarScript.style.display = 'none';
     if (grpCarId) grpCarId.style.display = 'none';
     if (grpSlideChips) grpSlideChips.style.display = 'none';
     const cardKeysWrapper = document.querySelector('.keycap-container');
