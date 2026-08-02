@@ -3384,7 +3384,12 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
       const isHidden = liveScriptBody.style.display === 'none';
       liveScriptBody.style.display = isHidden ? 'block' : 'none';
       if (arrowLiveScript) arrowLiveScript.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-      if (isHidden) window.refreshLiveScriptEditor();
+      if (isHidden) {
+        window.refreshLiveScriptEditor();
+        setTimeout(() => {
+          liveScriptBody.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
+      }
     });
   }
 
