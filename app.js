@@ -367,7 +367,8 @@ function updateCardPreview() {
   }
   if (tbDwgNo) {
     const prefix = softwareVal.substring(0, 3).toUpperCase();
-    const sanitizedKey = keysVal.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    let sanitizedKey = keysVal.replace(/^DAY\s*/i, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (!sanitizedKey) sanitizedKey = "01";
     tbDwgNo.textContent = `${prefix}-${sanitizedKey}`;
   }
   
