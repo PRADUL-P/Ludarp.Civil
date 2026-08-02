@@ -904,6 +904,33 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
 .card-steps { display: flex; flex-direction: column; gap: 18px; margin-top: 6px; max-width: 860px; }
 .card-step-item { display: flex; align-items: flex-start; gap: 20px; }
 .card-step-num { font-family: var(--font-mono); font-weight: 700; font-size: 24px; letter-spacing: 0.05em; margin-top: 4px; }
+
+/* Symbol marker override (removes circular border, background & box-shadow for dots/arrows/checks) */
+.card-step-num.is-symbol {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 26px !important;
+  font-weight: 900 !important;
+}
+.card-step-num.is-symbol.marker-bullet {
+  font-size: 32px !important;
+}
+.card-step-num.is-symbol.marker-arrow {
+  font-size: 24px !important;
+}
+.card-step-num.is-symbol.marker-check {
+  font-size: 28px !important;
+}
+.card-step-num.is-symbol.marker-square {
+  font-size: 22px !important;
+}
 .card-step-text { font-size: 26px; line-height: 1.45; color: #fff; }
 
 /* Footer */

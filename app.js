@@ -355,6 +355,9 @@ function updateCardPreview() {
   cardStepsList.innerHTML = '';
   let stepIndex = 0;
   const markerStyle = document.getElementById('list-marker-style') ? document.getElementById('list-marker-style').value : 'number';
+  const isSymbolMarker = ['bullet', 'arrow', 'check', 'square'].includes(markerStyle);
+  const symbolClass = isSymbolMarker ? `is-symbol marker-${markerStyle}` : '';
+  
   getStepInputs().forEach(input => {
     const text = input.value.trim();
     if (text) {
@@ -363,7 +366,7 @@ function updateCardPreview() {
       
       const markerSymbol = getMarkerSymbol(markerStyle, stepIndex);
       stepItem.innerHTML = `
-        <div class="card-step-num">${markerSymbol}</div>
+        <div class="card-step-num ${symbolClass}">${markerSymbol}</div>
         <div class="card-step-text">${text}</div>
       `;
       cardStepsList.appendChild(stepItem);
@@ -1267,13 +1270,17 @@ btnBulkExport.addEventListener('click', async () => {
       cardDesc.textContent = item.desc;
       
       cardStepsList.innerHTML = '';
+      const markerStyle = item.markerStyle || (document.getElementById('list-marker-style') ? document.getElementById('list-marker-style').value : 'number');
+      const isSymbolMarker = ['bullet', 'arrow', 'check', 'square'].includes(markerStyle);
+      const symbolClass = isSymbolMarker ? `is-symbol marker-${markerStyle}` : '';
+      
       item.steps.forEach((stepText, sIdx) => {
         if (stepText.trim()) {
           const stepItem = document.createElement('div');
           stepItem.className = 'card-step-item';
-          const numFormatted = (sIdx + 1).toString().padStart(2, '0');
+          const markerSymbol = getMarkerSymbol(markerStyle, sIdx);
           stepItem.innerHTML = `
-            <div class="card-step-num">${numFormatted}</div>
+            <div class="card-step-num ${symbolClass}">${markerSymbol}</div>
             <div class="card-step-text">${stepText}</div>
           `;
           cardStepsList.appendChild(stepItem);
