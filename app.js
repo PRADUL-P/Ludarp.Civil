@@ -4529,9 +4529,27 @@ function parseRawTextToPosts(rawText) {
     const commonMistake = mistakeLines.join(' ');
     const hashtags = hashtagLines.join(' ');
 
+    // Auto-generate Carousel ID if omitted in script text (e.g. AC-003A, AC-003B, AC-003C...)
+    const carouselIdInput = document.getElementById('content-carousel-id');
+    let baseId = (carouselIdInput && carouselIdInput.value && typeof carouselIdInput.value === 'string' && carouselIdInput.value.trim()) ? carouselIdInput.value.trim().toUpperCase() : '';
+    const match = baseId.match(/^(.*?)([A-Z])$/);
+    if (match && match[1].length >= 2) {
+      baseId = match[1];
+    }
+    if (!baseId) baseId = 'AC-003';
+
+    let autoAssignedId = customId;
+    if (!autoAssignedId) {
+      if (blocks.length > 1) {
+        autoAssignedId = `${baseId}${String.fromCharCode(65 + idx)}`;
+      } else {
+        autoAssignedId = `${baseId}A`;
+      }
+    }
+
     if (action || shortcut || desc || sw) {
       parsed.push({
-        id: customId || `LCS-${String(idx + 1).padStart(3, '0')}`,
+        id: autoAssignedId,
         software: sw || 'Ludarp Civil Studio',
         keys: shortcut || 'START',
         symbol: symbolVal || '',
