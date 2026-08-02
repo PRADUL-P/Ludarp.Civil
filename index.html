@@ -673,15 +673,28 @@
     </div>
   </div>
 
-  <script src="calendar_data.js"></script>
+  <script src="calendar_data.js?v=2.2"></script>
   <script>
-    let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
-    if (!calendarDb.length && typeof autocadCalendar !== 'undefined') {
-      calendarDb = autocadCalendar;
+    let calendarDb = [];
+    try {
+      calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
+    } catch(e) { calendarDb = []; }
+
+    if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
+      if (typeof CALENDAR_DATA_FROM_FILE !== 'undefined' && Array.isArray(CALENDAR_DATA_FROM_FILE) && CALENDAR_DATA_FROM_FILE.length > 0) {
+        calendarDb = CALENDAR_DATA_FROM_FILE;
+      } else if (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar)) {
+        calendarDb = autocadCalendar;
+      }
     }
-    const completedDays = new Set(JSON.parse(localStorage.getItem('ludarp_completed_calendar')) || []);
-    const publishedPosts = calendarDb.filter(post => post.posted || post.status === 'published' || completedDays.has(String(post.day)));
-    const feedPosts = publishedPosts.length > 0 ? publishedPosts : calendarDb;
+
+    let rawCompleted = [];
+    try {
+      rawCompleted = JSON.parse(localStorage.getItem('ludarp_completed_calendar')) || [];
+    } catch(e) { rawCompleted = []; }
+    const completedDays = new Set((Array.isArray(rawCompleted) ? rawCompleted : []).map(String));
+    const publishedPosts = (Array.isArray(calendarDb) ? calendarDb : []).filter(post => post && (post.posted || post.status === 'published' || completedDays.has(String(post.day))));
+    const feedPosts = publishedPosts.length > 0 ? publishedPosts : (Array.isArray(calendarDb) ? calendarDb : []);
 
     // Tab Switcher
     const navBtns = document.querySelectorAll('.pub-nav-btn[data-tab]');
@@ -791,14 +804,19 @@
     // 2. Render Search Hub
     function renderHub() {
       const grid = document.getElementById('hub-cards-grid');
-      const searchVal = document.getElementById('hub-search-input').value.toLowerCase().trim();
-      const catVal = document.getElementById('hub-cat-filter').value;
+      if (!grid) return;
+
+      const searchInput = document.getElementById('hub-search-input');
+      const catFilter = document.getElementById('hub-cat-filter');
+      const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+      const catVal = catFilter ? catFilter.value : 'all';
 
       grid.innerHTML = '';
 
-      const filtered = calendarDb.filter(post => {
-        const matchesCat = catVal === 'all' || post.category === catVal;
-        const text = `${post.shortcut} ${post.keys} ${post.action} ${post.title} ${post.description} ${post.desc}`.toLowerCase();
+      const filtered = (Array.isArray(calendarDb) ? calendarDb : []).filter(post => {
+        if (!post) return false;
+        const matchesCat = catVal === 'all' || (post.category || 'General') === catVal;
+        const text = `${post.shortcut || ''} ${post.keys || ''} ${post.action || ''} ${post.title || ''} ${post.description || ''} ${post.desc || ''}`.toLowerCase();
         const matchesSearch = !searchVal || text.includes(searchVal);
         return matchesCat && matchesSearch;
       });
@@ -821,22 +839,24 @@
     const btnInt = document.getElementById('btn-level-intermediate');
     const btnAdv = document.getElementById('btn-level-advanced');
 
-    btnBeg.onclick = () => setQuizLevel('Beginner');
-    btnInt.onclick = () => setQuizLevel('Intermediate');
-    btnAdv.onclick = () => setQuizLevel('Advanced');
+    if (btnBeg) btnBeg.onclick = () => setQuizLevel('Beginner');
+    if (btnInt) btnInt.onclick = () => setQuizLevel('Intermediate');
+    if (btnAdv) btnAdv.onclick = () => setQuizLevel('Advanced');
 
     function setQuizLevel(lvl) {
       selectedLevel = lvl;
-      btnBeg.className = 'level-btn ' + (lvl === 'Beginner' ? 'active-beginner' : '');
-      btnInt.className = 'level-btn ' + (lvl === 'Intermediate' ? 'active-intermediate' : '');
-      btnAdv.className = 'level-btn ' + (lvl === 'Advanced' ? 'active-advanced' : '');
+      if (btnBeg) btnBeg.className = 'level-btn ' + (lvl === 'Beginner' ? 'active-beginner' : '');
+      if (btnInt) btnInt.className = 'level-btn ' + (lvl === 'Intermediate' ? 'active-intermediate' : '');
+      if (btnAdv) btnAdv.className = 'level-btn ' + (lvl === 'Advanced' ? 'active-advanced' : '');
 
       startQuizSet();
     }
 
     function startQuizSet() {
-      document.getElementById('quiz-game-body').style.display = 'block';
-      document.getElementById('quiz-results-screen').style.display = 'none';
+      const gameBody = document.getElementById('quiz-game-body');
+      const resultsScreen = document.getElementById('quiz-results-screen');
+      if (gameBody) gameBody.style.display = 'block';
+      if (resultsScreen) resultsScreen.style.display = 'none';
 
       // Filter pool by difficulty level
       let pool = calendarDb.filter(p => {
@@ -903,23 +923,35 @@
       if (currentQuizIndex >= 10 || currentQuizIndex >= currentQuizPool.length) {
         // Finish Quiz Set & Save Progress locally
         const isNewRecord = saveQuizScore(selectedLevel, quizScore);
-        document.getElementById('quiz-game-body').style.display = 'none';
-        document.getElementById('quiz-results-screen').style.display = 'block';
-        document.getElementById('quiz-final-score-text').innerHTML = `
-          Level: <b>${selectedLevel}</b> • Score: <b>${quizScore} / 100</b>
-          ${isNewRecord ? '<br><span style="color:var(--accent-green); font-size:1.05rem; font-weight:900; display:inline-block; margin-top:8px;">🎉 NEW PERSONAL BEST HIGH SCORE!</span>' : ''}
-        `;
+        const gameBody = document.getElementById('quiz-game-body');
+        const resultsScreen = document.getElementById('quiz-results-screen');
+        const finalScoreText = document.getElementById('quiz-final-score-text');
+
+        if (gameBody) gameBody.style.display = 'none';
+        if (resultsScreen) resultsScreen.style.display = 'block';
+        if (finalScoreText) {
+          finalScoreText.innerHTML = `
+            Level: <b>${selectedLevel}</b> • Score: <b>${quizScore} / 100</b>
+            ${isNewRecord ? '<br><span style="color:var(--accent-green); font-size:1.05rem; font-weight:900; display:inline-block; margin-top:8px;">🎉 NEW PERSONAL BEST HIGH SCORE!</span>' : ''}
+          `;
+        }
         return;
       }
 
-      const q = currentQuizPool[currentQuizIndex];
-      const targetKey = q.shortcut || q.keys;
+      const q = currentQuizPool[currentQuizIndex] || {};
+      const targetKey = q.shortcut || q.keys || 'CAD';
 
-      document.getElementById('quiz-question-counter').textContent = `Question ${currentQuizIndex + 1} of 10`;
-      document.getElementById('quiz-score-val').textContent = `${quizScore} / 100`;
-      document.getElementById('quiz-progress-fill').style.width = `${((currentQuizIndex + 1) / 10) * 100}%`;
-      document.getElementById('quiz-question-text').textContent = `What is the shortcut for "${q.action}"?`;
-      document.getElementById('quiz-next-btn').style.display = 'none';
+      const qCounter = document.getElementById('quiz-question-counter');
+      const qScoreVal = document.getElementById('quiz-score-val');
+      const qProgressFill = document.getElementById('quiz-progress-fill');
+      const qText = document.getElementById('quiz-question-text');
+      const qNextBtn = document.getElementById('quiz-next-btn');
+
+      if (qCounter) qCounter.textContent = `Question ${currentQuizIndex + 1} of 10`;
+      if (qScoreVal) qScoreVal.textContent = `${quizScore} / 100`;
+      if (qProgressFill) qProgressFill.style.width = `${((currentQuizIndex + 1) / 10) * 100}%`;
+      if (qText) qText.textContent = `What is the shortcut for "${q.action || q.title || 'this command'}"?`;
+      if (qNextBtn) qNextBtn.style.display = 'none';
 
       // Wrong options
       const wrongKeys = calendarDb
@@ -952,14 +984,20 @@
       });
     }
 
-    document.getElementById('quiz-next-btn').onclick = () => {
-      currentQuizIndex++;
-      renderQuizQuestion();
-    };
+    const quizNextBtn = document.getElementById('quiz-next-btn');
+    if (quizNextBtn) {
+      quizNextBtn.onclick = () => {
+        currentQuizIndex++;
+        renderQuizQuestion();
+      };
+    }
 
-    document.getElementById('quiz-restart-btn').onclick = () => {
-      startQuizSet();
-    };
+    const quizRestartBtn = document.getElementById('quiz-restart-btn');
+    if (quizRestartBtn) {
+      quizRestartBtn.onclick = () => {
+        startQuizSet();
+      };
+    }
 
     // 4. Render Printable Master Cheat Sheet Table
     function renderCheatSheet() {
@@ -992,12 +1030,12 @@
       container.innerHTML = html;
     }
 
-    // Init
-    renderScorecard();
-    renderPublishedFeed();
-    renderHub();
-    setQuizLevel('Beginner');
-    renderCheatSheet();
+    // Safe Init
+    try { if (typeof renderScorecard === 'function') renderScorecard(); } catch (e) { console.error('Scorecard init error:', e); }
+    try { if (typeof renderPublishedFeed === 'function') renderPublishedFeed(); } catch (e) { console.error('Published feed init error:', e); }
+    try { if (typeof renderHub === 'function') renderHub(); } catch (e) { console.error('Hub init error:', e); }
+    try { if (typeof setQuizLevel === 'function') setQuizLevel('Beginner'); } catch (e) { console.error('Quiz init error:', e); }
+    try { if (typeof renderCheatSheet === 'function') renderCheatSheet(); } catch (e) { console.error('Cheatsheet init error:', e); }
   </script>
 </body>
 </html>
