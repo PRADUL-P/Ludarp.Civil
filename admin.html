@@ -676,6 +676,16 @@
                       <span>👁️</span> Post Element Checkboxes (On / Off)
                     </label>
                     <svg id="arrow-elem-visibility" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                    <span style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">Toggle individual elements:</span>
+                    <div style="display:flex; gap:6px;">
+                      <button type="button" id="btn-check-all-elems" style="padding:2px 8px; font-size:0.68rem; font-weight:700; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; color:var(--accent); cursor:pointer;">
+                        ☑️ Check All
+                      </button>
+                      <button type="button" id="btn-uncheck-all-elems" style="padding:2px 8px; font-size:0.68rem; font-weight:700; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; color:var(--text-secondary); cursor:pointer;">
+                        ☐ Uncheck All
+                      </button>
+                    </div>
                   </div>
 
                   <div id="elem-visibility-body" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">

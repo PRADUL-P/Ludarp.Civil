@@ -557,8 +557,9 @@ function updateCardPreview() {
 const contentDifficultyInput = document.getElementById('content-difficulty');
 const contentCategoryInput = document.getElementById('content-category');
 const contentCommonMistakeInput = document.getElementById('content-common-mistake');
+const contentSymbolInput = document.getElementById('content-symbol');
 
-[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput, contentDifficultyInput, contentCategoryInput, contentCommonMistakeInput].forEach(el => {
+[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentSymbolInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput, contentDifficultyInput, contentCategoryInput, contentCommonMistakeInput].forEach(el => {
   if (el) {
     el.addEventListener('input', () => {
       updateCardPreview();
@@ -3102,6 +3103,31 @@ function resetCreatorStudioForm() {
     toggleElemMistake.addEventListener('change', () => {
       const el = document.getElementById('card-common-mistake-box');
       if (el) el.style.display = toggleElemMistake.checked ? 'block' : 'none';
+    });
+  }
+
+  const btnCheckAllElems = document.getElementById('btn-check-all-elems');
+  const btnUncheckAllElems = document.getElementById('btn-uncheck-all-elems');
+
+  if (btnCheckAllElems && elemVisibilityBody) {
+    btnCheckAllElems.addEventListener('click', () => {
+      elemVisibilityBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+        cb.dispatchEvent(new Event('change'));
+      });
+      updateCardPreview();
+      showToast("☑️ All post elements checked!");
+    });
+  }
+
+  if (btnUncheckAllElems && elemVisibilityBody) {
+    btnUncheckAllElems.addEventListener('click', () => {
+      elemVisibilityBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+        cb.dispatchEvent(new Event('change'));
+      });
+      updateCardPreview();
+      showToast("☐ All post elements unchecked!");
     });
   }
 
