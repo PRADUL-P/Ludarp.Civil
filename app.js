@@ -418,13 +418,20 @@ function updateCardPreview() {
     tbDwgNo.textContent = `${prefix}-${sanitizedKey}`;
   }
   
-  // Update Pro Tip
+  // Update Pro Tip (supports multiple pro tips on separate lines)
   const proTipText = contentProTipInput ? contentProTipInput.value.trim() : '';
   const proTipBox = instagramCard.querySelector('.pro-tip-box');
   if (proTipBox) {
     if (proTipText) {
       proTipBox.style.display = 'flex';
-      if (cardProTip) cardProTip.textContent = proTipText;
+      if (cardProTip) {
+        if (proTipText.includes('\n')) {
+          const tips = proTipText.split('\n').map(t => t.trim()).filter(t => t);
+          cardProTip.innerHTML = tips.map(t => `<div style="margin-bottom:4px; display:flex; gap:4px; align-items:flex-start;"><span>💡</span><span>${t.replace(/^(?:💡|pro\s*tip:?\s*)/i, '').trim()}</span></div>`).join('');
+        } else {
+          cardProTip.textContent = proTipText;
+        }
+      }
     } else {
       proTipBox.style.display = 'none';
     }
@@ -3039,6 +3046,114 @@ function resetCreatorStudioForm() {
 
   loadCustomSoftwares();
 
+  // ── Script & JSON Exporters & Multi-ProTip Handler ───────────────────────
+  function generateScriptTextFromItem(item) {
+    let keys = item.keys || '';
+    let action = item.action || item.title || '';
+    const colonMatch = (item.title || '').match(/^([^:]+):\s*(.*)$/);
+    if (colonMatch) {
+      keys = keys || colonMatch[1].trim();
+      action = colonMatch[2].trim();
+    }
+
+    const stepsList = (item.bullets && item.bullets.length > 0)
+      ? item.bullets.map((b, i) => `${i + 1}. ${b}`).join('\n')
+      : '1. Execute command on keyboard.';
+
+    return `ID: ${item.id || ('AC-' + String(item.day || 1).padStart(3, '0'))}
+Software: ${item.software || 'AutoCAD'}
+Shortcut: ${keys}
+Action: ${action}
+Category: ${item.category || item.phase || 'General'}
+Difficulty: ${item.difficulty || 'Everyone'}
+Version: ${item.version || '2026'}
+Description:
+${item.desc || item.description || ''}
+Steps:
+${stepsList}
+Pro Tip:
+${item.proTip || ''}
+Common Mistake:
+${item.commonMistake || ''}
+Hashtags:
+${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
+  }
+
+  function generateJsonFromItem(item) {
+    return JSON.stringify(item, null, 2);
+  }
+
+  function getActiveEditorAsItem() {
+    const sw = contentSoftware ? contentSoftware.value : 'AutoCAD';
+    const keys = contentKeysInput ? contentKeysInput.value : '';
+    const action = contentActionInput ? contentActionInput.value : '';
+    const desc = contentDescInput ? contentDescInput.value : '';
+    const proTip = contentProTipInput ? contentProTipInput.value : '';
+    const mistake = document.getElementById('content-common-mistake') ? document.getElementById('content-common-mistake').value : '';
+    const hashtags = document.getElementById('content-hashtags') ? document.getElementById('content-hashtags').value : '';
+    const difficulty = document.getElementById('content-difficulty') ? document.getElementById('content-difficulty').value : 'Beginner';
+    const category = document.getElementById('content-category') ? document.getElementById('content-category').value : 'Drawing';
+
+    const bullets = Array.from(getStepInputs()).map(inp => inp.value.trim()).filter(val => val !== '');
+
+    const activeItem = calendarDb.find(i => Number(i.day) === Number(activeCalendarDayNum)) || {};
+
+    return {
+      id: activeItem.id || `AC-${String(activeCalendarDayNum).padStart(3, '0')}`,
+      day: activeCalendarDayNum,
+      software: sw,
+      keys: keys,
+      action: action,
+      title: keys ? `${keys}: ${action}` : action,
+      category: category,
+      difficulty: difficulty,
+      desc: desc,
+      bullets: bullets,
+      proTip: proTip,
+      commonMistake: mistake,
+      hashtags: hashtags,
+      format: currentFormat || 'post'
+    };
+  }
+
+  const btnCopyScript = document.getElementById('btn-copy-script');
+  const btnCopyJson = document.getElementById('btn-copy-json');
+
+  if (btnCopyScript) {
+    btnCopyScript.addEventListener('click', () => {
+      const item = getActiveEditorAsItem();
+      const scriptText = generateScriptTextFromItem(item);
+      navigator.clipboard.writeText(scriptText).then(() => {
+        showToast("📜 Formatted Text Script copied to clipboard!", "success");
+      });
+    });
+  }
+
+  if (btnCopyJson) {
+    btnCopyJson.addEventListener('click', () => {
+      const item = getActiveEditorAsItem();
+      const jsonText = generateJsonFromItem(item);
+      navigator.clipboard.writeText(jsonText).then(() => {
+        showToast("📦 Clean JSON Payload copied to clipboard!", "success");
+      });
+    });
+  }
+
+  const btnAddExtraProtip = document.getElementById('btn-add-extra-protip');
+  if (btnAddExtraProtip && contentProTipInput) {
+    btnAddExtraProtip.addEventListener('click', () => {
+      const existing = contentProTipInput.value.trim();
+      if (existing) {
+        contentProTipInput.value = existing + '\n💡 Pro Tip: ';
+      } else {
+        contentProTipInput.value = '💡 Pro Tip 1: \n💡 Pro Tip 2: ';
+      }
+      contentProTipInput.focus();
+      contentProTipInput.dispatchEvent(new Event('input'));
+      showToast("💡 Added extra Pro Tip line!");
+    });
+  }
+
   // Overlay & Pattern Controls Initialization
   const overlayGridPattern = document.getElementById('overlay-grid-pattern');
   const overlayToggleCropmarks = document.getElementById('overlay-toggle-cropmarks');
@@ -3192,6 +3307,8 @@ function renderDatabaseManagerTable() {
         <div style="display:inline-flex; gap:6px;">
           <button class="db-btn-sm btn-action btn-primary-action" data-action="load" data-day="${item.day}">Load</button>
           <button class="db-btn-sm btn-action btn-secondary-action" data-action="toggle" data-day="${item.day}">${isCompleted ? 'Undo' : 'Mark Done'}</button>
+          <button class="db-btn-sm btn-action btn-ghost-action" data-action="copy-script" data-day="${item.day}" title="Copy Text Script">📜 Script</button>
+          <button class="db-btn-sm btn-action btn-ghost-action" data-action="copy-json" data-day="${item.day}" title="Copy JSON Payload">📦 JSON</button>
           <button class="db-btn-sm btn-action btn-ghost-action" data-action="delete" data-day="${item.day}" style="color:var(--error);">Delete</button>
         </div>
       </td>
@@ -3203,6 +3320,20 @@ function renderDatabaseManagerTable() {
       loadCalendarItemToEditor(item);
       document.querySelector('.nav-btn[data-tab="studio"]').click();
       showToast(`Loaded Day ${item.day}: "${action}" into Creator Studio!`);
+    };
+
+    tr.querySelector('[data-action="copy-script"]').onclick = () => {
+      const scriptText = generateScriptTextFromItem(item);
+      navigator.clipboard.writeText(scriptText).then(() => {
+        showToast(`📜 Day ${item.day} Text Script copied!`, 'success');
+      });
+    };
+
+    tr.querySelector('[data-action="copy-json"]').onclick = () => {
+      const jsonText = generateJsonFromItem(item);
+      navigator.clipboard.writeText(jsonText).then(() => {
+        showToast(`📦 Day ${item.day} JSON copied!`, 'success');
+      });
     };
     
     tr.querySelector('[data-action="toggle"]').onclick = () => {
