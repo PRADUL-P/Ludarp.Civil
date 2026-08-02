@@ -964,6 +964,39 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
   align-self: flex-start;
 }
 .pro-tip-text { font-size: 20px; font-weight: 600; line-height: 1.35; }
+
+/* Common Mistake Callout Box */
+.common-mistake-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  flex: 1;
+  max-width: 520px;
+  position: relative;
+  background: #fecdd3 !important;
+  color: #881337 !important;
+  box-shadow: 4px 12px 25px rgba(0,0,0,0.3);
+  transform: rotate(0.8deg);
+}
+.common-mistake-tag {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  align-self: flex-start;
+  background: #e11d48 !important;
+  color: #fff !important;
+}
+.common-mistake-text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #881337 !important;
+  font-family: 'Chakra Petch', sans-serif;
+}
 .footer-meta-container { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; flex-shrink: 0; }
 .cta-message { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 22px; letter-spacing: 0.05em; text-transform: uppercase; }
 .cta-icon { width: 24px; height: 24px; animation: float 2s ease-in-out infinite; }

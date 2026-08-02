@@ -1,7 +1,37 @@
 {
   "appName": "Ludarp Civil Studio",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "updatedAt": "2026-08-02",
+  "standardPhases": [
+    "Phase 1: Basics",
+    "Phase 2: Drawing",
+    "Phase 3: Modify",
+    "Phase 4: Annotation",
+    "Phase 5: Layers",
+    "Phase 6: Blocks",
+    "Phase 7: Layouts & Plotting",
+    "Phase 8: Productivity",
+    "Phase 9: 3D",
+    "Phase 10: Advanced",
+    "Phase 11: Express Tools",
+    "Phase 12: AutoLISP"
+  ],
+  "categories": [
+    "Drawing",
+    "Modify",
+    "Layers",
+    "Blocks",
+    "Annotation",
+    "3D",
+    "Workflow",
+    "Express Tools"
+  ],
+  "difficultyLevels": [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+    "Expert"
+  ],
   "softwareList": [
     "AutoCAD",
     "Revit",

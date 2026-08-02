@@ -398,13 +398,29 @@ function updateCardPreview() {
   }
   
   // Update Pro Tip
-  const proTipText = contentProTipInput.value.trim();
+  const proTipText = contentProTipInput ? contentProTipInput.value.trim() : '';
   const proTipBox = instagramCard.querySelector('.pro-tip-box');
-  if (proTipText) {
-    proTipBox.style.display = 'flex';
-    cardProTip.textContent = proTipText;
-  } else {
-    proTipBox.style.display = 'none';
+  if (proTipBox) {
+    if (proTipText) {
+      proTipBox.style.display = 'flex';
+      if (cardProTip) cardProTip.textContent = proTipText;
+    } else {
+      proTipBox.style.display = 'none';
+    }
+  }
+
+  // Update Common Mistake Box
+  const contentCommonMistakeInput = document.getElementById('content-common-mistake');
+  const commonMistakeText = contentCommonMistakeInput ? contentCommonMistakeInput.value.trim() : '';
+  const commonMistakeBox = document.getElementById('card-common-mistake-box');
+  const cardCommonMistakeEl = document.getElementById('card-common-mistake');
+  if (commonMistakeBox) {
+    if (commonMistakeText) {
+      commonMistakeBox.style.display = 'flex';
+      if (cardCommonMistakeEl) cardCommonMistakeEl.textContent = commonMistakeText;
+    } else {
+      commonMistakeBox.style.display = 'none';
+    }
   }
 
   // Update background watermark letter
@@ -421,7 +437,11 @@ function updateCardPreview() {
 }
 
 // Bind event listeners to input elements for real-time visual syncing and database auto-saving
-[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput].forEach(el => {
+const contentDifficultyInput = document.getElementById('content-difficulty');
+const contentCategoryInput = document.getElementById('content-category');
+const contentCommonMistakeInput = document.getElementById('content-common-mistake');
+
+[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput, contentDifficultyInput, contentCategoryInput, contentCommonMistakeInput].forEach(el => {
   if (el) {
     el.addEventListener('input', () => {
       updateCardPreview();
@@ -1799,9 +1819,17 @@ function loadCalendarItemToEditor(item) {
   }
   contentDescInput.value = descText;
   
-  // Set pro-tip if any
-  contentProTipInput.value = item.proTip ? item.proTip : 'Save & share this AutoCAD tip for your next drawing project!';
+  // Set pro-tip & common mistake if any
+  contentProTipInput.value = item.proTip ? item.proTip : '';
+  const contentCommonMistakeInput = document.getElementById('content-common-mistake');
+  if (contentCommonMistakeInput) contentCommonMistakeInput.value = item.commonMistake ? item.commonMistake : '';
   
+  // Set Difficulty & Category
+  const contentDiffInput = document.getElementById('content-difficulty');
+  const contentCatInput = document.getElementById('content-category');
+  if (contentDiffInput) contentDiffInput.value = item.difficulty || 'Beginner';
+  if (contentCatInput) contentCatInput.value = item.category || 'Drawing';
+
   // Set hashtags if any
   if (contentHashtagsInput) {
     contentHashtagsInput.value = item.hashtags ? (Array.isArray(item.hashtags) ? item.hashtags.join(' ') : item.hashtags) : '#autocad #civilengineering #drafting';
@@ -2342,6 +2370,15 @@ async function saveCurrentDayData() {
   d.title = contentActionInput.value.trim();
   d.desc = contentDescInput.value.trim();
   d.proTip = contentProTipInput.value.trim();
+  
+  const contentDiffInput = document.getElementById('content-difficulty');
+  const contentCatInput = document.getElementById('content-category');
+  const contentCommonMistakeInput = document.getElementById('content-common-mistake');
+  
+  if (contentDiffInput) d.difficulty = contentDiffInput.value;
+  if (contentCatInput) d.category = contentCatInput.value;
+  if (contentCommonMistakeInput) d.commonMistake = contentCommonMistakeInput.value.trim();
+  
   if (contentHashtagsInput) {
     d.hashtags = contentHashtagsInput.value.trim().split(/\s+/).filter(t => t);
   }
@@ -3263,37 +3300,55 @@ const importerParsedCount = document.getElementById('importer-parsed-count');
 
 let currentParsedPosts = [];
 
-const EXAMPLE_POST_TEXT = `Software: AutoCAD
+const EXAMPLE_POST_TEXT = `ID: AC-001
+Software: AutoCAD
 Shortcut: F8 / ORTHO
 Action: Turn On Ortho Mode
+Category: Drawing
+Difficulty: Beginner
+Version: AutoCAD 2025
 Description: Locks your cursor to perfectly horizontal or vertical movement — the first thing every beginner should learn before drawing anything.
 Steps:
 1. Press F8 to toggle Ortho mode on or off.
 2. With Ortho on, start any draw command like LINE.
 3. Move your mouse — notice it only snaps to 0°, 90°, 180°, or 270°.
 Pro Tip: Ortho is great for walls and straight layouts, but turn it off (F8 again) when you need angled lines.
+Common Mistake: Leaving Ortho ON while trying to draw angled lines.
+Related Commands: LINE, POLAR, OSNAP
 Hashtags: #autocad #autocadbasics #beginnertips #cadforbeginners
 ---
+ID: AC-002
 Software: AutoCAD
 Shortcut: F3 / OSNAP
 Action: Turn On Object Snap
+Category: Drawing
+Difficulty: Beginner
+Version: AutoCAD 2025
 Description: Makes your cursor automatically snap to precise points like endpoints, midpoints, and intersections — essential for accurate drawings.
 Steps:
 1. Press F3 to toggle Object Snap on or off.
 2. Right-click the OSNAP icon in the status bar and choose snap points.
 3. Start drawing — your cursor will show a colored marker when snapping.
 Pro Tip: Beginners should start with just Endpoint, Midpoint, and Intersection enabled.
+Common Mistake: Keeping all 14 snap points active at once, causing cursor jumping.
+Related Commands: LINE, ORTHO, AUTOSNAP
 Hashtags: #autocad #osnap #cadbasics #beginnertips #drafting
 ---
+ID: AC-003
 Software: AutoCAD
 Shortcut: L
 Action: Draw a Line
+Category: Drawing
+Difficulty: Beginner
+Version: AutoCAD 2025
 Description: Creates a straight line segment between two or more points — the single most-used command in AutoCAD.
 Steps:
 1. Type 'L' and hit Enter (or Spacebar).
 2. Click your starting point in the drawing area.
 3. Click your endpoint, then press Enter to finish.
 Pro Tip: Hold Shift while drawing to temporarily snap to orthogonal (90°) angles.
+Common Mistake: Forgetting to press Enter or Spacebar to confirm the command.
+Related Commands: PLINE, RAY, XLINE
 Hashtags: #autocad #linecommand #cadbasics #beginnertips`;
 
 if (btnImporterLoadExample) {
@@ -3329,17 +3384,29 @@ function parseRawTextToPosts(rawText) {
     let desc = '';
     let steps = [];
     let protip = '';
+    let commonMistake = '';
+    let category = 'Drawing';
+    let difficulty = 'Beginner';
+    let relatedCommands = [];
+    let version = 'AutoCAD 2025';
     let hashtags = '';
+    let customId = '';
 
     let inSteps = false;
 
     lines.forEach(line => {
-      if (/^software:/i.test(line)) {
+      if (/^id:/i.test(line)) {
+        customId = line.split(/:(.+)/)[1].trim();
+      } else if (/^software:/i.test(line)) {
         sw = line.split(/:(.+)/)[1].trim();
       } else if (/^shortcut:/i.test(line)) {
         shortcut = line.split(/:(.+)/)[1].trim();
       } else if (/^action:/i.test(line)) {
         action = line.split(/:(.+)/)[1].trim();
+      } else if (/^category:/i.test(line)) {
+        category = line.split(/:(.+)/)[1].trim();
+      } else if (/^difficulty:/i.test(line)) {
+        difficulty = line.split(/:(.+)/)[1].trim();
       } else if (/^description:/i.test(line)) {
         desc = line.split(/:(.+)/)[1].trim();
         inSteps = false;
@@ -3347,6 +3414,16 @@ function parseRawTextToPosts(rawText) {
         inSteps = true;
       } else if (/^pro tip:/i.test(line) || /^protip:/i.test(line)) {
         protip = line.split(/:(.+)/)[1].trim();
+        inSteps = false;
+      } else if (/^common mistake:/i.test(line) || /^mistake:/i.test(line)) {
+        commonMistake = line.split(/:(.+)/)[1].trim();
+        inSteps = false;
+      } else if (/^related commands:/i.test(line) || /^related:/i.test(line)) {
+        const rawRel = line.split(/:(.+)/)[1].trim();
+        relatedCommands = rawRel.split(',').map(s => s.trim()).filter(s => s);
+        inSteps = false;
+      } else if (/^version:/i.test(line)) {
+        version = line.split(/:(.+)/)[1].trim();
         inSteps = false;
       } else if (/^hashtags:/i.test(line)) {
         hashtags = line.split(/:(.+)/)[1].trim();
@@ -3359,17 +3436,23 @@ function parseRawTextToPosts(rawText) {
 
     if (action || shortcut || desc) {
       parsed.push({
-        id: `parsed-${Date.now()}-${idx}`,
+        id: customId || `AC-${String(idx + 1).padStart(3, '0')}`,
         software: sw || 'AutoCAD',
         keys: shortcut || 'CAD',
         action: action || 'Shortcut Action',
         title: shortcut ? `${shortcut}: ${action}` : action,
+        category: category,
+        difficulty: difficulty,
         desc: desc || 'Description goes here.',
         bullets: steps.length > 0 ? steps : ['Step 1: Execute command on keyboard'],
-        proTip: protip || 'Save for later!',
+        proTip: protip || '',
+        commonMistake: commonMistake || '',
+        relatedCommands: relatedCommands,
+        version: version,
         hashtags: hashtags || '#autocad #civilengineering #drafting',
         format: 'post',
-        markerStyle: 'number'
+        markerStyle: 'number',
+        creatorHandle: 'ludarp.civil'
       });
     }
   });

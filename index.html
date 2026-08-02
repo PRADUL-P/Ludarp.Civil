@@ -267,9 +267,39 @@
                 </div>
               </div>
 
+              <div class="form-row" style="display:flex; gap:10px; margin-top:8px;">
+                <div class="form-group" style="flex:1;">
+                  <label for="content-difficulty" style="font-size:0.75rem; font-weight:700;">Difficulty</label>
+                  <select id="content-difficulty" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                  </select>
+                </div>
+                <div class="form-group" style="flex:1;">
+                  <label for="content-category" style="font-size:0.75rem; font-weight:700;">Category</label>
+                  <select id="content-category" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
+                    <option value="Drawing">Drawing</option>
+                    <option value="Modify">Modify</option>
+                    <option value="Layers">Layers</option>
+                    <option value="Blocks">Blocks</option>
+                    <option value="Annotation">Annotation</option>
+                    <option value="3D">3D</option>
+                    <option value="Workflow">Workflow</option>
+                    <option value="Express Tools">Express Tools</option>
+                  </select>
+                </div>
+              </div>
+
               <div class="form-group" id="protip-field">
-                <label for="content-pro-tip">Pro Tip</label>
+                <label for="content-pro-tip">💡 Pro Tip</label>
                 <textarea id="content-pro-tip" rows="2" placeholder="Value-add pro tip..."></textarea>
+              </div>
+
+              <div class="form-group" id="common-mistake-field">
+                <label for="content-common-mistake" style="color:var(--error); font-weight:700;">❌ Common Mistake to Avoid</label>
+                <textarea id="content-common-mistake" rows="2" placeholder="Frequent beginner mistake to avoid..."></textarea>
               </div>
 
               <div class="form-group">
@@ -548,6 +578,12 @@
                     <div class="sticky-tape tape-right"></div>
                     <div class="pro-tip-tag">PRO TIP</div>
                     <div class="pro-tip-text" id="card-pro-tip">Hold SHIFT while using Trim to quickly extend lines instead!</div>
+                  </div>
+                  <div class="common-mistake-box" id="card-common-mistake-box" style="display:none;">
+                    <div class="sticky-tape tape-left"></div>
+                    <div class="sticky-tape tape-right"></div>
+                    <div class="common-mistake-tag">❌ MISTAKE</div>
+                    <div class="common-mistake-text" id="card-common-mistake">Leaving Ortho ON while trying to draw angled lines.</div>
                   </div>
                   <div class="footer-meta-container">
                     <div class="cta-message">
