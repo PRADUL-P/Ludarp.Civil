@@ -336,16 +336,17 @@ function updateCardPreview() {
   
   // Update steps
   cardStepsList.innerHTML = '';
-  let stepIndex = 1;
+  let stepIndex = 0;
+  const markerStyle = document.getElementById('list-marker-style') ? document.getElementById('list-marker-style').value : 'number';
   getStepInputs().forEach(input => {
     const text = input.value.trim();
     if (text) {
       const stepItem = document.createElement('div');
       stepItem.className = 'card-step-item';
       
-      const numFormatted = stepIndex.toString().padStart(2, '0');
+      const markerSymbol = getMarkerSymbol(markerStyle, stepIndex);
       stepItem.innerHTML = `
-        <div class="card-step-num">${numFormatted}</div>
+        <div class="card-step-num">${markerSymbol}</div>
         <div class="card-step-text">${text}</div>
       `;
       cardStepsList.appendChild(stepItem);
@@ -440,31 +441,45 @@ function bindStepRowEvents(row) {
 }
 
 function reindexSteps() {
+  const markerStyle = document.getElementById('list-marker-style') ? document.getElementById('list-marker-style').value : 'number';
   const rows = stepsContainer.querySelectorAll('.step-input-row');
   rows.forEach((r, index) => {
-    r.querySelector('.step-number').textContent = index + 1;
+    const numSpan = r.querySelector('.step-number');
+    if (numSpan) numSpan.textContent = getMarkerSymbol(markerStyle, index);
     const input = r.querySelector('.step-input');
-    if (input) input.placeholder = `Step ${index + 1}`;
+    if (input) input.placeholder = `Item ${index + 1}`;
   });
 }
 
 if (btnAddStep) {
   btnAddStep.addEventListener('click', () => {
     const rows = stepsContainer.querySelectorAll('.step-input-row');
-    const newIndex = rows.length + 1;
+    const newIndex = rows.length;
+    const markerStyle = document.getElementById('list-marker-style') ? document.getElementById('list-marker-style').value : 'number';
+    const markerSymbol = getMarkerSymbol(markerStyle, newIndex);
     
     const newRow = document.createElement('div');
     newRow.className = 'step-input-row';
     newRow.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
     newRow.innerHTML = `
-      <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${newIndex}</span>
-      <input type="text" class="step-input" placeholder="Step ${newIndex}" value="" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+      <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${markerSymbol}</span>
+      <input type="text" class="step-input" placeholder="Item ${newIndex + 1}" value="" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
       <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
     `;
     
     stepsContainer.appendChild(newRow);
     bindStepRowEvents(newRow);
     newRow.querySelector('.step-input').focus();
+    updateCardPreview();
+    saveCurrentDayData();
+  });
+}
+
+// Bind List Marker Style select dropdown change listener
+const listMarkerSelect = document.getElementById('list-marker-style');
+if (listMarkerSelect) {
+  listMarkerSelect.addEventListener('change', () => {
+    reindexSteps();
     updateCardPreview();
     saveCurrentDayData();
   });
@@ -1770,6 +1785,13 @@ function loadCalendarItemToEditor(item) {
   if (contentSavesInput) contentSavesInput.value = item.saves || '';
   if (contentLikesInput) contentLikesInput.value = item.likes || '';
 
+  // Set List Marker Style
+  const listMarkerSelect = document.getElementById('list-marker-style');
+  if (listMarkerSelect) {
+    listMarkerSelect.value = item.markerStyle || 'number';
+  }
+  const markerStyle = item.markerStyle || 'number';
+
   // Auto-detect command type (Single Command vs List)
   const isList = item.type === 'list' || (item.bullets && item.bullets.length > 5);
   setType(isList ? 'list' : 'command', false);
@@ -1779,12 +1801,13 @@ function loadCalendarItemToEditor(item) {
   const listItems = item.bullets || item.items || [];
   if (listItems.length > 0) {
     listItems.forEach((bulletText, index) => {
+      const markerSymbol = getMarkerSymbol(markerStyle, index);
       const row = document.createElement('div');
       row.className = 'step-input-row';
       row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
       row.innerHTML = `
-        <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${index + 1}</span>
-        <input type="text" class="step-input" placeholder="Step ${index + 1}" value="${bulletText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+        <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${markerSymbol}</span>
+        <input type="text" class="step-input" placeholder="Item ${index + 1}" value="${bulletText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
         <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
       `;
       stepsContainer.appendChild(row);
@@ -2303,6 +2326,7 @@ async function saveCurrentDayData() {
   const isCommand = typeCommandBtn && typeCommandBtn.classList.contains('active');
   d.type = isCommand ? 'command' : 'list';
   d.keys = contentKeysInput.value.trim();
+  d.markerStyle = document.getElementById('list-marker-style') ? document.getElementById('list-marker-style').value : 'number';
   
   if (isCommand) {
     d.bullets = steps;

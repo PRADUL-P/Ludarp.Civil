@@ -234,9 +234,20 @@
               </div>
 
               <div class="form-group" id="steps-field">
-                <div class="steps-header">
-                  <label id="steps-label">Steps</label>
-                  <button type="button" id="btn-add-step" class="btn-add-step">+ Add Step</button>
+                <div class="steps-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <label id="steps-label" style="margin:0;">List Items</label>
+                    <select id="list-marker-style" style="padding:3px 8px; font-size:0.75rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--accent); font-weight:700; cursor:pointer;">
+                      <option value="number">1, 2, 3 (Numbers)</option>
+                      <option value="bullet">• (Bullet Dots)</option>
+                      <option value="arrow">▶ (CAD Arrowhead)</option>
+                      <option value="check">✓ (Checkmarks)</option>
+                      <option value="square">■ (CAD Squares)</option>
+                      <option value="alphabet">A, B, C (Letters)</option>
+                      <option value="roman">I, II, III (Roman)</option>
+                    </select>
+                  </div>
+                  <button type="button" id="btn-add-step" class="btn-add-step">+ Add Item</button>
                 </div>
                 <div id="steps-container">
                   <div class="step-input-row">
