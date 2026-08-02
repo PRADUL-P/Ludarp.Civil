@@ -480,6 +480,31 @@
        TAB 1: LEVEL-BASED 10-QUESTION QUIZ GAME (FIRST ACTIVE TAB)
        ========================================================================= -->
   <main class="tab-section active" id="tab-quiz">
+    <!-- Persistent User Scorecard & High Scores -->
+    <div style="background:linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); border:1px solid var(--border-accent); border-radius:20px; padding:20px 24px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; box-shadow:0 10px 30px rgba(0,0,0,0.4);">
+      <div>
+        <div style="font-size:0.75rem; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em;">YOUR QUIZ MASTERY SCORECARD</div>
+        <div style="font-size:1.25rem; font-weight:900; color:var(--text-primary); margin-top:2px;" id="user-rank-badge">🐣 CAD Novice (0 XP)</div>
+      </div>
+
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <div style="text-align:center; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); padding:8px 16px; border-radius:14px;">
+          <div style="font-size:0.68rem; font-weight:800; color:var(--accent-green);">🟢 BEGINNER BEST</div>
+          <div style="font-size:1.15rem; font-weight:900; color:var(--text-primary);" id="high-score-beginner">0 / 100</div>
+        </div>
+
+        <div style="text-align:center; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); padding:8px 16px; border-radius:14px;">
+          <div style="font-size:0.68rem; font-weight:800; color:var(--accent-orange);">🟡 INTERMEDIATE BEST</div>
+          <div style="font-size:1.15rem; font-weight:900; color:var(--text-primary);" id="high-score-intermediate">0 / 100</div>
+        </div>
+
+        <div style="text-align:center; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); padding:8px 16px; border-radius:14px;">
+          <div style="font-size:0.68rem; font-weight:800; color:var(--accent-purple);">🔴 ADVANCED BEST</div>
+          <div style="font-size:1.15rem; font-weight:900; color:var(--text-primary);" id="high-score-advanced">0 / 100</div>
+        </div>
+      </div>
+    </div>
+
     <div class="quiz-container">
       <div style="text-align:center;">
         <h2 style="font-size:1.4rem; font-weight:900; margin:0 0 6px 0; color:var(--text-primary);">🧠 AutoCAD Mastery Quiz</h2>
@@ -825,12 +850,60 @@
       renderQuizQuestion();
     }
 
+    // ── Quiz User Data Persistence Engine ────────────────────────────────────
+    function getQuizUserData() {
+      return JSON.parse(localStorage.getItem('ludarp_quiz_user_data')) || {
+        highScores: { Beginner: 0, Intermediate: 0, Advanced: 0 },
+        totalXp: 0,
+        setsCompleted: 0
+      };
+    }
+
+    function renderScorecard() {
+      const data = getQuizUserData();
+      const begEl = document.getElementById('high-score-beginner');
+      const intEl = document.getElementById('high-score-intermediate');
+      const advEl = document.getElementById('high-score-advanced');
+      const rankEl = document.getElementById('user-rank-badge');
+
+      if (begEl) begEl.textContent = `${data.highScores.Beginner || 0} / 100`;
+      if (intEl) intEl.textContent = `${data.highScores.Intermediate || 0} / 100`;
+      if (advEl) advEl.textContent = `${data.highScores.Advanced || 0} / 100`;
+
+      let rank = '🐣 CAD Novice';
+      if (data.totalXp >= 600) rank = '🏆 AutoCAD Master';
+      else if (data.totalXp >= 300) rank = '📐 Drafting Specialist';
+      else if (data.totalXp >= 100) rank = '⚡ CAD Practitioner';
+
+      if (rankEl) rankEl.textContent = `${rank} (${data.totalXp} XP)`;
+    }
+
+    function saveQuizScore(level, score) {
+      const data = getQuizUserData();
+      data.setsCompleted += 1;
+      data.totalXp += score;
+
+      let isNewHigh = false;
+      if (score > (data.highScores[level] || 0)) {
+        data.highScores[level] = score;
+        isNewHigh = true;
+      }
+
+      localStorage.setItem('ludarp_quiz_user_data', JSON.stringify(data));
+      renderScorecard();
+      return isNewHigh;
+    }
+
     function renderQuizQuestion() {
       if (currentQuizIndex >= 10 || currentQuizIndex >= currentQuizPool.length) {
-        // Finish Quiz Set
+        // Finish Quiz Set & Save Progress locally
+        const isNewRecord = saveQuizScore(selectedLevel, quizScore);
         document.getElementById('quiz-game-body').style.display = 'none';
         document.getElementById('quiz-results-screen').style.display = 'block';
-        document.getElementById('quiz-final-score-text').textContent = `Level: ${selectedLevel} • Final Score: ${quizScore} / 100`;
+        document.getElementById('quiz-final-score-text').innerHTML = `
+          Level: <b>${selectedLevel}</b> • Score: <b>${quizScore} / 100</b>
+          ${isNewRecord ? '<br><span style="color:var(--accent-green); font-size:1.05rem; font-weight:900; display:inline-block; margin-top:8px;">🎉 NEW PERSONAL BEST HIGH SCORE!</span>' : ''}
+        `;
         return;
       }
 
@@ -915,6 +988,7 @@
     }
 
     // Init
+    renderScorecard();
     renderPublishedFeed();
     renderHub();
     setQuizLevel('Beginner');
