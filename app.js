@@ -2651,12 +2651,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     aiApiKeyInput.value = localStorage.getItem('ludarp_gemini_api_key') || '';
   }
   
+function resetCreatorStudioForm() {
+  const dayTitleEl = document.getElementById('day-title');
+  const daySubEl = document.getElementById('day-sub');
+  if (dayTitleEl) dayTitleEl.textContent = "Post Editor";
+  if (daySubEl) daySubEl.textContent = "CREATOR STUDIO";
+
+  if (contentKeysInput) contentKeysInput.value = "";
+  if (contentActionInput) contentActionInput.value = "";
+  if (contentDescInput) contentDescInput.value = "";
+  if (contentProTipInput) contentProTipInput.value = "";
+
+  if (stepsContainer) {
+    stepsContainer.innerHTML = `
+      <div class="step-input-row">
+        <span class="step-number">1</span>
+        <input type="text" class="step-input" placeholder="Item 1" value="">
+        <button type="button" class="btn-remove-step">&times;</button>
+      </div>
+    `;
+    stepsContainer.querySelectorAll('.step-input-row').forEach(row => bindStepRowEvents(row));
+  }
+  updateCardPreview();
+}
+
   // Load initial active day on startup (Day 1)
   if (calendarDb.length > 0) {
     const activeDay = calendarDb.find(d => String(d.day) === String(activeCalendarDayNum)) || calendarDb[0];
     loadCalendarItemToEditor(activeDay);
   } else {
-    updateCardPreview();
+    resetCreatorStudioForm();
   }
   
   // Wire real-time CAD crosshairs mouse tracking movement on preview canvas
