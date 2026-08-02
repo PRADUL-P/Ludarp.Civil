@@ -317,6 +317,23 @@ const calendarProgressBar = document.getElementById('calendar-progress-bar');
 // 2. Real-Time Creator Studio Updates
 // ==========================================================================
 
+function getMarkerSymbol(markerStyle, index) {
+  switch (markerStyle) {
+    case 'bullet': return '•';
+    case 'arrow': return '▶';
+    case 'check': return '✓';
+    case 'square': return '■';
+    case 'alphabet': return String.fromCharCode(65 + index);
+    case 'roman': {
+      const romans = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+      return romans[index] || (index + 1).toString();
+    }
+    case 'number':
+    default:
+      return (index + 1).toString().padStart(2, '0');
+  }
+}
+
 function updateCardPreview() {
   // Update brand handle
   const handleVal = brandHandleInput.value.trim() || "ludarp_civil";
