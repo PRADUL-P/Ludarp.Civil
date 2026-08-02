@@ -598,6 +598,50 @@
               </div>
             </div>
 
+            <!-- Typography & Font Sizes Adjuster -->
+            <div class="typo-settings-section" style="padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px;">
+              <div class="settings-section-header" id="toggle-typo-settings" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                <label class="theme-section-label" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                  <span>🔤</span> Typography & Text Sizes
+                </label>
+                <svg id="arrow-typo-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+
+              <div id="typo-settings-body" class="layout-settings-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+
+                <!-- Title Font Size -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Action Title Size (<span id="val-font-title">36</span>px)</label>
+                  <input type="range" id="font-size-title" min="20" max="64" value="36" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- Keycap Font Size -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Keycap Size (<span id="val-font-keycap">54</span>px)</label>
+                  <input type="range" id="font-size-keycap" min="28" max="90" value="54" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- Description Font Size -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Description Size (<span id="val-font-desc">18</span>px)</label>
+                  <input type="range" id="font-size-desc" min="12" max="32" value="18" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- Steps Font Size -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Steps List Size (<span id="val-font-steps">16</span>px)</label>
+                  <input type="range" id="font-size-steps" min="11" max="28" value="16" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- Pro Tip Size -->
+                <div class="form-group" style="grid-column: span 2;">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Sticky Pro Tip Size (<span id="val-font-protip">15</span>px)</label>
+                  <input type="range" id="font-size-protip" min="11" max="24" value="15" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+              </div>
+            </div>
+
           </div>
 
           <!-- RIGHT: Live Preview Canvas -->

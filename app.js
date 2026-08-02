@@ -2858,6 +2858,70 @@ function resetCreatorStudioForm() {
     });
   }
 
+  // ── Typography & Text Sizes Controls Binding ───────────────────────────────
+  const fontSizeTitle = document.getElementById('font-size-title');
+  const fontSizeKeycap = document.getElementById('font-size-keycap');
+  const fontSizeDesc = document.getElementById('font-size-desc');
+  const fontSizeSteps = document.getElementById('font-size-steps');
+  const fontSizeProtip = document.getElementById('font-size-protip');
+
+  const valFontTitle = document.getElementById('val-font-title');
+  const valFontKeycap = document.getElementById('val-font-keycap');
+  const valFontDesc = document.getElementById('val-font-desc');
+  const valFontSteps = document.getElementById('val-font-steps');
+  const valFontProtip = document.getElementById('val-font-protip');
+
+  if (fontSizeTitle) {
+    fontSizeTitle.addEventListener('input', () => {
+      if (valFontTitle) valFontTitle.textContent = fontSizeTitle.value;
+      if (cardAction) cardAction.style.fontSize = `${fontSizeTitle.value}px`;
+    });
+  }
+
+  if (fontSizeKeycap) {
+    fontSizeKeycap.addEventListener('input', () => {
+      if (valFontKeycap) valFontKeycap.textContent = fontSizeKeycap.value;
+      const cardKeys = document.getElementById('card-keys');
+      if (cardKeys) cardKeys.style.fontSize = `${fontSizeKeycap.value}px`;
+    });
+  }
+
+  if (fontSizeDesc) {
+    fontSizeDesc.addEventListener('input', () => {
+      if (valFontDesc) valFontDesc.textContent = fontSizeDesc.value;
+      const cardDesc = document.getElementById('card-desc');
+      if (cardDesc) cardDesc.style.fontSize = `${fontSizeDesc.value}px`;
+    });
+  }
+
+  if (fontSizeSteps) {
+    fontSizeSteps.addEventListener('input', () => {
+      if (valFontSteps) valFontSteps.textContent = fontSizeSteps.value;
+      const cardStepsList = document.getElementById('card-steps-list');
+      if (cardStepsList) cardStepsList.style.fontSize = `${fontSizeSteps.value}px`;
+    });
+  }
+
+  if (fontSizeProtip) {
+    fontSizeProtip.addEventListener('input', () => {
+      if (valFontProtip) valFontProtip.textContent = fontSizeProtip.value;
+      const cardProTipText = document.getElementById('card-pro-tip');
+      if (cardProTipText) cardProTipText.style.fontSize = `${fontSizeProtip.value}px`;
+    });
+  }
+
+  const toggleTypoSettings = document.getElementById('toggle-typo-settings');
+  const typoSettingsBody = document.getElementById('typo-settings-body');
+  const arrowTypoSettings = document.getElementById('arrow-typo-settings');
+
+  if (toggleTypoSettings && typoSettingsBody) {
+    toggleTypoSettings.addEventListener('click', () => {
+      const isHidden = typoSettingsBody.style.display === 'none';
+      typoSettingsBody.style.display = isHidden ? 'grid' : 'none';
+      if (arrowTypoSettings) arrowTypoSettings.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+  }
+
   // Overlay & Pattern Controls Initialization
   const overlayGridPattern = document.getElementById('overlay-grid-pattern');
   const overlayToggleCropmarks = document.getElementById('overlay-toggle-cropmarks');
