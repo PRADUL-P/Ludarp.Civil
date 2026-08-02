@@ -175,8 +175,16 @@ const defaultShortcuts = [
   }
 ];
 
-// Load from LocalStorage or fallback to defaults
-let shortcutDb = JSON.parse(localStorage.getItem('ludarp_shortcuts')) || defaultShortcuts;
+// Purge old cached sample data from localStorage on load if needed
+if (localStorage.getItem('ludarp_calendar_db_v2_cleared') !== 'true') {
+  localStorage.removeItem('ludarp_calendar_db');
+  localStorage.removeItem('ludarp_shortcuts');
+  localStorage.removeItem('ludarp_completed_calendar');
+  localStorage.setItem('ludarp_calendar_db_v2_cleared', 'true');
+}
+
+// Load clean database arrays
+let shortcutDb = JSON.parse(localStorage.getItem('ludarp_shortcuts')) || [];
 
 // State variables
 let currentFormat = "square"; // "square" or "story"
@@ -185,13 +193,9 @@ let activeStudioShortcutId = null; // Track currently loaded shortcut from libra
 let latestGeneratedResearch = null; // Store latest AI generated result object
 let fileHandle = null; // Stored FileSystemFileHandle for disk sync
 
-// Mutable calendar schedule database
+// Mutable content post database
 let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
-if (calendarDb.length === 0 && typeof autocadCalendar !== 'undefined') {
-  calendarDb = JSON.parse(JSON.stringify(autocadCalendar));
-  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
-}
-let activeCalendarDayNum = "1"; // Default to day "1" string
+let activeCalendarDayNum = "1";
 
 // Dynamic Sidebar Controls
 const sidebarStudioContext = document.getElementById('sidebar-studio-context');
