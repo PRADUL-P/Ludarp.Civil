@@ -375,9 +375,9 @@
     </a>
 
     <nav class="pub-nav">
-      <button class="pub-nav-btn active" data-tab="feed">📸 Published Feed</button>
+      <button class="pub-nav-btn active" data-tab="quiz">🧠 10-Set Quiz</button>
+      <button class="pub-nav-btn" data-tab="feed">📸 Published Feed</button>
       <button class="pub-nav-btn" data-tab="search">🔍 Shortcut Hub</button>
-      <button class="pub-nav-btn" data-tab="quiz">🧠 10-Set Quiz</button>
       <button class="pub-nav-btn" data-tab="cheatsheet">📄 Cheat Sheet</button>
       <a href="admin.html" class="pub-nav-btn" style="border: 1px solid var(--accent); color: var(--accent);">⚙️ Admin</a>
     </nav>
@@ -408,9 +408,64 @@
   </section>
 
   <!-- =========================================================================
-       TAB 1: PUBLISHED INSTAGRAM FEED
+       TAB 1: LEVEL-BASED 10-QUESTION QUIZ GAME (FIRST ACTIVE TAB)
        ========================================================================= -->
-  <main class="tab-section active" id="tab-feed">
+  <main class="tab-section active" id="tab-quiz">
+    <div class="quiz-container">
+      <div style="text-align:center;">
+        <h2 style="font-size:1.4rem; font-weight:900; margin:0 0 6px 0; color:var(--text-primary);">🧠 AutoCAD Mastery Quiz</h2>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 20px 0;">Select your skill level to start a 10-question challenge set!</p>
+
+        <!-- Level Selector Buttons -->
+        <div class="level-selector-row">
+          <button class="level-btn active-beginner" id="btn-level-beginner">🟢 Beginner (10 Questions)</button>
+          <button class="level-btn" id="btn-level-intermediate">🟡 Intermediate (10 Questions)</button>
+          <button class="level-btn" id="btn-level-advanced">🔴 Advanced (10 Questions)</button>
+        </div>
+      </div>
+
+      <!-- Question Card Body -->
+      <div id="quiz-game-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; font-weight:800; color:var(--text-secondary);">
+          <span id="quiz-question-counter">Question 1 of 10</span>
+          <span>Score: <strong style="color:var(--accent-green); font-size:1rem;" id="quiz-score-val">0 / 100</strong></span>
+        </div>
+
+        <div class="quiz-progress-bar-wrap">
+          <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+        </div>
+
+        <div style="font-size:1.25rem; font-weight:800; margin:20px 0; color:var(--text-primary); line-height:1.4;" id="quiz-question-text">
+          Loading Question...
+        </div>
+
+        <div id="quiz-options-container">
+          <!-- Options injected here -->
+        </div>
+
+        <div style="margin-top:24px; display:flex; justify-content:flex-end;">
+          <button id="quiz-next-btn" style="padding:12px 24px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; font-size:0.9rem; cursor:pointer; display:none;">
+            Next Question ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- Final Results Screen -->
+      <div id="quiz-results-screen" style="display:none; text-align:center; padding:20px 0;">
+        <div style="font-size:3.5rem; margin-bottom:10px;">🏆</div>
+        <h2 style="font-size:1.6rem; font-weight:900; margin:0 0 8px 0; color:var(--text-primary);">Level Completed!</h2>
+        <p style="font-size:0.95rem; color:var(--text-secondary); margin:0 0 20px 0;" id="quiz-final-score-text">You scored 80 / 100!</p>
+        <button id="quiz-restart-btn" style="padding:12px 28px; background:var(--accent-green); color:#000; border:none; border-radius:16px; font-weight:900; font-size:0.95rem; cursor:pointer;">
+          🔄 Try Another Quiz Set
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       TAB 2: PUBLISHED INSTAGRAM FEED
+       ========================================================================= -->
+  <main class="tab-section" id="tab-feed">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
       <h2 style="font-size:1.35rem; font-weight:900; margin:0;">📸 Published Instagram Feed</h2>
       <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Posts published from Admin Dashboard</span>
