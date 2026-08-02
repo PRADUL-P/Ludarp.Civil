@@ -91,6 +91,24 @@
           </svg>
           Bulk Post Importer
         </button>
+        <button class="nav-btn" data-tab="cheatsheet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          PDF Cheat Sheet
+        </button>
+        <button class="nav-btn" data-tab="quiz">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Quiz & Flashcards
+        </button>
       </nav>
 
       <!-- Post Library Sidebar -->
@@ -966,6 +984,103 @@
             <div id="importer-parsed-list" style="display:flex; flex-direction:column; gap:12px; max-height:520px; overflow-y:auto; padding-right:4px;">
               <!-- Populated dynamically -->
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 8: PRINTABLE PDF CHEAT SHEET GENERATOR   ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="cheatsheet-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>📄 Printable PDF Cheat Sheet Generator</h2>
+            <p>Generate high-resolution 1-page quick-reference guides grouped by software and category</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-action btn-primary-action" id="btn-print-cheatsheet">
+              🖨️ Print / Save as PDF
+            </button>
+          </div>
+        </header>
+
+        <div class="card" id="cheatsheet-preview-container" style="background:#fff; color:#0f172a; padding:30px; border-radius:var(--r-lg); min-height:600px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+          <!-- Header for Cheat Sheet -->
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #0f2b46; padding-bottom:16px; margin-bottom:24px;">
+            <div>
+              <h1 style="font-family:'Chakra Petch', sans-serif; font-size:24px; font-weight:800; color:#0f2b46; text-transform:uppercase; margin:0;">Ludarp Civil Studio</h1>
+              <p style="font-size:12px; font-weight:700; color:#475569; margin:2px 0 0 0;">MASTER CAD & CIVIL ENGINEERING SHORTCUT QUICK REFERENCE GUIDE</p>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:#64748b; background:#f1f5f9; padding:4px 10px; border-radius:4px; border:1px solid #cbd5e1;">@ludarp.civil</span>
+            </div>
+          </div>
+
+          <!-- Content Grid populated dynamically -->
+          <div id="cheatsheet-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px;">
+            <!-- Rendered by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 9: QUIZ & FLASHCARD LEARNING ENGINE       ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="quiz-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>🎮 Quiz & Flashcard Learning Engine</h2>
+            <p>Gamified learning engine with flashcards and multiple-choice knowledge quizzes</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-action btn-primary-action" id="btn-mode-flashcards">🎴 Flashcards Mode</button>
+            <button class="btn-action btn-secondary-action" id="btn-mode-quiz">🧠 Knowledge Quiz Mode</button>
+          </div>
+        </header>
+
+        <!-- FLASHCARDS CONTAINER -->
+        <div id="quiz-flashcards-container" style="display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px 0;">
+          <div id="flashcard-element" class="card" style="width:100%; max-width:540px; min-height:300px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 30px; cursor:pointer; position:relative; background:linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border:2px solid var(--accent); transition:transform 0.3s ease;">
+            <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); position:absolute; top:16px; left:20px;" id="flashcard-software-badge">AUTOCAD</span>
+            <span style="font-size:0.75rem; font-weight:800; color:var(--accent); position:absolute; top:16px; right:20px;" id="flashcard-count-badge">Card 1 / 1</span>
+            
+            <div id="flashcard-front">
+              <div style="font-family:var(--font-mono); font-size:3rem; font-weight:900; color:var(--accent); margin-bottom:12px;" id="flashcard-keys">TR</div>
+              <h3 style="font-size:1.4rem; font-weight:800; color:var(--text-primary);" id="flashcard-action">Trim Objects</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin-top:12px;">Click card to flip & reveal description, steps & pro tip</p>
+            </div>
+
+            <div id="flashcard-back" style="display:none; flex-direction:column; gap:10px; text-align:left; width:100%;">
+              <p style="font-size:0.9rem; color:var(--text-primary);" id="flashcard-desc">Trims elements to meet the edges of other selected elements.</p>
+              <div style="font-size:0.8rem; color:var(--warning); font-weight:700; background:rgba(245,158,11,0.1); padding:8px 12px; border-radius:6px; border-left:3px solid var(--warning);" id="flashcard-protip">💡 Pro Tip: Hold Shift while trimming to Extend lines instead.</div>
+              <div style="font-size:0.8rem; color:var(--error); font-weight:700; background:rgba(239,68,68,0.1); padding:8px 12px; border-radius:6px; border-left:3px solid var(--error); margin-top:4px;" id="flashcard-mistake">❌ Mistake: Forgetting to select boundary edges.</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:14px; align-items:center;">
+            <button class="btn-action btn-secondary-action" id="btn-flashcard-prev">← Previous</button>
+            <button class="btn-action btn-ghost-action" id="btn-flashcard-flip">🔄 Flip Card</button>
+            <button class="btn-action btn-primary-action" id="btn-flashcard-next">Next →</button>
+          </div>
+        </div>
+
+        <!-- QUIZ CONTAINER -->
+        <div id="quiz-game-container" style="display:none; flex-direction:column; align-items:center; gap:20px; padding:20px 0;">
+          <div class="card" style="width:100%; max-width:600px; display:flex; flex-direction:column; gap:20px; padding:30px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px;">
+              <span style="font-weight:800; font-size:0.85rem; color:var(--accent);" id="quiz-question-number">Question 1 of 5</span>
+              <span style="font-weight:800; font-size:0.85rem; color:var(--warning);" id="quiz-score-badge">Score: 0</span>
+            </div>
+
+            <h3 style="font-size:1.1rem; font-weight:800; color:var(--text-primary); line-height:1.4;" id="quiz-question-text">What shortcut key is used to Trim Objects in AutoCAD?</h3>
+
+            <div id="quiz-options-container" style="display:flex; flex-direction:column; gap:10px;">
+              <!-- Rendered by app.js -->
+            </div>
+
+            <div id="quiz-feedback-box" style="display:none; padding:12px; border-radius:var(--r-md); font-weight:700; font-size:0.85rem;"></div>
+
+            <button class="btn-action btn-primary-action" id="btn-quiz-next-question" style="display:none; align-self:flex-end;">Next Question →</button>
           </div>
         </div>
       </section>

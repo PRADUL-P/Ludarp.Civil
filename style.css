@@ -1438,3 +1438,15 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
   .main-content { height: auto; padding: 20px 16px; }
   .research-layout { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PRINT / PDF CHEAT SHEET STYLES
+   ══════════════════════════════════════════════════════════════════════ */
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  .sidebar, .view-header, .nav-menu, .sidebar-section, .sidebar-sync-block { display: none !important; }
+  .main-content { padding: 0 !important; margin: 0 !important; width: 100% !important; }
+  #cheatsheet-view { display: block !important; }
+  #cheatsheet-preview-container { box-shadow: none !important; border: none !important; padding: 0 !important; }
+  .tab-view:not(#cheatsheet-view) { display: none !important; }
+}

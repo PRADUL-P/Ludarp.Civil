@@ -571,6 +571,10 @@ sidebarButtons.forEach(btn => {
       renderInstagramFeedGrid();
     } else if (targetTab === 'importer') {
       // Importer tab active
+    } else if (targetTab === 'cheatsheet') {
+      renderCheatSheet();
+    } else if (targetTab === 'quiz') {
+      initQuizAndFlashcards();
     }
   });
 });
@@ -3554,5 +3558,259 @@ if (btnImporterSaveAll) {
     saveAllDataToSyncFile();
 
     showToast(`✅ Imported all ${currentParsedPosts.length} posts to database!`, 'success');
+  });
+}
+
+// ==========================================================================
+// 17. Printable PDF Cheat Sheet Generator Engine
+// ==========================================================================
+function renderCheatSheet() {
+  const grid = document.getElementById('cheatsheet-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const posts = calendarDb.length > 0 ? calendarDb : parseRawTextToPosts(EXAMPLE_POST_TEXT);
+
+  if (posts.length === 0) {
+    grid.innerHTML = `<div style="grid-column:span 2; text-align:center; padding:40px; color:#64748b; font-weight:700;">No posts available to generate cheat sheet. Add posts in Bulk Importer!</div>`;
+    return;
+  }
+
+  const categories = [...new Set(posts.map(p => p.category || 'General CAD'))];
+
+  categories.forEach(cat => {
+    const catBlock = document.createElement('div');
+    catBlock.style.cssText = 'border:1px solid #cbd5e1; border-radius:6px; padding:16px; background:#f8fafc;';
+
+    const catTitle = document.createElement('h3');
+    catTitle.style.cssText = 'font-size:14px; font-weight:800; color:#0f2b46; border-bottom:2px solid #0f2b46; padding-bottom:6px; margin:0 0 10px 0; text-transform:uppercase; font-family:"Chakra Petch", sans-serif;';
+    catTitle.textContent = cat;
+    catBlock.appendChild(catTitle);
+
+    const table = document.createElement('table');
+    table.style.cssText = 'width:100%; border-collapse:collapse; font-size:12px;';
+    table.innerHTML = `
+      <thead>
+        <tr style="background:#e2e8f0; color:#1e293b; text-align:left; font-weight:800;">
+          <th style="padding:6px;">KEY</th>
+          <th style="padding:6px;">ACTION</th>
+          <th style="padding:6px;">PRO TIP</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+    posts.filter(p => (p.category || 'General CAD') === cat).forEach(item => {
+      const tr = document.createElement('tr');
+      tr.style.cssText = 'border-bottom:1px solid #e2e8f0;';
+      tr.innerHTML = `
+        <td style="padding:6px; font-family:monospace; font-weight:800; color:#2563eb;">${item.keys || item.shortcut || ''}</td>
+        <td style="padding:6px; font-weight:700; color:#0f172a;">${item.action || item.title || ''}</td>
+        <td style="padding:6px; color:#475569; font-size:11px;">${item.proTip || item.desc || ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    catBlock.appendChild(table);
+    grid.appendChild(catBlock);
+  });
+}
+
+const btnPrintCheat = document.getElementById('btn-print-cheatsheet');
+if (btnPrintCheat) {
+  btnPrintCheat.addEventListener('click', () => {
+    window.print();
+  });
+}
+
+// ==========================================================================
+// 18. Quiz & Flashcards Engine
+// ==========================================================================
+let currentFlashcardIndex = 0;
+let currentQuizScore = 0;
+let currentQuizIndex = 0;
+let currentQuizQuestions = [];
+
+function initQuizAndFlashcards() {
+  const flashcardEl = document.getElementById('flashcard-element');
+  const btnFlip = document.getElementById('btn-flashcard-flip');
+  const btnPrev = document.getElementById('btn-flashcard-prev');
+  const btnNext = document.getElementById('btn-flashcard-next');
+
+  const btnModeFlash = document.getElementById('btn-mode-flashcards');
+  const btnModeQuiz = document.getElementById('btn-mode-quiz');
+  const flashContainer = document.getElementById('quiz-flashcards-container');
+  const quizContainer = document.getElementById('quiz-game-container');
+
+  if (btnModeFlash && btnModeQuiz && flashContainer && quizContainer) {
+    btnModeFlash.onclick = () => {
+      flashContainer.style.display = 'flex';
+      quizContainer.style.display = 'none';
+      btnModeFlash.classList.add('btn-primary-action');
+      btnModeFlash.classList.remove('btn-secondary-action');
+      btnModeQuiz.classList.add('btn-secondary-action');
+      btnModeQuiz.classList.remove('btn-primary-action');
+    };
+
+    btnModeQuiz.onclick = () => {
+      flashContainer.style.display = 'none';
+      quizContainer.style.display = 'flex';
+      btnModeQuiz.classList.add('btn-primary-action');
+      btnModeQuiz.classList.remove('btn-secondary-action');
+      btnModeFlash.classList.add('btn-secondary-action');
+      btnModeFlash.classList.remove('btn-primary-action');
+      startQuizGame();
+    };
+  }
+
+  const posts = calendarDb.length > 0 ? calendarDb : parseRawTextToPosts(EXAMPLE_POST_TEXT);
+  if (posts.length === 0) return;
+
+  function renderFlashcard() {
+    const card = posts[currentFlashcardIndex % posts.length];
+    if (!card) return;
+
+    document.getElementById('flashcard-software-badge').textContent = (card.software || 'AUTOCAD').toUpperCase();
+    document.getElementById('flashcard-count-badge').textContent = `Card ${currentFlashcardIndex + 1} / ${posts.length}`;
+    document.getElementById('flashcard-keys').textContent = card.keys || card.shortcut || 'CAD';
+    document.getElementById('flashcard-action').textContent = card.action || card.title || 'Action Title';
+    document.getElementById('flashcard-desc').textContent = card.desc || 'Description of command.';
+    
+    const protipEl = document.getElementById('flashcard-protip');
+    if (protipEl) {
+      if (card.proTip) {
+        protipEl.style.display = 'block';
+        protipEl.textContent = `💡 Pro Tip: ${card.proTip}`;
+      } else {
+        protipEl.style.display = 'none';
+      }
+    }
+
+    const mistakeEl = document.getElementById('flashcard-mistake');
+    if (mistakeEl) {
+      if (card.commonMistake) {
+        mistakeEl.style.display = 'block';
+        mistakeEl.textContent = `❌ Mistake: ${card.commonMistake}`;
+      } else {
+        mistakeEl.style.display = 'none';
+      }
+    }
+
+    // Reset card to front
+    document.getElementById('flashcard-front').style.display = 'block';
+    document.getElementById('flashcard-back').style.display = 'none';
+  }
+
+  if (flashcardEl) {
+    flashcardEl.onclick = () => {
+      const front = document.getElementById('flashcard-front');
+      const back = document.getElementById('flashcard-back');
+      if (front.style.display === 'none') {
+        front.style.display = 'block';
+        back.style.display = 'none';
+      } else {
+        front.style.display = 'none';
+        back.style.display = 'flex';
+      }
+    };
+  }
+
+  if (btnFlip) btnFlip.onclick = () => flashcardEl.click();
+  if (btnNext) btnNext.onclick = () => { currentFlashcardIndex++; renderFlashcard(); };
+  if (btnPrev) btnPrev.onclick = () => { currentFlashcardIndex = (currentFlashcardIndex - 1 + posts.length) % posts.length; renderFlashcard(); };
+
+  renderFlashcard();
+}
+
+function startQuizGame() {
+  const posts = calendarDb.length > 0 ? calendarDb : parseRawTextToPosts(EXAMPLE_POST_TEXT);
+  if (posts.length === 0) return;
+
+  currentQuizScore = 0;
+  currentQuizIndex = 0;
+  currentQuizQuestions = posts.slice(0, 5); // Take 5 questions
+
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const qNum = document.getElementById('quiz-question-number');
+  const scoreBadge = document.getElementById('quiz-score-badge');
+  const qText = document.getElementById('quiz-question-text');
+  const optsContainer = document.getElementById('quiz-options-container');
+  const feedbackBox = document.getElementById('quiz-feedback-box');
+  const btnNextQ = document.getElementById('btn-quiz-next-question');
+
+  if (!qText || !optsContainer) return;
+
+  if (currentQuizIndex >= currentQuizQuestions.length) {
+    // Quiz Finish
+    qText.textContent = `🎉 Quiz Completed! You scored ${currentQuizScore} out of ${currentQuizQuestions.length}!`;
+    optsContainer.innerHTML = `<button class="btn-action btn-primary-action" onclick="startQuizGame()" style="align-self:center; margin-top:20px;">🔄 Restart Quiz</button>`;
+    if (feedbackBox) feedbackBox.style.display = 'none';
+    if (btnNextQ) btnNextQ.style.display = 'none';
+    return;
+  }
+
+  const currentQ = currentQuizQuestions[currentQuizIndex];
+  if (qNum) qNum.textContent = `Question ${currentQuizIndex + 1} of ${currentQuizQuestions.length}`;
+  if (scoreBadge) scoreBadge.textContent = `Score: ${currentQuizScore}`;
+
+  qText.textContent = `What is the correct shortcut key for "${currentQ.action || currentQ.title}" in ${currentQ.software || 'AutoCAD'}?`;
+
+  optsContainer.innerHTML = '';
+  if (feedbackBox) feedbackBox.style.display = 'none';
+  if (btnNextQ) btnNextQ.style.display = 'none';
+
+  // Generate 4 choices
+  const correctAnswer = currentQ.keys || currentQ.shortcut || 'TR';
+  const distractorPool = ['TR', 'EX', 'L', 'C', 'REC', 'PL', 'A', 'O', 'MI', 'RO', 'M', 'E', 'F8', 'F3', 'Z', 'P'];
+  const wrongChoices = distractorPool.filter(k => k !== correctAnswer).sort(() => 0.5 - Math.random()).slice(0, 3);
+  const choices = [correctAnswer, ...wrongChoices].sort(() => 0.5 - Math.random());
+
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-action btn-secondary-action';
+    btn.style.cssText = 'padding:14px; text-align:left; font-weight:800; font-size:0.95rem; font-family:var(--font-mono); justify-content:flex-start;';
+    btn.textContent = choice;
+
+    btn.onclick = () => {
+      // Disable all choice buttons
+      optsContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+
+      if (choice === correctAnswer) {
+        btn.style.background = 'var(--success)';
+        btn.style.color = '#fff';
+        currentQuizScore++;
+        if (scoreBadge) scoreBadge.textContent = `Score: ${currentQuizScore}`;
+        if (feedbackBox) {
+          feedbackBox.style.display = 'block';
+          feedbackBox.style.background = 'rgba(16,185,129,0.15)';
+          feedbackBox.style.color = 'var(--success)';
+          feedbackBox.textContent = `✅ Correct! ${currentQ.action} uses "${correctAnswer}". ${currentQ.proTip ? '💡 Pro Tip: ' + currentQ.proTip : ''}`;
+        }
+      } else {
+        btn.style.background = 'var(--error)';
+        btn.style.color = '#fff';
+        if (feedbackBox) {
+          feedbackBox.style.display = 'block';
+          feedbackBox.style.background = 'rgba(239,68,68,0.15)';
+          feedbackBox.style.color = 'var(--error)';
+          feedbackBox.textContent = `❌ Incorrect. The correct key is "${correctAnswer}".`;
+        }
+      }
+
+      if (btnNextQ) {
+        btnNextQ.style.display = 'block';
+        btnNextQ.onclick = () => {
+          currentQuizIndex++;
+          renderQuizQuestion();
+        };
+      }
+    };
+
+    optsContainer.appendChild(btn);
   });
 }
