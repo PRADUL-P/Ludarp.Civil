@@ -187,31 +187,38 @@ function safeJsonParse(key, fallback = []) {
   }
 }
 
-// Fallback to preloaded data if local storage is empty
-const defaultData = (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar) && autocadCalendar.length > 0)
-  ? autocadCalendar
-  : ((typeof CALENDAR_DATA_FROM_FILE !== 'undefined' && Array.isArray(CALENDAR_DATA_FROM_FILE) && CALENDAR_DATA_FROM_FILE.length > 0)
-    ? CALENDAR_DATA_FROM_FILE
-    : []);
+function getCleanDefaultData() {
+  if (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar) && autocadCalendar.length > 0) {
+    return autocadCalendar;
+  }
+  if (typeof CALENDAR_DATA_FROM_FILE !== 'undefined' && Array.isArray(CALENDAR_DATA_FROM_FILE) && CALENDAR_DATA_FROM_FILE.length > 0) {
+    return CALENDAR_DATA_FROM_FILE;
+  }
+  return [];
+}
 
-// Load clean database arrays safely
 let calendarDb = safeJsonParse('ludarp_calendar_db', []);
 if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
   calendarDb = safeJsonParse('ludarp_shortcuts', []);
 }
 
-if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
-  if (defaultData.length > 0) {
-    calendarDb = JSON.parse(JSON.stringify(defaultData));
+function ensureCalendarDbLoaded() {
+  if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
+    const defaults = getCleanDefaultData();
+    if (defaults.length > 0) {
+      calendarDb = JSON.parse(JSON.stringify(defaults));
+    }
   }
+  shortcutDb = calendarDb;
+  try {
+    if (Array.isArray(calendarDb) && calendarDb.length > 0) {
+      localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+      localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
+    }
+  } catch(e) {}
 }
 
-// Single Unified Database: shortcutDb references calendarDb directly
-let shortcutDb = calendarDb;
-try {
-  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
-  localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
-} catch(e) {}
+ensureCalendarDbLoaded();
 
 // State variables
 let currentFormat = "square"; // "square" or "story"
@@ -3060,18 +3067,23 @@ async function saveAllDataToSyncFile() {
 
 // Render dynamic post checklist in sidebar (Post Library)
 function renderSidebarDaysList() {
-  if (!sidebarDaysList) return;
-  sidebarDaysList.innerHTML = '';
+  ensureCalendarDbLoaded();
+  const sidebarList = document.getElementById('sidebar-days-list');
+  const progressCount = document.getElementById('sidebar-progress-count');
+  const progressBar = document.getElementById('sidebar-progress-bar');
+  
+  if (!sidebarList) return;
+  sidebarList.innerHTML = '';
   
   if (calendarDb.length === 0) {
-    sidebarDaysList.innerHTML = `
+    sidebarList.innerHTML = `
       <div style="padding: 20px 10px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
         <p style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">No Content Posts Yet</p>
         <p style="font-size: 0.72rem; line-height: 1.4;">Paste your fresh posts in the <b>Bulk Post Importer</b> tab to start building your library!</p>
       </div>
     `;
-    if (sidebarProgressCount) sidebarProgressCount.textContent = `0 / 0`;
-    if (sidebarProgressBar) sidebarProgressBar.style.width = `0%`;
+    if (progressCount) progressCount.textContent = `0 / 0`;
+    if (progressBar) progressBar.style.width = `0%`;
     return;
   }
 
@@ -3082,7 +3094,7 @@ function renderSidebarDaysList() {
     label.className = 'phase-label';
     label.style.cssText = 'font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: 12px 0 6px 0; padding-bottom: 4px; border-bottom: 1px solid var(--border);';
     label.textContent = phase;
-    sidebarDaysList.appendChild(label);
+    sidebarList.appendChild(label);
     
     calendarDb.forEach(post => {
       if ((post.phase || 'General Posts') !== phase) return;
@@ -3103,16 +3115,16 @@ function renderSidebarDaysList() {
         renderSidebarDaysList();
       });
       
-      sidebarDaysList.appendChild(item);
+      sidebarList.appendChild(item);
     });
   });
   
   // Update sidebar progress count & bar
   const total = calendarDb.length;
   const done = calendarDb.filter(post => completedCalendarDays.has(String(post.day))).length;
-  if (sidebarProgressCount) sidebarProgressCount.textContent = `${done} / ${total}`;
+  if (progressCount) progressCount.textContent = `${done} / ${total}`;
   const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-  if (sidebarProgressBar) sidebarProgressBar.style.width = `${percent}%`;
+  if (progressBar) progressBar.style.width = `${percent}%`;
 }
 
 // Auto-reconnect stored JSON file handle on page load
