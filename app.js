@@ -187,12 +187,6 @@ function safeJsonParse(key, fallback = []) {
   }
 }
 
-<<<<<<< HEAD
-// Load clean single database array
-let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || JSON.parse(localStorage.getItem('ludarp_shortcuts')) || [];
-
-=======
->>>>>>> 27b165e (Add safeJsonParse protection for all localStorage reads to prevent corrupted cache load crashes)
 // Fallback to preloaded data if local storage is empty
 const defaultData = (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar) && autocadCalendar.length > 0)
   ? autocadCalendar
@@ -212,19 +206,12 @@ if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
   }
 }
 
-<<<<<<< HEAD
-// Single Unified Database: shortcutDb references calendarDb
-let shortcutDb = calendarDb;
-localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
-localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
-=======
 // Single Unified Database: shortcutDb references calendarDb directly
 let shortcutDb = calendarDb;
 try {
   localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
   localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
 } catch(e) {}
->>>>>>> 27b165e (Add safeJsonParse protection for all localStorage reads to prevent corrupted cache load crashes)
 
 // State variables
 let currentFormat = "square"; // "square" or "story"
