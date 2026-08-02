@@ -440,8 +440,8 @@ body {
 /* Studio Layout: Editor + Preview */
 .studio-layout {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 24px;
+  grid-template-columns: minmax(340px, 1.15fr) minmax(360px, 1fr);
+  gap: 20px;
   align-items: start;
   flex: 1;
 }
@@ -451,7 +451,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: calc(100vh - 190px);
+  max-height: calc(100vh - 170px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -1450,7 +1450,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
 ══════════════════════════════════════════════════════════════════════ */
 @media (max-width: 1200px) {
   .studio-layout { grid-template-columns: 1fr; }
-  .preview-panel { align-items: flex-start; position: static; }
+  .preview-panel { align-items: center; position: sticky; top: 10px; z-index: 25; order: -1; margin-bottom: 16px; }
   #canvas-wrapper-square { width: 380px; height: 380px; }
   #canvas-wrapper-square #instagram-post-canvas { transform: scale(0.35185); }
 }
