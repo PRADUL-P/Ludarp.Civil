@@ -3796,10 +3796,16 @@ const gsheetSetupModal = document.getElementById('gsheet-setup-modal');
 const btnCloseGsheetModal = document.getElementById('btn-close-gsheet-modal');
 const btnCopyGsheetScript = document.getElementById('btn-copy-gsheet-script');
 
-// Load saved Google Sheet URL from LocalStorage
+// Load saved Google Sheet URL from LocalStorage (or use permanent default)
+const LUDARP_GSHEET_DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbyVUADznw9S_gp1rZNfMC_p9pMHxLXuKgkO2ycd7Z3pF1lMcpac8hAYDLjkvPR-D524/exec';
+
 if (gsheetApiUrlInput) {
-  const savedUrl = localStorage.getItem('ludarp_gsheet_url');
-  if (savedUrl) gsheetApiUrlInput.value = savedUrl;
+  const savedUrl = localStorage.getItem('ludarp_gsheet_url') || LUDARP_GSHEET_DEFAULT_URL;
+  gsheetApiUrlInput.value = savedUrl;
+  // Persist to localStorage on first load so it sticks
+  if (!localStorage.getItem('ludarp_gsheet_url')) {
+    localStorage.setItem('ludarp_gsheet_url', LUDARP_GSHEET_DEFAULT_URL);
+  }
 
   gsheetApiUrlInput.addEventListener('change', () => {
     localStorage.setItem('ludarp_gsheet_url', gsheetApiUrlInput.value.trim());
