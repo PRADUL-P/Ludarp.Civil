@@ -2598,4 +2598,87 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Initialize File Sync
   await initDiskSync();
+
+  // Layout Adjuster Controls Initialization
+  const layoutTitleFont = document.getElementById('layout-title-font');
+  const layoutTitleSize = document.getElementById('layout-title-size');
+  const layoutProtipRot = document.getElementById('layout-protip-rot');
+  const layoutWatermarkOp = document.getElementById('layout-watermark-op');
+  const layoutWatermarkSize = document.getElementById('layout-watermark-size');
+  const layoutToggleProtip = document.getElementById('layout-toggle-protip');
+  const layoutToggleWatermark = document.getElementById('layout-toggle-watermark');
+  const layoutToggleBookmark = document.getElementById('layout-toggle-bookmark');
+
+  const valTitleSize = document.getElementById('val-title-size');
+  const valProtipRot = document.getElementById('val-protip-rot');
+  const valWatermarkOp = document.getElementById('val-watermark-op');
+  const valWatermarkSize = document.getElementById('val-watermark-size');
+
+  if (layoutTitleFont) {
+    layoutTitleFont.addEventListener('change', () => {
+      if (cardAction) cardAction.style.fontFamily = layoutTitleFont.value;
+    });
+  }
+
+  if (layoutTitleSize) {
+    layoutTitleSize.addEventListener('input', () => {
+      if (valTitleSize) valTitleSize.textContent = layoutTitleSize.value;
+      if (cardAction) cardAction.style.fontSize = `${layoutTitleSize.value}px`;
+    });
+  }
+
+  if (layoutProtipRot) {
+    layoutProtipRot.addEventListener('input', () => {
+      if (valProtipRot) valProtipRot.textContent = layoutProtipRot.value;
+      const proTipBox = instagramCard ? instagramCard.querySelector('.pro-tip-box') : null;
+      if (proTipBox) proTipBox.style.transform = `rotate(${layoutProtipRot.value}deg)`;
+    });
+  }
+
+  if (layoutWatermarkOp) {
+    layoutWatermarkOp.addEventListener('input', () => {
+      if (valWatermarkOp) valWatermarkOp.textContent = layoutWatermarkOp.value;
+      if (cardWatermark) cardWatermark.style.opacity = layoutWatermarkOp.value / 100;
+    });
+  }
+
+  if (layoutWatermarkSize) {
+    layoutWatermarkSize.addEventListener('input', () => {
+      if (valWatermarkSize) valWatermarkSize.textContent = layoutWatermarkSize.value;
+      if (cardWatermark) cardWatermark.style.fontSize = `${layoutWatermarkSize.value}px`;
+    });
+  }
+
+  if (layoutToggleProtip) {
+    layoutToggleProtip.addEventListener('change', () => {
+      const proTipBox = instagramCard ? instagramCard.querySelector('.pro-tip-box') : null;
+      if (proTipBox) proTipBox.style.display = layoutToggleProtip.checked ? 'flex' : 'none';
+    });
+  }
+
+  if (layoutToggleWatermark) {
+    layoutToggleWatermark.addEventListener('change', () => {
+      if (cardWatermark) cardWatermark.style.display = layoutToggleWatermark.checked ? 'block' : 'none';
+    });
+  }
+
+  if (layoutToggleBookmark) {
+    layoutToggleBookmark.addEventListener('change', () => {
+      const ctaMsg = instagramCard ? instagramCard.querySelector('.cta-message') : null;
+      if (ctaMsg) ctaMsg.style.display = layoutToggleBookmark.checked ? 'flex' : 'none';
+    });
+  }
+
+  // Layout Accordion Toggle
+  const toggleLayoutSettings = document.getElementById('toggle-layout-settings');
+  const layoutSettingsBody = document.getElementById('layout-settings-body');
+  const arrowLayoutSettings = document.getElementById('arrow-layout-settings');
+  if (toggleLayoutSettings && layoutSettingsBody && arrowLayoutSettings) {
+    let isOpen = true;
+    toggleLayoutSettings.addEventListener('click', () => {
+      isOpen = !isOpen;
+      layoutSettingsBody.style.display = isOpen ? 'grid' : 'none';
+      arrowLayoutSettings.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+    });
+  }
 });

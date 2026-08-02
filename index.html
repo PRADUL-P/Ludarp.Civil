@@ -292,6 +292,68 @@
               </div>
             </div>
 
+            <!-- Layout & Positioning Adjuster -->
+            <div class="layout-settings-section" style="padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px;">
+              <div class="settings-section-header" id="toggle-layout-settings" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                <label class="theme-section-label" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                  <span>📐</span> Layout & Position Adjuster
+                </label>
+                <svg id="arrow-layout-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              
+              <div id="layout-settings-body" class="layout-settings-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                
+                <!-- Title Font -->
+                <div class="form-group" style="grid-column: span 2;">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Title Font Family</label>
+                  <select id="layout-title-font" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
+                    <option value="'Chakra Petch', sans-serif">Chakra Petch (Clean CAD)</option>
+                    <option value="'Inter', sans-serif">Inter (Modern Sans)</option>
+                    <option value="'JetBrains Mono', monospace">JetBrains Mono (Technical Code)</option>
+                    <option value="'Big Shoulders Stencil Text', sans-serif">Big Shoulders (Stencil)</option>
+                  </select>
+                </div>
+
+                <!-- Title Size -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Title Size (<span id="val-title-size">58</span>px)</label>
+                  <input type="range" id="layout-title-size" min="40" max="80" value="58" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- ProTip Angle -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Sticky Angle (<span id="val-protip-rot">-0.8</span>°)</label>
+                  <input type="range" id="layout-protip-rot" min="-5" max="5" step="0.5" value="-0.8" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- Watermark Opacity -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Watermark Tint (<span id="val-watermark-op">8</span>%)</label>
+                  <input type="range" id="layout-watermark-op" min="0" max="30" value="8" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- Watermark Size -->
+                <div class="form-group">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Watermark Size (<span id="val-watermark-size">600</span>px)</label>
+                  <input type="range" id="layout-watermark-size" min="400" max="900" step="20" value="600" style="width:100%; accent-color:var(--accent);">
+                </div>
+
+                <!-- Element Toggles -->
+                <div class="form-group" style="grid-column: span 2; display:flex; gap:12px; flex-wrap:wrap; margin-top:4px;">
+                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                    <input type="checkbox" id="layout-toggle-protip" checked style="accent-color:var(--accent);"> Sticky Note
+                  </label>
+                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                    <input type="checkbox" id="layout-toggle-watermark" checked style="accent-color:var(--accent);"> Watermark Letter
+                  </label>
+                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                    <input type="checkbox" id="layout-toggle-bookmark" checked style="accent-color:var(--accent);"> Bookmark CTA
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
           </div>
 
           <!-- RIGHT: Live Preview Canvas -->
