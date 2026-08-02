@@ -252,9 +252,11 @@ const instagramCard = document.getElementById('instagram-post-canvas');
 const brandHandleInput = document.getElementById('brand-handle');
 const contentSoftwareSelect = document.getElementById('content-software');
 const contentKeysInput = document.getElementById('content-keys');
+const contentSymbolInput = document.getElementById('content-symbol');
 const contentActionInput = document.getElementById('content-action');
 const contentDescInput = document.getElementById('content-desc');
 const contentProTipInput = document.getElementById('content-pro-tip');
+const contentCommonMistakeInput = document.getElementById('content-common-mistake');
 const contentHashtagsInput = document.getElementById('content-hashtags');
 const stepsContainer = document.getElementById('steps-container');
 const btnAddStep = document.getElementById('btn-add-step');
@@ -403,14 +405,16 @@ function updateCardPreview() {
   const slideChipsContainer = document.getElementById('carousel-slide-chips');
   if (slideChipsContainer) {
     const activeChip = slideChipsContainer.querySelector('.btn-slide-chip.active');
-    const currentSlide = detectedLetter || (activeChip ? activeChip.dataset.slide : 'A');
+    const activeSlideVal = activeChip ? (activeChip.dataset ? activeChip.dataset.slide : activeChip.getAttribute('data-slide')) : null;
+    const currentSlide = detectedLetter || activeSlideVal || 'A';
     if (carouselBadge) carouselBadge.textContent = `${baseCode}${currentSlide}`;
 
     slideChipsContainer.querySelectorAll('.btn-slide-chip').forEach(chip => {
-      const isCur = chip.dataset.slide === currentSlide;
-      chip.textContent = `${baseCode}${chip.dataset.slide} (${chip.dataset.slide === 'A' ? 'Hook' : chip.dataset.slide === 'B' ? 'Steps' : 'ProTip'})`;
+      const chipSlideVal = chip.dataset ? chip.dataset.slide : (chip.getAttribute('data-slide') || 'A');
+      const isCur = chipSlideVal === currentSlide;
+      chip.textContent = `${baseCode}${chipSlideVal} (${chipSlideVal === 'A' ? 'Title' : chipSlideVal === 'B' ? 'Steps' : 'ProTip'})`;
       chip.onclick = () => {
-        const slideLetter = chip.dataset.slide;
+        const slideLetter = chip.dataset ? chip.dataset.slide : (chip.getAttribute('data-slide') || 'A');
         const descEl = document.getElementById('card-desc');
         const stepsEl = document.getElementById('card-steps-list');
         const proTipEl = document.querySelector('.pro-tip-box');
@@ -632,7 +636,12 @@ const contentDifficultyInput = document.getElementById('content-difficulty');
 const contentCategoryInput = document.getElementById('content-category');
 const contentCarouselIdInput = document.getElementById('content-carousel-id');
 
-[brandHandleInput, contentSoftwareSelect, contentCarouselIdInput, contentKeysInput, contentSymbolInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput, contentDifficultyInput, contentCategoryInput, contentCommonMistakeInput].forEach(el => {
+[
+  'brand-handle', 'content-software', 'content-carousel-id', 'content-keys',
+  'content-symbol', 'content-action', 'content-desc', 'content-pro-tip',
+  'content-hashtags', 'content-difficulty', 'content-category', 'content-common-mistake'
+].forEach(id => {
+  const el = document.getElementById(id);
   if (el) {
     el.addEventListener('input', () => {
       updateCardPreview();
