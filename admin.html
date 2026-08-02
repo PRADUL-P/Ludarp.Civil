@@ -547,20 +547,50 @@
                   <input type="range" id="layout-watermark-size" min="400" max="900" step="20" value="600" style="width:100%; accent-color:var(--accent);">
                 </div>
 
-                <!-- Element Toggles -->
-                <div class="form-group" style="grid-column: span 2; display:flex; gap:12px; flex-wrap:wrap; margin-top:4px;">
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-grid" checked style="accent-color:var(--accent);"> Background Grid
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-protip" checked style="accent-color:var(--accent);"> Sticky Note
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-watermark" checked style="accent-color:var(--accent);"> Watermark Letter
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-bookmark" checked style="accent-color:var(--accent);"> Bookmark CTA
-                  </label>
+                <!-- Element Visibility Checkboxes Section -->
+                <div class="element-visibility-section" style="grid-column: span 2; padding-top: 10px; border-top: 1px dashed var(--border); margin-top: 10px;">
+                  <div class="settings-section-header" id="toggle-elem-visibility-settings" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <label class="theme-section-label" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                      <span>👁️</span> Post Element Checkboxes (On / Off)
+                    </label>
+                    <svg id="arrow-elem-visibility" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+
+                  <div id="elem-visibility-body" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-software" checked style="accent-color:var(--accent);"> Software Badge
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-handle" checked style="accent-color:var(--accent);"> Handle @ludarp
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-keycap" checked style="accent-color:var(--accent);"> Keycap Box
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-title" checked style="accent-color:var(--accent);"> Action Title
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-desc" checked style="accent-color:var(--accent);"> Description Text
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-steps" checked style="accent-color:var(--accent);"> Steps List
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="layout-toggle-protip" checked style="accent-color:var(--accent);"> Sticky Pro Tip
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-mistake" checked style="accent-color:var(--accent);"> Common Mistake
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="layout-toggle-bookmark" checked style="accent-color:var(--accent);"> Bookmark CTA
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="layout-toggle-grid" checked style="accent-color:var(--accent);"> Background Grid
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600; grid-column: span 2;">
+                      <input type="checkbox" id="layout-toggle-watermark" checked style="accent-color:var(--accent);"> Watermark Letter
+                    </label>
+                  </div>
                 </div>
 
               </div>

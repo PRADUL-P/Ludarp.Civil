@@ -2858,6 +2858,76 @@ function resetCreatorStudioForm() {
     });
   }
 
+  // ── Element Visibility Checkboxes Binding ─────────────────────────────────
+  const toggleElemSoftware = document.getElementById('toggle-elem-software');
+  const toggleElemHandle = document.getElementById('toggle-elem-handle');
+  const toggleElemKeycap = document.getElementById('toggle-elem-keycap');
+  const toggleElemTitle = document.getElementById('toggle-elem-title');
+  const toggleElemDesc = document.getElementById('toggle-elem-desc');
+  const toggleElemSteps = document.getElementById('toggle-elem-steps');
+  const toggleElemMistake = document.getElementById('toggle-elem-mistake');
+
+  if (toggleElemSoftware) {
+    toggleElemSoftware.addEventListener('change', () => {
+      const el = instagramCard ? instagramCard.querySelector('.software-badge') : null;
+      if (el) el.style.display = toggleElemSoftware.checked ? 'inline-block' : 'none';
+    });
+  }
+
+  if (toggleElemHandle) {
+    toggleElemHandle.addEventListener('change', () => {
+      const el = instagramCard ? instagramCard.querySelector('.creator-tag') : null;
+      if (el) el.style.display = toggleElemHandle.checked ? 'flex' : 'none';
+    });
+  }
+
+  if (toggleElemKeycap) {
+    toggleElemKeycap.addEventListener('change', () => {
+      const el = instagramCard ? instagramCard.querySelector('.keycap-container') : null;
+      if (el) el.style.display = toggleElemKeycap.checked ? 'block' : 'none';
+    });
+  }
+
+  if (toggleElemTitle) {
+    toggleElemTitle.addEventListener('change', () => {
+      const el = document.getElementById('card-action');
+      if (el) el.style.display = toggleElemTitle.checked ? 'block' : 'none';
+    });
+  }
+
+  if (toggleElemDesc) {
+    toggleElemDesc.addEventListener('change', () => {
+      const el = document.getElementById('card-desc');
+      if (el) el.style.display = toggleElemDesc.checked ? 'block' : 'none';
+    });
+  }
+
+  if (toggleElemSteps) {
+    toggleElemSteps.addEventListener('change', () => {
+      const el = document.getElementById('card-steps-list');
+      if (el) el.style.display = toggleElemSteps.checked ? 'block' : 'none';
+    });
+  }
+
+  if (toggleElemMistake) {
+    toggleElemMistake.addEventListener('change', () => {
+      const el = document.getElementById('card-common-mistake-box');
+      if (el) el.style.display = toggleElemMistake.checked ? 'block' : 'none';
+    });
+  }
+
+  const toggleElemVisibilitySettings = document.getElementById('toggle-elem-visibility-settings');
+  const elemVisibilityBody = document.getElementById('elem-visibility-body');
+  const arrowElemVisibility = document.getElementById('arrow-elem-visibility');
+
+  if (toggleElemVisibilitySettings && elemVisibilityBody) {
+    toggleElemVisibilitySettings.addEventListener('click', () => {
+      const isHidden = elemVisibilityBody.style.display === 'none';
+      elemVisibilityBody.style.display = isHidden ? 'grid' : 'none';
+      if (arrowElemVisibility) arrowElemVisibility.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+  }
+
   // ── Typography & Text Sizes Controls Binding ───────────────────────────────
   const fontSizeTitle = document.getElementById('font-size-title');
   const fontSizeKeycap = document.getElementById('font-size-keycap');
