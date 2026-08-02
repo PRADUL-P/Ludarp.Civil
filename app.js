@@ -2687,6 +2687,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Overlay & Pattern Controls Initialization
+  const overlayGridPattern = document.getElementById('overlay-grid-pattern');
+  const overlayToggleCropmarks = document.getElementById('overlay-toggle-cropmarks');
+  const overlayToggleUcs = document.getElementById('overlay-toggle-ucs');
+  const overlayToggleVignette = document.getElementById('overlay-toggle-vignette');
+
+  if (overlayGridPattern) {
+    overlayGridPattern.addEventListener('change', () => {
+      const bgGrid = instagramCard ? instagramCard.querySelector('.card-bg-grid') : null;
+      if (bgGrid) {
+        bgGrid.className = 'card-bg-grid'; // Reset classes
+        if (overlayGridPattern.value !== 'square') {
+          bgGrid.classList.add(`grid-${overlayGridPattern.value}`);
+        }
+      }
+    });
+  }
+
+  if (overlayToggleCropmarks) {
+    overlayToggleCropmarks.addEventListener('change', () => {
+      const cropmarks = instagramCard ? instagramCard.querySelectorAll('.viewport-crosshair') : [];
+      cropmarks.forEach(cm => cm.style.display = overlayToggleCropmarks.checked ? 'block' : 'none');
+    });
+  }
+
+  if (overlayToggleUcs) {
+    overlayToggleUcs.addEventListener('change', () => {
+      const ucsIcon = document.getElementById('card-ucs-icon');
+      if (ucsIcon) ucsIcon.style.display = overlayToggleUcs.checked ? 'block' : 'none';
+    });
+  }
+
+  if (overlayToggleVignette) {
+    overlayToggleVignette.addEventListener('change', () => {
+      const vignette = document.getElementById('card-vignette');
+      if (vignette) vignette.style.display = overlayToggleVignette.checked ? 'block' : 'none';
+    });
+  }
+
   // Layout Accordion Toggle
   const toggleLayoutSettings = document.getElementById('toggle-layout-settings');
   const layoutSettingsBody = document.getElementById('layout-settings-body');
@@ -2697,6 +2736,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       isOpen = !isOpen;
       layoutSettingsBody.style.display = isOpen ? 'grid' : 'none';
       arrowLayoutSettings.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+    });
+  }
+
+  // Overlay Accordion Toggle
+  const toggleOverlaySettings = document.getElementById('toggle-overlay-settings');
+  const overlaySettingsBody = document.getElementById('overlay-settings-body');
+  const arrowOverlaySettings = document.getElementById('arrow-overlay-settings');
+  if (toggleOverlaySettings && overlaySettingsBody && arrowOverlaySettings) {
+    let isOpen = true;
+    toggleOverlaySettings.addEventListener('click', () => {
+      isOpen = !isOpen;
+      overlaySettingsBody.style.display = isOpen ? 'grid' : 'none';
+      arrowOverlaySettings.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
     });
   }
 });
