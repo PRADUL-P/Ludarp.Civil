@@ -364,13 +364,21 @@ function updateCardPreview() {
 
   // Update Carousel ID badge & Slide Switcher chips
   const carouselInput = document.getElementById('content-carousel-id');
-  const baseCode = (carouselInput && carouselInput.value.trim() ? carouselInput.value.trim() : 'AC-001').toUpperCase();
+  let rawCode = (carouselInput && carouselInput.value.trim() ? carouselInput.value.trim() : 'AC-001').toUpperCase();
   
+  let baseCode = rawCode;
+  let detectedLetter = '';
+  const letterMatch = rawCode.match(/^(.*?)([A-Z])$/);
+  if (letterMatch && letterMatch[1].length >= 2) {
+    baseCode = letterMatch[1];
+    detectedLetter = letterMatch[2];
+  }
+
   const carouselBadge = document.getElementById('card-carousel-id-badge');
   const slideChipsContainer = document.getElementById('carousel-slide-chips');
   if (slideChipsContainer) {
     const activeChip = slideChipsContainer.querySelector('.btn-slide-chip.active');
-    const currentSlide = activeChip ? activeChip.dataset.slide : 'A';
+    const currentSlide = detectedLetter || (activeChip ? activeChip.dataset.slide : 'A');
     if (carouselBadge) carouselBadge.textContent = `${baseCode}${currentSlide}`;
 
     slideChipsContainer.querySelectorAll('.btn-slide-chip').forEach(chip => {
@@ -2030,9 +2038,17 @@ function loadCalendarItemToEditor(item) {
   }
   const markerStyle = item.markerStyle || 'number';
 
-  // Auto-detect command type (Single Command vs List)
+  // Auto-detect command type (Single Command vs List vs Carousel)
+  const isCarousel = item.format === 'carousel' || item.type === 'carousel' || (item.carouselId && /[A-Z]$/i.test(item.carouselId)) || (item.script && item.script.includes('---'));
   const isList = item.type === 'list' || (item.bullets && item.bullets.length > 5);
-  setType(isList ? 'list' : 'command', false);
+  
+  if (isCarousel) {
+    setType('carousel', false);
+  } else if (isList) {
+    setType('list', false);
+  } else {
+    setType('command', false);
+  }
 
   // Re-generate steps container inputs based on item content
   stepsContainer.innerHTML = '';
@@ -2558,22 +2574,38 @@ if (btnParsePaste) {
 
 const typeCommandBtn = document.getElementById('type-command');
 const typeListBtn = document.getElementById('type-list');
+const typeCarouselBtn = document.getElementById('type-carousel');
 const keyField = document.getElementById('key-field');
 const stepsLabel = document.getElementById('steps-label');
+const carouselScriptGroup = document.getElementById('carousel-script-group');
+const carouselMultiScriptInput = document.getElementById('carousel-multi-script');
 
 function setType(type, triggerSync = true) {
-  if (type === 'command') {
+  if (type === 'carousel') {
+    if (typeCommandBtn) typeCommandBtn.classList.remove('active');
+    if (typeListBtn) typeListBtn.classList.remove('active');
+    if (typeCarouselBtn) typeCarouselBtn.classList.add('active');
+    if (keyField) keyField.style.display = 'block';
+    if (stepsLabel) stepsLabel.textContent = 'Carousel Slide Items';
+    if (carouselScriptGroup) carouselScriptGroup.style.display = 'block';
+    const cardKeysWrapper = document.querySelector('.keycap-container');
+    if (cardKeysWrapper) cardKeysWrapper.style.display = 'flex';
+  } else if (type === 'command') {
     if (typeCommandBtn) typeCommandBtn.classList.add('active');
     if (typeListBtn) typeListBtn.classList.remove('active');
+    if (typeCarouselBtn) typeCarouselBtn.classList.remove('active');
     if (keyField) keyField.style.display = 'block';
     if (stepsLabel) stepsLabel.textContent = 'Steps';
+    if (carouselScriptGroup) carouselScriptGroup.style.display = 'none';
     const cardKeysWrapper = document.querySelector('.keycap-container');
-    if (cardKeysWrapper) cardKeysWrapper.style.display = 'block';
+    if (cardKeysWrapper) cardKeysWrapper.style.display = 'flex';
   } else {
     if (typeCommandBtn) typeCommandBtn.classList.remove('active');
     if (typeListBtn) typeListBtn.classList.add('active');
+    if (typeCarouselBtn) typeCarouselBtn.classList.remove('active');
     if (keyField) keyField.style.display = 'none';
     if (stepsLabel) stepsLabel.textContent = 'Shortcut List Items';
+    if (carouselScriptGroup) carouselScriptGroup.style.display = 'none';
     const cardKeysWrapper = document.querySelector('.keycap-container');
     if (cardKeysWrapper) cardKeysWrapper.style.display = 'none';
   }
@@ -2583,9 +2615,95 @@ function setType(type, triggerSync = true) {
   }
 }
 
-if (typeCommandBtn && typeListBtn) {
-  typeCommandBtn.onclick = () => setType('command');
-  typeListBtn.onclick = () => setType('list');
+if (typeCommandBtn) typeCommandBtn.onclick = () => setType('command');
+if (typeListBtn) typeListBtn.onclick = () => setType('list');
+if (typeCarouselBtn) typeCarouselBtn.onclick = () => setType('carousel');
+
+// Multi-Slide Script Parser for '---' dividers
+function parseMultiSlideScript(scriptText) {
+  if (!scriptText || !scriptText.includes('---')) return null;
+
+  const slides = scriptText.split(/\n\s*---\s*\n|\n\s*---|---\s*\n|---/).map(s => s.trim()).filter(s => s);
+  if (slides.length === 0) return null;
+
+  const parsedData = {
+    title: '',
+    desc: '',
+    steps: [],
+    proTip: ''
+  };
+
+  // Slide 1 (Hook / Cover / Title & Desc)
+  const slide1Lines = slides[0].split('\n').map(l => l.trim()).filter(l => l);
+  slide1Lines.forEach(line => {
+    const clean = line.replace(/\*\*|`|__|\*/g, '').trim();
+    if (/^(?:title|action|hook|cover):\s*/i.test(clean)) {
+      parsedData.title = clean.replace(/^(?:title|action|hook|cover):\s*/i, '').trim();
+    } else if (/^(?:desc|description):\s*/i.test(clean)) {
+      parsedData.desc = clean.replace(/^(?:desc|description):\s*/i, '').trim();
+    } else if (!parsedData.title && !clean.includes(':')) {
+      parsedData.title = clean;
+    } else if (!parsedData.desc && parsedData.title) {
+      parsedData.desc += (parsedData.desc ? ' ' : '') + clean;
+    }
+  });
+
+  // Slide 2 (Steps / Content)
+  if (slides.length > 1) {
+    const slide2Lines = slides[1].split('\n').map(l => l.trim()).filter(l => l);
+    slide2Lines.forEach(line => {
+      const clean = line.replace(/\*\*|`|__|\*/g, '').trim();
+      const stepText = clean.replace(/^(?:\d+[\.\)]|[•▶✓■a-z]\.)\s*/i, '').trim();
+      if (stepText) parsedData.steps.push(stepText);
+    });
+  }
+
+  // Slide 3 (ProTip / CTA)
+  if (slides.length > 2) {
+    const slide3Lines = slides[2].split('\n').map(l => l.trim()).filter(l => l);
+    slide3Lines.forEach(line => {
+      const clean = line.replace(/\*\*|`|__|\*/g, '').trim();
+      if (/^(?:pro\s*tip|protip|tip):\s*/i.test(clean)) {
+        parsedData.proTip = clean.replace(/^(?:pro\s*tip|protip|tip):\s*/i, '').trim();
+      } else {
+        parsedData.proTip += (parsedData.proTip ? ' ' : '') + clean;
+      }
+    });
+  }
+
+  return parsedData;
+}
+
+if (carouselMultiScriptInput) {
+  carouselMultiScriptInput.addEventListener('input', () => {
+    const text = carouselMultiScriptInput.value;
+    if (text.includes('---')) {
+      setType('carousel', false);
+      const parsed = parseMultiSlideScript(text);
+      if (parsed) {
+        if (parsed.title) contentActionInput.value = parsed.title;
+        if (parsed.desc) contentDescInput.value = parsed.desc;
+        if (parsed.proTip) contentProTipInput.value = parsed.proTip;
+        if (parsed.steps && parsed.steps.length > 0) {
+          stepsContainer.innerHTML = '';
+          parsed.steps.forEach((stepText, index) => {
+            const row = document.createElement('div');
+            row.className = 'step-input-row';
+            row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+            row.innerHTML = `
+              <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${index + 1}</span>
+              <input type="text" class="step-input" placeholder="Step ${index + 1}" value="${stepText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+              <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+            `;
+            stepsContainer.appendChild(row);
+            bindStepRowEvents(row);
+          });
+        }
+      }
+    }
+    updateCardPreview();
+    saveCurrentDayData();
+  });
 }
 
 // Arrow day selectors
