@@ -2181,6 +2181,92 @@ function loadCalendarItemToEditor(item) {
   showToast(`Loaded Day ${item.day}: "${action}" into Creator Studio!`);
 }
 
+function applyStyleToAllCarouselSlides() {
+  const carouselInput = document.getElementById('content-carousel-id');
+  let currentId = (carouselInput && carouselInput.value && carouselInput.value.trim() ? carouselInput.value.trim() : 'AC-003A').toUpperCase();
+
+  let baseCode = currentId;
+  const match = currentId.match(/^(.*?)([A-Z])$/);
+  if (match && match[1].length >= 2) {
+    baseCode = match[1];
+  }
+
+  // Get active canvas theme class
+  const canvas = document.getElementById('instagram-post-canvas');
+  let currentTheme = 'theme-blueprint';
+  if (canvas) {
+    const themeClass = [...canvas.classList].find(c => c.startsWith('theme-'));
+    if (themeClass) currentTheme = themeClass;
+  }
+
+  // Get active theme preset button
+  const activePresetBtn = document.querySelector('.style-preset-btn.active');
+  const activeStyleTheme = activePresetBtn ? activePresetBtn.getAttribute('data-style') : 'blueprint';
+
+  // Get custom colors
+  const customColors = {};
+  ['color-bg-start', 'color-bg-end', 'color-accent', 'color-text'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) customColors[id] = el.value;
+  });
+
+  // Get layout sliders
+  const layoutSettings = {};
+  ['layout-title-font', 'layout-title-size', 'layout-grid-size', 'layout-protip-rot', 'layout-watermark-op', 'layout-watermark-size'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) layoutSettings[id] = el.value;
+  });
+
+  // Get font size sliders
+  const fontSizes = {};
+  ['font-size-title', 'font-size-keycap', 'font-size-desc', 'font-size-steps', 'font-size-protip'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) fontSizes[id] = el.value;
+  });
+
+  // Get element visibility checkboxes
+  const elementVisibility = {};
+  ['toggle-elem-symbol', 'toggle-elem-watermark', 'toggle-elem-ucs', 'toggle-elem-instagram', 'toggle-elem-crosshair', 'toggle-elem-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) elementVisibility[id] = el.checked;
+  });
+
+  const swVal = contentSoftwareSelect ? contentSoftwareSelect.value : 'AutoCAD';
+  const handleVal = brandHandleInput ? brandHandleInput.value : 'ludarp.civil';
+  const difficultyVal = document.getElementById('content-difficulty') ? document.getElementById('content-difficulty').value : 'Beginner';
+  const categoryVal = document.getElementById('content-category') ? document.getElementById('content-category').value : 'Navigation';
+  const hashtagsVal = contentHashtagsInput ? contentHashtagsInput.value : '#autocad #ludarpcivil';
+
+  let count = 0;
+  calendarDb.forEach(item => {
+    if (item.id && item.id.toUpperCase().startsWith(baseCode)) {
+      item._theme = currentTheme;
+      item._styleTheme = activeStyleTheme;
+      item._colors = { ...customColors };
+      item._layoutSettings = { ...layoutSettings };
+      item._fontSizes = { ...fontSizes };
+      item._visibility = { ...elementVisibility };
+      item.software = swVal;
+      item.creatorHandle = handleVal;
+      item.difficulty = difficultyVal;
+      item.category = categoryVal;
+      item.hashtags = hashtagsVal;
+      count++;
+    }
+  });
+
+  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+  if (typeof saveAllDataToSyncFile === 'function') saveAllDataToSyncFile();
+
+  showToast(`✨ Applied visual theme & layout to all ${count} slide${count === 1 ? '' : 's'} in ${baseCode}!`);
+  updateCardPreview();
+}
+
+const btnApplyStyleToAll = document.getElementById('btn-apply-style-to-all-slides');
+if (btnApplyStyleToAll) {
+  btnApplyStyleToAll.addEventListener('click', applyStyleToAllCarouselSlides);
+}
+
 if (calendarPhaseSelect) {
   calendarPhaseSelect.addEventListener('change', renderCalendarHub);
 }
