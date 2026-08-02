@@ -185,6 +185,30 @@ if (localStorage.getItem('ludarp_calendar_db_v2_cleared') !== 'true') {
 
 // Load clean database arrays
 let shortcutDb = JSON.parse(localStorage.getItem('ludarp_shortcuts')) || [];
+let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
+
+// Fallback to preloaded data if local storage is empty
+const defaultData = (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar) && autocadCalendar.length > 0)
+  ? autocadCalendar
+  : ((typeof CALENDAR_DATA_FROM_FILE !== 'undefined' && Array.isArray(CALENDAR_DATA_FROM_FILE) && CALENDAR_DATA_FROM_FILE.length > 0)
+    ? CALENDAR_DATA_FROM_FILE
+    : []);
+
+if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
+  if (defaultData.length > 0) {
+    calendarDb = JSON.parse(JSON.stringify(defaultData));
+    localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+  }
+}
+
+if (!Array.isArray(shortcutDb) || shortcutDb.length === 0) {
+  if (calendarDb.length > 0) {
+    shortcutDb = JSON.parse(JSON.stringify(calendarDb));
+  } else {
+    shortcutDb = JSON.parse(JSON.stringify(defaultShortcuts));
+  }
+  localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+}
 
 // State variables
 let currentFormat = "square"; // "square" or "story"
@@ -192,9 +216,6 @@ let activeStylePreset = "blueprint";
 let activeStudioShortcutId = null; // Track currently loaded shortcut from library
 let latestGeneratedResearch = null; // Store latest AI generated result object
 let fileHandle = null; // Stored FileSystemFileHandle for disk sync
-
-// Mutable content post database
-let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
 let activeCalendarDayNum = "1";
 
 // Dynamic Sidebar Controls
@@ -1644,7 +1665,8 @@ function renderCalendarHub() {
   calendarGridContainer.innerHTML = '';
   
   // Filter posts
-  const filteredPosts = autocadCalendar.filter(post => {
+  const sourcePosts = (Array.isArray(calendarDb) && calendarDb.length > 0) ? calendarDb : (typeof autocadCalendar !== 'undefined' ? autocadCalendar : []);
+  const filteredPosts = sourcePosts.filter(post => {
     return selectedPhase === 'all' || post.phase === selectedPhase;
   });
   
@@ -1669,12 +1691,12 @@ function renderCalendarHub() {
     }
     
     // Set snippet preview
-    let snippet = '';
-    if (post.bullets && post.bullets.length > 0) {
+    let snippet = post.description || post.desc || '';
+    if (!snippet && post.bullets && post.bullets.length > 0) {
       snippet = post.bullets.slice(0, 3).map(b => `• ${b}`).join('\n');
-    } else if (post.script) {
-      snippet = `Script: ${post.script}`;
-    } else if (post.caption) {
+    } else if (!snippet && post.script) {
+      snippet = post.script;
+    } else if (!snippet && post.caption) {
       snippet = post.caption;
     }
     
@@ -1682,15 +1704,16 @@ function renderCalendarHub() {
     card.className = `calendar-card ${phaseClass} ${isCompleted ? 'completed' : ''}`;
     card.setAttribute('data-day', post.day);
     
+    const shortcutKey = post.shortcut || post.keys || '';
+    const cardTitle = post.action || (post.title ? post.title.replace(/^[^:]+:\s*/, '') : 'Untitled') ;
+    const formatType = post.format || 'post';
     card.innerHTML = `
       <div>
         <div class="calendar-card-header">
           <span class="calendar-day-badge">DAY ${post.day}</span>
-          <span class="calendar-format-badge format-${post.format}-badge">
-            ${post.format === 'carousel' ? '🎠 Carousel' : post.format === 'reel' ? '🎥 Reel' : '🖼️ Post'}
-          </span>
+          ${shortcutKey ? `<span class="calendar-format-badge" style="font-family:var(--font-mono); font-size:0.72rem; font-weight:800; padding:3px 8px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:6px; color:var(--accent);">${shortcutKey}</span>` : ''}
         </div>
-        <h4 class="calendar-card-title">${post.title}</h4>
+        <h4 class="calendar-card-title">${cardTitle}</h4>
         <pre class="calendar-card-snippet" style="font-family: inherit; white-space: pre-wrap; margin: 8px 0; max-height: 80px; overflow: hidden; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">${snippet}</pre>
       </div>
       
@@ -1815,14 +1838,7 @@ function loadCalendarItemToEditor(item) {
   contentActionInput.value = action;
   
   // Build description
-  let descText = '';
-  if (item.caption) {
-    descText = item.caption;
-  } else if (item.script) {
-    descText = item.script;
-  } else if (item.bullets && item.bullets.length > 0) {
-    descText = item.bullets.join(' | ');
-  }
+  let descText = item.description || item.desc || item.caption || item.script || (item.bullets && item.bullets.length > 0 ? item.bullets.join(' | ') : '');
   contentDescInput.value = descText;
   
   // Set pro-tip & common mistake if any
@@ -2375,6 +2391,7 @@ async function saveCurrentDayData() {
   d.software = contentSoftwareSelect.value;
   d.title = contentActionInput.value.trim();
   d.desc = contentDescInput.value.trim();
+  d.description = d.desc; // keep both fields in sync
   d.proTip = contentProTipInput.value.trim();
   
   const contentDiffInput = document.getElementById('content-difficulty');
@@ -3490,6 +3507,24 @@ function renderParsedPostsList() {
     };
 
     cardEl.querySelector('[data-action="add-db"]').onclick = () => {
+      const isDuplicate = calendarDb.some(item => {
+        const itemKey = (item.shortcut || item.keys || '').toLowerCase().trim();
+        const postKey = (post.shortcut || post.keys || '').toLowerCase().trim();
+        const itemAct = (item.action || '').toLowerCase().trim();
+        const postAct = (post.action || '').toLowerCase().trim();
+        return (itemKey && itemKey === postKey) || (itemAct && itemAct === postAct);
+      });
+
+      if (isDuplicate) {
+        const confirmAdd = confirm(
+          `⚠️ Duplicate Command Warning:\n\nCommand "${post.shortcut || post.keys}: ${post.action}" already exists in your database.\n\nDo you want to add this duplicate anyway?`
+        );
+        if (!confirmAdd) {
+          showToast('ℹ️ Cancelled adding duplicate command.', 'info');
+          return;
+        }
+      }
+
       const maxDay = calendarDb.reduce((max, item) => Math.max(max, Number(item.day) || 0), 0);
       post.day = maxDay + 1;
       calendarDb.push(post);
@@ -3498,6 +3533,7 @@ function renderParsedPostsList() {
       renderSidebarDaysList();
       renderDatabaseManagerTable();
       saveAllDataToSyncFile();
+      updateUnsyncedBanner(1);
       showToast(`✅ Added Day ${post.day}: "${post.action}" to Database!`, 'success');
     };
 
@@ -3512,9 +3548,52 @@ if (btnImporterSaveAll) {
   btnImporterSaveAll.addEventListener('click', () => {
     if (currentParsedPosts.length === 0) return;
 
-    let maxDay = calendarDb.reduce((max, item) => Math.max(max, Number(item.day) || 0), 0);
+    const duplicates = [];
+    const uniquePosts = [];
 
     currentParsedPosts.forEach(post => {
+      const isDup = calendarDb.some(item => {
+        const itemKey = (item.shortcut || item.keys || '').toLowerCase().trim();
+        const postKey = (post.shortcut || post.keys || '').toLowerCase().trim();
+        const itemAct = (item.action || '').toLowerCase().trim();
+        const postAct = (post.action || '').toLowerCase().trim();
+        return (itemKey && itemKey === postKey) || (itemAct && itemAct === postAct);
+      });
+
+      if (isDup) {
+        duplicates.push(post);
+      } else {
+        uniquePosts.push(post);
+      }
+    });
+
+    let postsToAdd = [];
+
+    if (duplicates.length > 0) {
+      const dupSummary = duplicates.slice(0, 5).map(d => ` • ${d.shortcut || d.keys}: ${d.action}`).join('\n');
+      const moreCount = duplicates.length > 5 ? `\n ... and ${duplicates.length - 5} more` : '';
+
+      const confirmDuplicates = confirm(
+        `⚠️ Duplicate Commands Detected (${duplicates.length} item${duplicates.length > 1 ? 's' : ''}):\n\n${dupSummary}${moreCount}\n\nDo you want to include these duplicate commands?\n\n• Click OK to add ALL (${currentParsedPosts.length} posts, including duplicates)\n• Click CANCEL to skip duplicates and add ONLY new unique commands (${uniquePosts.length} posts)`
+      );
+
+      if (confirmDuplicates) {
+        postsToAdd = currentParsedPosts;
+      } else {
+        postsToAdd = uniquePosts;
+      }
+    } else {
+      postsToAdd = currentParsedPosts;
+    }
+
+    if (postsToAdd.length === 0) {
+      showToast('ℹ️ No new unique commands to import.', 'warning');
+      return;
+    }
+
+    let maxDay = calendarDb.reduce((max, item) => Math.max(max, Number(item.day) || 0), 0);
+
+    postsToAdd.forEach(post => {
       maxDay++;
       const itemCopy = { ...post, day: maxDay };
       calendarDb.push(itemCopy);
@@ -3525,8 +3604,9 @@ if (btnImporterSaveAll) {
     renderSidebarDaysList();
     renderDatabaseManagerTable();
     saveAllDataToSyncFile();
+    updateUnsyncedBanner(postsToAdd.length);
 
-    showToast(`✅ Imported all ${currentParsedPosts.length} posts to database!`, 'success');
+    showToast(`✅ Successfully imported ${postsToAdd.length} commands to database!`, 'success');
   });
 }
 
@@ -4021,7 +4101,10 @@ function tryParse(str, fallback) {
 
 async function fetchCloudViewerData() {
   const url = (typeof LUDARP_GSHEET_DEFAULT_URL !== 'undefined') ? LUDARP_GSHEET_DEFAULT_URL : '';
-  const savedUrl = localStorage.getItem('ludarp_gsheet_url') || url;
+  let savedUrl = localStorage.getItem('ludarp_gsheet_url') || url;
+  if (gsheetApiUrlInput && gsheetApiUrlInput.value.trim()) {
+    savedUrl = gsheetApiUrlInput.value.trim();
+  }
   if (!savedUrl) {
     showToast('⚠️ No Google Sheet URL configured. Go to Database Manager to set it up.', 'error');
     return;
@@ -4045,10 +4128,10 @@ async function fetchCloudViewerData() {
         emptyEl.style.display = 'block';
         emptyEl.innerHTML = `
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:52px;height:52px;margin-bottom:14px;opacity:0.35;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          <p style="font-weight:800; font-size:1rem; color:var(--text-primary);">Google Sheet is empty</p>
-          <p style="font-size:0.82rem; margin-top:6px; opacity:0.7;">Add posts via Bulk Post Importer and click <b>📤 Push TO Cloud</b> in Database Manager first.</p>`;
+          <p style="font-weight:800; font-size:1rem; color:var(--text-primary);">Google Sheet is currently empty (0 rows)</p>
+          <p style="font-size:0.82rem; margin-top:6px; opacity:0.7;">Go to <b>Database Manager</b> and click <b>📤 Push TO Cloud</b> to upload all 141 posts into your Google Sheet!</p>`;
       }
-      showToast('⚠️ Google Sheet returned no data rows.', 'warning');
+      showToast('⚠️ Google Sheet connected, but returned no data rows.', 'warning');
       return;
     }
 
@@ -4065,9 +4148,16 @@ async function fetchCloudViewerData() {
       emptyEl.innerHTML = `
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:52px;height:52px;margin-bottom:14px;opacity:0.35;color:var(--error);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <p style="font-weight:800; font-size:1rem; color:var(--error);">Failed to connect to Google Sheet</p>
-        <p style="font-size:0.82rem; margin-top:6px; opacity:0.7;">Make sure your Apps Script is deployed as a public Web App and the URL is correct.</p>`;
+        <p style="font-size:0.82rem; margin-top:8px; line-height:1.5; opacity:0.85; max-width:480px; margin-left:auto; margin-right:auto;">
+          Google Apps Script Web App returned a 404 or connection error.<br><br>
+          <b>How to fix in 30 seconds:</b><br>
+          1. Open Google Sheets ➔ <b>Extensions ➔ Apps Script</b>.<br>
+          2. Click <b>Deploy ➔ New deployment ➔ Web app</b>.<br>
+          3. Set <b>Who has access: Anyone</b> and click <b>Deploy</b>.<br>
+          4. Copy the new Web App URL and paste it in <b>Database Manager</b>!
+        </p>`;
     }
-    showToast('❌ Could not reach Google Sheet. Check your deployment.', 'error');
+    showToast('❌ Could not reach Google Sheet Web App.', 'error');
   }
 }
 
@@ -4198,3 +4288,53 @@ function renderCloudCards(rows, container) {
     container.appendChild(card);
   });
 }
+
+// ── Unsynced Cloud Banner Engine ─────────────────────────────────────────────
+let unsyncedCount = Number(localStorage.getItem('ludarp_unsynced_count') || 0);
+
+function updateUnsyncedBanner(increment = 0) {
+  if (increment > 0) {
+    unsyncedCount += increment;
+  } else if (increment === -1) {
+    unsyncedCount = 0;
+  }
+  localStorage.setItem('ludarp_unsynced_count', unsyncedCount);
+
+  const banner = document.getElementById('unsynced-alert-banner');
+  const countText = document.getElementById('unsynced-count-text');
+
+  if (banner && countText) {
+    if (unsyncedCount > 0) {
+      banner.style.display = 'flex';
+      countText.textContent = `⚠️ ${unsyncedCount} new/updated command${unsyncedCount !== 1 ? 's' : ''} not synced to Google Sheet`;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+}
+
+const bannerSyncBtn = document.getElementById('btn-banner-sync-now');
+if (bannerSyncBtn) {
+  bannerSyncBtn.addEventListener('click', () => {
+    if (btnGsheetPush) {
+      btnGsheetPush.click();
+    } else {
+      const dbTab = document.querySelector('.nav-btn[data-tab="database"]');
+      if (dbTab) dbTab.click();
+    }
+  });
+}
+
+if (btnGsheetPush) {
+  btnGsheetPush.addEventListener('click', () => {
+    setTimeout(() => {
+      updateUnsyncedBanner(-1);
+    }, 1500);
+  });
+}
+
+// Check initial banner state on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateUnsyncedBanner(0);
+});
+updateUnsyncedBanner(0);

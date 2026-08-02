@@ -3,1313 +3,798 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ludarp Civil Studio — AutoCAD Content Engine</title>
-  <meta name="description" content="Professional AutoCAD Instagram content creation studio for civil engineers. Create, schedule and export blueprint-styled posts.">
+  <title>Ludarp Civil Studio — AutoCAD Shorts & Mastery Hub</title>
+  <script>
+    if (window.location.hash === '#admin' || window.location.search.includes('admin') || window.location.pathname.endsWith('/admin')) {
+      window.location.href = 'admin.html';
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Text:wght@700;800;900&family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #060911;
+      --bg-secondary: #0f172a;
+      --bg-tertiary: #1e293b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.3);
+      --accent-purple: #a855f7;
+      --accent-orange: #f59e0b;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-accent: rgba(56, 189, 248, 0.4);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.12), transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.1), transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Top Navigation Bar */
+    .pub-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(6, 9, 17, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pub-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+    .pub-brand-logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8, #818cf8);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .pub-nav {
+      display: flex;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 5px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+    }
+    .pub-nav-btn {
+      padding: 9px 20px;
+      border-radius: 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pub-nav-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .pub-nav-btn.active {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #000;
+      font-weight: 800;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      max-width: 1080px;
+      margin: 30px auto 24px auto;
+      padding: 32px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-accent);
+      border-radius: 24px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    .hero-avatar {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #38bdf8, #a855f7, #10b981);
+      padding: 4px;
+      box-shadow: 0 0 35px var(--accent-glow);
+      flex-shrink: 0;
+    }
+    .hero-avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+    }
+    .hero-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      margin: 0 0 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(to right, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-stats-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .stat-badge {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stat-badge strong {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    /* Tab Sections */
+    .tab-section {
+      max-width: 1080px;
+      margin: 0 auto 60px auto;
+      padding: 0 20px;
+      display: none;
+    }
+    .tab-section.active {
+      display: block;
+    }
+
+    /* CAD Cards Grid */
+    .insta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 860px) {
+      .insta-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-banner { flex-direction: column; text-align: center; }
+      .hero-stats-row { justify-content: center; }
+    }
+    @media (max-width: 560px) {
+      .insta-grid { grid-template-columns: 1fr; }
+    }
+
+    .cad-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .cad-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 35px rgba(56, 189, 248, 0.25);
+      background: rgba(30, 41, 59, 0.8);
+    }
+    .card-key-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--accent);
+      background: rgba(30, 41, 59, 0.9);
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-accent);
+      display: inline-block;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    /* Quiz Level System Styles */
+    .quiz-container {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-accent);
+      border-radius: 24px;
+      padding: 36px;
+      max-width: 700px;
+      margin: 20px auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .level-selector-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .level-btn {
+      padding: 10px 22px;
+      border-radius: 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .level-btn.active-beginner {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      box-shadow: 0 0 15px var(--accent-green-glow);
+    }
+    .level-btn.active-intermediate {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+    .level-btn.active-advanced {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--accent-purple);
+      color: var(--accent-purple);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    }
+
+    .quiz-progress-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0 24px 0;
+    }
+    .quiz-progress-fill {
+      height: 100%;
+      width: 10%;
+      background: linear-gradient(to right, var(--accent), var(--accent-green));
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+    .quiz-option-btn {
+      width: 100%;
+      padding: 16px 20px;
+      margin: 10px 0;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text-primary);
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .quiz-option-btn:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+      transform: translateX(4px);
+    }
+    .quiz-option-btn.correct {
+      background: rgba(16, 185, 129, 0.25) !important;
+      border-color: var(--accent-green) !important;
+      color: var(--accent-green) !important;
+    }
+    .quiz-option-btn.wrong {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: #ef4444 !important;
+      color: #ef4444 !important;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-accent);
+      border-radius: 24px;
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 36px;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: none; border: none;
+      color: var(--text-muted);
+      font-size: 1.8rem; cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <div class="app-container">
 
-    <!-- ═══════════════════════════════════════════════════════
-         SIDEBAR NAVIGATION
-    ══════════════════════════════════════════════════════════ -->
-    <aside class="sidebar">
-      <!-- Brand -->
-      <div class="brand">
-        <div class="brand-logo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
-          </svg>
-        </div>
-        <div class="brand-text">
-          <h1>Ludarp Civil Studio</h1>
-          <span>Content Engine v2</span>
+  <!-- Top Sticky Navigation Bar -->
+  <header class="pub-header">
+    <a href="#" class="pub-brand">
+      <div class="pub-brand-logo" style="overflow:hidden; padding:0;">
+        <img src="profile.jpg" alt="Ludarp Civil Studio Logo" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+      </div>
+      <div>
+        <div style="font-weight: 900; font-size: 1.05rem; letter-spacing: -0.02em;">Ludarp Civil Studio</div>
+        <div style="font-size: 0.74rem; color: var(--accent); font-weight: 700;">AutoCAD Shorts & Mastery Hub</div>
+      </div>
+    </a>
+
+    <nav class="pub-nav">
+      <button class="pub-nav-btn active" data-tab="feed">📸 Published Feed</button>
+      <button class="pub-nav-btn" data-tab="search">🔍 Shortcut Hub</button>
+      <button class="pub-nav-btn" data-tab="quiz">🧠 10-Set Quiz</button>
+      <button class="pub-nav-btn" data-tab="cheatsheet">📄 Cheat Sheet</button>
+      <a href="admin.html" class="pub-nav-btn" style="border: 1px solid var(--accent); color: var(--accent);">⚙️ Admin</a>
+    </nav>
+  </header>
+
+  <!-- Hero Profile Banner -->
+  <section class="hero-banner">
+    <div class="hero-avatar">
+      <div class="hero-avatar-inner" style="overflow:hidden;">
+        <img src="profile.jpg" alt="Ludarp Civil Studio Profile" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <h1 class="hero-title">
+        ludarp.civil
+        <span style="color: var(--accent); font-size: 1.3rem;">✓</span>
+      </h1>
+      <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">
+        🚀 Daily AutoCAD shortcuts, 2D drafting hacks, and 3D modeling tips for civil engineers & architects.
+      </p>
+
+      <div class="hero-stats-row">
+        <div class="stat-badge">⚡ <strong>141</strong> <span>AutoCAD Shortcuts</span></div>
+        <div class="stat-badge">🎯 <span>Beginner to Expert</span></div>
+        <div class="stat-badge">📐 <strong style="color: var(--accent-green)">2D & 3D</strong> <span>Mastery</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       TAB 1: PUBLISHED INSTAGRAM FEED
+       ========================================================================= -->
+  <main class="tab-section active" id="tab-feed">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2 style="font-size:1.35rem; font-weight:900; margin:0;">📸 Published Instagram Feed</h2>
+      <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Posts published from Admin Dashboard</span>
+    </div>
+
+    <div class="insta-grid" id="pub-feed-grid">
+      <!-- Populated dynamically -->
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       TAB 2: SHORTCUT SEARCH HUB
+       ========================================================================= -->
+  <main class="tab-section" id="tab-search">
+    <div style="background:rgba(15, 23, 42, 0.8); border:1px solid var(--border-accent); border-radius:20px; padding:28px; margin-bottom:24px;">
+      <h2 style="font-size:1.35rem; font-weight:900; margin:0 0 16px 0;">🔍 Interactive AutoCAD Shortcut Library</h2>
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <input type="text" id="hub-search-input" placeholder="Search shortcut (e.g. TR, F8, LINE), command action, or description..." style="flex:1; min-width:280px; padding:14px 18px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:14px; color:var(--text-primary); font-size:0.92rem;">
+        <select id="hub-cat-filter" style="padding:14px 18px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:14px; color:var(--text-primary); font-size:0.9rem; font-weight:700;">
+          <option value="all">All Categories</option>
+          <option value="Editing">Editing</option>
+          <option value="Drawing">Drawing</option>
+          <option value="3D Modeling">3D Modeling</option>
+          <option value="Layer Management">Layer Management</option>
+          <option value="Annotation">Annotation</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="insta-grid" id="hub-cards-grid">
+      <!-- Populated dynamically -->
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       TAB 3: LEVEL-BASED 10-QUESTION QUIZ GAME
+       ========================================================================= -->
+  <main class="tab-section" id="tab-quiz">
+    <div class="quiz-container">
+      <div style="text-align:center;">
+        <h2 style="font-size:1.4rem; font-weight:900; margin:0 0 6px 0; color:var(--text-primary);">🧠 AutoCAD Mastery Quiz</h2>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 20px 0;">Select your skill level to start a 10-question challenge set!</p>
+
+        <!-- Level Selector Buttons -->
+        <div class="level-selector-row">
+          <button class="level-btn active-beginner" id="btn-level-beginner">🟢 Beginner (10 Questions)</button>
+          <button class="level-btn" id="btn-level-intermediate">🟡 Intermediate (10 Questions)</button>
+          <button class="level-btn" id="btn-level-advanced">🔴 Advanced (10 Questions)</button>
         </div>
       </div>
 
-      <!-- Navigation -->
-      <nav class="nav-menu">
-        <button class="nav-btn active" data-tab="studio">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <rect width="18" height="18" x="3" y="3" rx="2"/>
-            <circle cx="9" cy="9" r="2"/>
-            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-          </svg>
-          Creator Studio
-        </button>
-        <button class="nav-btn" data-tab="hub">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-            <line x1="12" y1="22.08" x2="12" y2="12"/>
-          </svg>
-          Shortcut Hub
-        </button>
-        <button class="nav-btn" data-tab="calendar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <rect width="18" height="18" x="3" y="4" rx="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-          Post Directory
-        </button>
-        <button class="nav-btn" data-tab="research">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-          </svg>
-          AI Research Hub
-        </button>
-        <button class="nav-btn" data-tab="database">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <ellipse cx="12" cy="5" rx="9" ry="3"/>
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-          </svg>
-          Database Manager
-        </button>
-        <button class="nav-btn" data-tab="feed">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <rect width="7" height="7" x="3" y="3" rx="1"/>
-            <rect width="7" height="7" x="14" y="3" rx="1"/>
-            <rect width="7" height="7" x="14" y="14" rx="1"/>
-            <rect width="7" height="7" x="3" y="14" rx="1"/>
-          </svg>
-          Feed Grid
-        </button>
-        <button class="nav-btn" data-tab="importer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="12" y1="18" x2="12" y2="12"/>
-            <line x1="9" y1="15" x2="15" y2="15"/>
-          </svg>
-          Bulk Post Importer
-        </button>
-        <button class="nav-btn" data-tab="cheatsheet">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
-          </svg>
-          PDF Cheat Sheet
-        </button>
-        <button class="nav-btn" data-tab="quiz">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          Quiz & Flashcards
-        </button>
-        <button class="nav-btn" data-tab="cloudviewer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-          Cloud Sheet Viewer
-        </button>
-      </nav>
+      <!-- Question Card Body -->
+      <div id="quiz-game-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; font-weight:800; color:var(--text-secondary);">
+          <span id="quiz-question-counter">Question 1 of 10</span>
+          <span>Score: <strong style="color:var(--accent-green); font-size:1rem;" id="quiz-score-val">0 / 100</strong></span>
+        </div>
 
-      <!-- Post Library Sidebar -->
-      <div id="sidebar-studio-context" class="sidebar-section">
-        <div class="sidebar-section-header">
-          <span class="sidebar-section-label">Post Library</span>
-          <span id="sidebar-progress-count" class="sidebar-badge">0 / 0</span>
+        <div class="quiz-progress-bar-wrap">
+          <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
         </div>
-        <div class="sidebar-progress-bar-wrap">
-          <div id="sidebar-progress-bar" class="sidebar-progress-fill"></div>
-        </div>
-        <div id="sidebar-days-list" class="sidebar-days-list">
-          <!-- populated by JS -->
-        </div>
-      </div>
 
-      <!-- DB Sync Controls -->
-      <div class="sidebar-sync-block">
-        <div class="sync-status-card">
-          <div class="sync-indicator" id="sync-dot"></div>
-          <div id="sync-status" class="sync-label">Local Sandbox</div>
+        <div style="font-size:1.25rem; font-weight:800; margin:20px 0; color:var(--text-primary); line-height:1.4;" id="quiz-question-text">
+          Loading Question...
         </div>
-        <button class="btn-sync" id="btn-connect-file">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;flex-shrink:0">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-          </svg>
-          Link JSON File
-        </button>
-        <div class="sync-backup-row">
-          <button class="btn-backup" id="btn-export-backup" title="Export backup">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Export
-          </button>
-          <button class="btn-backup" id="btn-import-backup" title="Import backup">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            Import
+
+        <div id="quiz-options-container">
+          <!-- Options injected here -->
+        </div>
+
+        <div style="margin-top:24px; display:flex; justify-content:flex-end;">
+          <button id="quiz-next-btn" style="padding:12px 24px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; font-size:0.9rem; cursor:pointer; display:none;">
+            Next Question ➔
           </button>
         </div>
-        <input type="file" id="file-import-backup" accept=".json" style="display:none">
       </div>
 
-      <!-- Footer -->
-      <div class="sidebar-footer">
-        <div class="pulse-indicator"></div>
-        <p>Instagram • Active</p>
+      <!-- Final Results Screen -->
+      <div id="quiz-results-screen" style="display:none; text-align:center; padding:20px 0;">
+        <div style="font-size:3.5rem; margin-bottom:10px;">🏆</div>
+        <h2 style="font-size:1.6rem; font-weight:900; margin:0 0 8px 0; color:var(--text-primary);">Level Completed!</h2>
+        <p style="font-size:0.95rem; color:var(--text-secondary); margin:0 0 20px 0;" id="quiz-final-score-text">You scored 80 / 100!</p>
+        <button id="quiz-restart-btn" style="padding:12px 28px; background:var(--accent-green); color:#000; border:none; border-radius:16px; font-weight:900; font-size:0.95rem; cursor:pointer;">
+          🔄 Try Another Quiz Set
+        </button>
       </div>
-    </aside>
-
-    <!-- ═══════════════════════════════════════════════════════
-         MAIN CONTENT
-    ══════════════════════════════════════════════════════════ -->
-    <main class="main-content">
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 1: CREATOR STUDIO                         ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="studio-view" class="tab-view active">
-
-        <!-- Studio Header -->
-        <header class="studio-header">
-          <div class="studio-header-left">
-            <div class="studio-day-nav">
-              <button class="btn-day-arrow" id="btn-prev" title="Previous Day">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg>
-              </button>
-              <div class="studio-day-info">
-                <span id="day-sub" class="day-phase-badge">CREATOR STUDIO</span>
-                <h2 id="day-title" class="day-title">Post Editor</h2>
-              </div>
-              <button class="btn-day-arrow" id="btn-next" title="Next Post">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
-          </div>
-          <div class="studio-header-right" style="display:flex; gap:10px; align-items:center;">
-            <button class="btn-action btn-secondary-action" id="btn-duplicate-card" style="padding:6px 12px; font-size:0.78rem;" title="Duplicate active card as new entry (Ctrl+D)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><rect width="13" height="13" x="9" y="9" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Duplicate
-            </button>
-            <div class="canvas-toggle-group">
-              <button class="toggle-btn active" id="btn-format-square">1:1 Post</button>
-              <button class="toggle-btn" id="btn-format-story">9:16 Reel</button>
-            </div>
-          </div>
-        </header>
-
-        <!-- Studio Body -->
-        <div class="studio-layout">
-
-          <!-- LEFT: Editor Controls -->
-          <div class="controls-panel card">
-
-            <!-- Card Type Toggle -->
-            <div class="type-toggle-group">
-              <button type="button" class="type-toggle-btn active" id="type-command">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                Single Command
-              </button>
-              <button type="button" class="type-toggle-btn" id="type-list">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                Shortcut List
-              </button>
-            </div>
-
-            <!-- Form Fields -->
-            <div class="form-fields">
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="content-software">Software</label>
-                  <select id="content-software">
-                    <option value="AutoCAD">AutoCAD</option>
-                    <option value="Revit">Revit</option>
-                    <option value="Civil 3D">Civil 3D</option>
-                    <option value="ETABS">ETABS</option>
-                    <option value="SketchUp">SketchUp</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="brand-handle">Handle</label>
-                  <div class="input-wrapper">
-                    <span class="input-prefix">@</span>
-                    <input type="text" id="brand-handle" placeholder="yourpage" value="ludarp.civil">
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group" id="key-field">
-                <label for="content-keys">Shortcut Keys</label>
-                <input type="text" id="content-keys" placeholder="e.g. TR or NCOPY" value="">
-              </div>
-
-              <div class="form-group">
-                <label for="content-action">Title / Action</label>
-                <input type="text" id="content-action" placeholder="e.g. Trim Objects" value="">
-              </div>
-
-              <div class="form-group">
-                <label for="content-desc">Description</label>
-                <textarea id="content-desc" rows="2" placeholder="Explain the command briefly..."></textarea>
-              </div>
-
-              <div class="form-group" id="steps-field">
-                <div class="steps-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <div style="display:flex; align-items:center; gap:8px;">
-                    <label id="steps-label" style="margin:0;">List Items</label>
-                    <select id="list-marker-style" style="padding:3px 8px; font-size:0.75rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--accent); font-weight:700; cursor:pointer;">
-                      <option value="number">1, 2, 3 (Numbers)</option>
-                      <option value="bullet">• (Bullet Dots)</option>
-                      <option value="arrow">▶ (CAD Arrowhead)</option>
-                      <option value="check">✓ (Checkmarks)</option>
-                      <option value="square">■ (CAD Squares)</option>
-                      <option value="alphabet">A, B, C (Letters)</option>
-                      <option value="roman">I, II, III (Roman)</option>
-                    </select>
-                  </div>
-                  <button type="button" id="btn-add-step" class="btn-add-step">+ Add Item</button>
-                </div>
-                <div id="steps-container">
-                  <div class="step-input-row">
-                    <span class="step-number">1</span>
-                    <input type="text" class="step-input" placeholder="Item 1" value="">
-                    <button type="button" class="btn-remove-step">&times;</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-row" style="display:flex; gap:10px; margin-top:8px;">
-                <div class="form-group" style="flex:1;">
-                  <label for="content-difficulty" style="font-size:0.75rem; font-weight:700;">Difficulty</label>
-                  <select id="content-difficulty" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Expert">Expert</option>
-                  </select>
-                </div>
-                <div class="form-group" style="flex:1;">
-                  <label for="content-category" style="font-size:0.75rem; font-weight:700;">Category</label>
-                  <select id="content-category" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                    <option value="Drawing">Drawing</option>
-                    <option value="Modify">Modify</option>
-                    <option value="Layers">Layers</option>
-                    <option value="Blocks">Blocks</option>
-                    <option value="Annotation">Annotation</option>
-                    <option value="3D">3D</option>
-                    <option value="Workflow">Workflow</option>
-                    <option value="Express Tools">Express Tools</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group" id="protip-field">
-                <label for="content-pro-tip">💡 Pro Tip</label>
-                <textarea id="content-pro-tip" rows="2" placeholder="Value-add pro tip..."></textarea>
-              </div>
-
-              <div class="form-group" id="common-mistake-field">
-                <label for="content-common-mistake" style="color:var(--error); font-weight:700;">❌ Common Mistake to Avoid</label>
-                <textarea id="content-common-mistake" rows="2" placeholder="Frequent beginner mistake to avoid..."></textarea>
-              </div>
-
-              <div class="form-group">
-                <label for="content-hashtags">Hashtags</label>
-                <textarea id="content-hashtags" rows="2" placeholder="#autocad ...">#autocad #cadhacks #drafting #civilengineering</textarea>
-              </div>
-
-              <!-- Post Date & Performance Log -->
-              <div class="form-row" style="margin-top:10px; display:flex; gap:10px;">
-                <div class="form-group" style="flex:1;">
-                  <label for="content-date" style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">Post Date</label>
-                  <input type="date" id="content-date" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                </div>
-                <div class="form-group" style="flex:1;">
-                  <label for="content-saves" style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">Saves 💾</label>
-                  <input type="number" id="content-saves" min="0" placeholder="0" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                </div>
-                <div class="form-group" style="flex:1;">
-                  <label for="content-likes" style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">Likes ❤️</label>
-                  <input type="number" id="content-likes" min="0" placeholder="0" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                </div>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-              <button class="btn-action btn-primary-action" id="btn-export-image">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Export Image
-              </button>
-              <button class="btn-action btn-purple-action" id="btn-export-carousel">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10M7 12h10M7 17h10"/></svg>
-                Export ZIP
-              </button>
-              <div class="btn-action-row">
-                <button class="btn-action btn-success-action" id="btn-mark-day-done" style="display:none; flex:1;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                  <span>Mark Done</span>
-                </button>
-                <button class="btn-action btn-secondary-action" id="btn-save-to-library" style="flex:1;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                  Save to Hub
-                </button>
-              </div>
-              <button class="btn-action btn-ghost-action" id="btn-copy-caption">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                Copy Caption
-              </button>
-            </div>
-
-            <!-- Style Themes -->
-            <div class="style-themes-section">
-              <label class="theme-section-label">Visual Theme</label>
-              <div class="style-presets" style="grid-template-columns: repeat(3, 1fr);">
-                <button class="style-preset-btn active" data-style="blueprint" style="background:linear-gradient(135deg,#0a1628,#0d1f3c);color:#38bdf8;border-color:#1e3a5f">⬛ Blueprint</button>
-                <button class="style-preset-btn" data-style="obsidian" style="background:linear-gradient(135deg,#09090b,#18181b);color:#fff;border-color:#333">⚫ Obsidian</button>
-                <button class="style-preset-btn" data-style="amber" style="background:linear-gradient(135deg,#1c1407,#2d1f05);color:#f59e0b;border-color:#534109">🟡 Amber</button>
-                <button class="style-preset-btn" data-style="emerald" style="background:linear-gradient(135deg,#061d15,#0b3425);color:#10b981;border-color:#059669">💚 Emerald</button>
-                <button class="style-preset-btn" data-style="cyber" style="background:linear-gradient(135deg,#13091e,#230f38);color:#c084fc;border-color:#9333ea">💜 Cyber</button>
-                <button class="style-preset-btn" data-style="parchment" style="background:linear-gradient(135deg,#f8f6f0,#eae5d9);color:#b45309;border-color:#d97706">📜 Sand</button>
-                <button class="style-preset-btn" data-style="custom" id="custom-theme-trigger" style="grid-column: span 3; background:linear-gradient(135deg,#18181b,#27272a);color:#94a3b8;border:1px dashed #555">🎨 Custom Theme Builder</button>
-              </div>
-              <div id="custom-colors-container" class="custom-colors-grid hidden">
-                <div class="color-picker-group">
-                  <label>BG Start</label>
-                  <input type="color" id="color-bg-start" value="#0a0a14">
-                </div>
-                <div class="color-picker-group">
-                  <label>BG End</label>
-                  <input type="color" id="color-bg-end" value="#12121f">
-                </div>
-                <div class="color-picker-group">
-                  <label>Accent</label>
-                  <input type="color" id="color-accent" value="#38bdf8">
-                </div>
-                <div class="color-picker-group">
-                  <label>Text</label>
-                  <input type="color" id="color-text" value="#f1f5f9">
-                </div>
-              </div>
-            </div>
-
-            <!-- Layout & Positioning Adjuster -->
-            <div class="layout-settings-section" style="padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px;">
-              <div class="settings-section-header" id="toggle-layout-settings" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                <label class="theme-section-label" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
-                  <span>📐</span> Layout & Position Adjuster
-                </label>
-                <svg id="arrow-layout-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
-              </div>
-              
-              <div id="layout-settings-body" class="layout-settings-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                
-                <!-- Title Font -->
-                <div class="form-group" style="grid-column: span 2;">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Title Font Family</label>
-                  <select id="layout-title-font" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                    <option value="'Chakra Petch', sans-serif">Chakra Petch (Clean CAD)</option>
-                    <option value="'Inter', sans-serif">Inter (Modern Sans)</option>
-                    <option value="'JetBrains Mono', monospace">JetBrains Mono (Technical Code)</option>
-                    <option value="'Big Shoulders Stencil Text', sans-serif">Big Shoulders (Stencil)</option>
-                  </select>
-                </div>
-
-                <!-- Title Size -->
-                <div class="form-group">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Title Size (<span id="val-title-size">58</span>px)</label>
-                  <input type="range" id="layout-title-size" min="40" max="80" value="58" style="width:100%; accent-color:var(--accent);">
-                </div>
-
-                <!-- Grid Size / Density -->
-                <div class="form-group">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Grid Density (<span id="val-grid-size">45</span>px)</label>
-                  <input type="range" id="layout-grid-size" min="20" max="80" value="45" style="width:100%; accent-color:var(--accent);">
-                </div>
-
-                <!-- ProTip Angle -->
-                <div class="form-group">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Sticky Angle (<span id="val-protip-rot">-0.8</span>°)</label>
-                  <input type="range" id="layout-protip-rot" min="-5" max="5" step="0.5" value="-0.8" style="width:100%; accent-color:var(--accent);">
-                </div>
-
-                <!-- Watermark Opacity -->
-                <div class="form-group">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Watermark Tint (<span id="val-watermark-op">8</span>%)</label>
-                  <input type="range" id="layout-watermark-op" min="0" max="30" value="8" style="width:100%; accent-color:var(--accent);">
-                </div>
-
-                <!-- Watermark Size -->
-                <div class="form-group" style="grid-column: span 2;">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Watermark Size (<span id="val-watermark-size">600</span>px)</label>
-                  <input type="range" id="layout-watermark-size" min="400" max="900" step="20" value="600" style="width:100%; accent-color:var(--accent);">
-                </div>
-
-                <!-- Element Toggles -->
-                <div class="form-group" style="grid-column: span 2; display:flex; gap:12px; flex-wrap:wrap; margin-top:4px;">
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-grid" checked style="accent-color:var(--accent);"> Background Grid
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-protip" checked style="accent-color:var(--accent);"> Sticky Note
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-watermark" checked style="accent-color:var(--accent);"> Watermark Letter
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="layout-toggle-bookmark" checked style="accent-color:var(--accent);"> Bookmark CTA
-                  </label>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- Background & Overlays Adjuster -->
-            <div class="overlay-settings-section" style="padding-top: 14px; border-top: 1px solid var(--border); margin-top: 14px;">
-              <div class="settings-section-header" id="toggle-overlay-settings" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                <label class="theme-section-label" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px;">
-                  <span>🖼️</span> Background & Overlays
-                </label>
-                <svg id="arrow-overlay-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
-              </div>
-              
-              <div id="overlay-settings-body" class="layout-settings-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                
-                <!-- Grid Style Pattern -->
-                <div class="form-group" style="grid-column: span 2;">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Grid Pattern Style</label>
-                  <select id="overlay-grid-pattern" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                    <option value="square">Square Mesh Grid (Default CAD)</option>
-                    <option value="dots">Dot Matrix Grid</option>
-                    <option value="isometric">Isometric 3D Drafting Grid</option>
-                    <option value="major-minor">Engineering Major/Minor Grid</option>
-                  </select>
-                </div>
-
-                <!-- CAD Overlays Toggles -->
-                <div class="form-group" style="grid-column: span 2; display:flex; gap:12px; flex-wrap:wrap; margin-top:4px;">
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="overlay-toggle-cropmarks" checked style="accent-color:var(--accent);"> CAD Corner Cropmarks
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="overlay-toggle-ucs" checked style="accent-color:var(--accent);"> UCS X-Y Axis Icon
-                  </label>
-                  <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
-                    <input type="checkbox" id="overlay-toggle-vignette" checked style="accent-color:var(--accent);"> Dark Vignette Shadows
-                  </label>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-          <!-- RIGHT: Live Preview Canvas -->
-          <div class="preview-panel">
-            <div class="preview-header">
-              <div class="preview-header-left">
-                <div class="preview-live-dot"></div>
-                <span>LIVE PREVIEW</span>
-              </div>
-              <span id="preview-aspect-label" class="preview-size-label">1080 × 1080 PX</span>
-            </div>
-
-            <div class="canvas-outer-wrapper" id="canvas-wrapper-square" style="position:relative;overflow:hidden">
-              <!-- CAD Crosshairs -->
-              <div id="cad-crosshair-h" style="position:absolute;left:0;width:100%;height:1px;border-top:1px dotted rgba(255,107,53,0.4);pointer-events:none;display:none;z-index:10;"></div>
-              <div id="cad-crosshair-v" style="position:absolute;top:0;width:1px;height:100%;border-left:1px dotted rgba(255,107,53,0.4);pointer-events:none;display:none;z-index:10;"></div>
-
-              <!-- Instagram Post Canvas -->
-              <div id="instagram-post-canvas" class="instagram-card format-square theme-blueprint">
-                <div class="card-bg-grid" id="card-bg-grid"></div>
-                <div class="vignette-overlay" id="card-vignette"></div>
-                <div class="card-watermark" id="card-watermark">A</div>
-
-                <!-- CAD UCS Axis Icon -->
-                <div class="ucs-axis-icon" id="card-ucs-icon">
-                  <svg viewBox="0 0 60 60" style="width:40px; height:40px;">
-                    <circle cx="12" cy="48" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <line x1="12" y1="48" x2="48" y2="48" stroke="#ff6b35" stroke-width="2.5"/>
-                    <text x="50" y="52" fill="#ff6b35" font-size="12" font-weight="900" font-family="sans-serif">X</text>
-                    <line x1="12" y1="48" x2="12" y2="12" stroke="#38bdf8" stroke-width="2.5"/>
-                    <text x="8" y="8" fill="#38bdf8" font-size="12" font-weight="900" font-family="sans-serif">Y</text>
-                  </svg>
-                </div>
-
-                <!-- Crop Marks -->
-                <div class="viewport-crosshair ch-top-left"></div>
-                <div class="viewport-crosshair ch-top-right"></div>
-                <div class="viewport-crosshair ch-bottom-left"></div>
-                <div class="viewport-crosshair ch-bottom-right"></div>
-
-                <!-- Header Row -->
-                <div class="card-header-row">
-                  <div class="software-badge">
-                    <span id="card-software-name">AUTOCAD</span>
-                  </div>
-                  <div class="creator-tag">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="instagram-icon">
-                      <rect width="20" height="20" x="2" y="2" rx="5"/>
-                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-                    </svg>
-                    <span id="card-handle-text">@ludarp.civil</span>
-                  </div>
-                </div>
-
-                <!-- Body -->
-                <div class="card-body">
-                  <div class="shortcut-box">
-                    <div class="keycap-container">
-                      <div class="keycap" id="card-keys">TR</div>
-                    </div>
-                    <div class="action-title" id="card-action">Trim Objects</div>
-                  </div>
-                  <div class="card-description" id="card-desc">Trims elements to meet the edges of other selected elements.</div>
-                  <div class="card-steps" id="card-steps-list">
-                    <div class="card-step-item">
-                      <div class="card-step-num">01</div>
-                      <div class="card-step-text">Type 'TR' on your keyboard and hit Enter.</div>
-                    </div>
-                    <div class="card-step-item">
-                      <div class="card-step-num">02</div>
-                      <div class="card-step-text">Select cutting edges or press Enter for all.</div>
-                    </div>
-                    <div class="card-step-item">
-                      <div class="card-step-num">03</div>
-                      <div class="card-step-text">Click the parts of the lines you want to remove.</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="card-footer-row">
-                  <div class="pro-tip-box">
-                    <div class="sticky-tape tape-left"></div>
-                    <div class="sticky-tape tape-right"></div>
-                    <div class="pro-tip-tag">PRO TIP</div>
-                    <div class="pro-tip-text" id="card-pro-tip">Hold SHIFT while using Trim to quickly extend lines instead!</div>
-                  </div>
-                  <div class="common-mistake-box" id="card-common-mistake-box" style="display:none;">
-                    <div class="sticky-tape tape-left"></div>
-                    <div class="sticky-tape tape-right"></div>
-                    <div class="common-mistake-tag">❌ MISTAKE</div>
-                    <div class="common-mistake-text" id="card-common-mistake">Leaving Ortho ON while trying to draw angled lines.</div>
-                  </div>
-                  <div class="footer-meta-container">
-                    <div class="cta-message">
-                      <span>Save for later</span>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-icon"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
-                    </div>
-                  </div>
-                </div>
-
-              </div><!-- /instagram-post-canvas -->
-            </div><!-- /canvas-outer-wrapper -->
-          </div><!-- /preview-panel -->
-
-        </div><!-- /studio-layout -->
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 2: SHORTCUT HUB                           ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="hub-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>Shortcut Hub</h2>
-            <p>Your library of saved CAD shortcuts — edit any card or bulk export.</p>
-          </div>
-          <button class="btn-action btn-primary-action" id="btn-open-add-modal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Shortcut
-          </button>
-        </header>
-
-        <!-- Search & Filters -->
-        <div class="hub-filters card">
-          <div class="hub-search-wrapper">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hub-search-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="hub-search-input" placeholder="Search shortcuts, commands, descriptions…">
-          </div>
-          <div class="hub-filter-row">
-            <div class="hub-tab-btns" id="hub-software-tabs">
-              <button class="hub-tab-btn active" data-software="all">All</button>
-              <button class="hub-tab-btn" data-software="AutoCAD">AutoCAD</button>
-              <button class="hub-tab-btn" data-software="Revit">Revit</button>
-              <button class="hub-tab-btn" data-software="Civil 3D">Civil 3D</button>
-              <button class="hub-tab-btn" data-software="ETABS">ETABS</button>
-              <button class="hub-tab-btn" data-software="SketchUp">SketchUp</button>
-            </div>
-            <select id="hub-sort-select" style="flex-shrink:0">
-              <option value="recent">Recently Added</option>
-              <option value="alpha">A → Z</option>
-              <option value="software">By Software</option>
-            </select>
-          </div>
-          <div id="hub-phase-tabs" class="hub-tab-btns" style="margin-top:0">
-            <button class="hub-tab-btn active" data-phase="all">All Phases</button>
-            <button class="hub-tab-btn" data-phase="basics">Basics</button>
-            <button class="hub-tab-btn" data-phase="advanced">Advanced</button>
-            <button class="hub-tab-btn" data-phase="workflow">Workflow</button>
-          </div>
-          <p id="search-feedback-count" style="font-size:0.8rem;color:var(--text-muted);margin-top:4px"></p>
-        </div>
-
-        <!-- Shortcuts Grid -->
-        <div id="shortcuts-grid-container" class="shortcuts-grid"></div>
-
-        <!-- Bulk Export Section -->
-        <div class="card">
-          <h3 style="font-size:1rem;font-weight:700;margin-bottom:12px">Bulk Export</h3>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="AutoCAD" checked> AutoCAD</label>
-            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="Revit"> Revit</label>
-            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="Civil 3D"> Civil 3D</label>
-            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="ETABS"> ETABS</label>
-            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="SketchUp"> SketchUp</label>
-            <button class="btn-action btn-purple-action" id="btn-bulk-export">Export All as ZIP</button>
-          </div>
-          <div id="bulk-progress-container" class="id-hidden" style="margin-top:16px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span id="bulk-progress-status" style="font-size:0.8rem;color:var(--text-secondary)">Generating...</span>
-              <span id="bulk-progress-percent" style="font-size:0.8rem;color:var(--accent-color);font-weight:700">0%</span>
-            </div>
-            <div style="height:6px;background:var(--border-color);border-radius:4px;overflow:hidden">
-              <div id="bulk-progress-bar" style="height:100%;width:0%;background:var(--accent-color);transition:width 0.3s ease"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 3: CONTENT CALENDAR                       ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="calendar-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>Content Calendar</h2>
-            <p>83-day AutoCAD posting schedule — check off days as you post them.</p>
-          </div>
-          <select id="calendar-phase-select" style="min-width:180px">
-            <option value="all">All Phases</option>
-            <option value="Phase 1 & 2: 2D & 3D Basics">Phase 1&2 — Basics</option>
-            <option value="Phase 3: Advanced & Productivity">Phase 3 — Advanced</option>
-            <option value="Phase 4: Career & Workflow">Phase 4 — Workflow</option>
-          </select>
-        </header>
-
-        <div class="calendar-progress-bar card" style="padding:16px 20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-weight:700;font-size:0.9rem">Overall Progress</span>
-            <div style="display:flex;gap:10px;align-items:center">
-              <span id="calendar-progress-count" style="font-weight:800;color:var(--accent-color);font-family:var(--font-mono)">0 / 83</span>
-              <span id="calendar-progress-percent" style="font-size:0.8rem;color:var(--text-muted)">(0%)</span>
-            </div>
-          </div>
-          <div style="height:8px;background:var(--border-color);border-radius:6px;overflow:hidden">
-            <div id="calendar-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--success),#34d399);transition:width 0.4s ease;border-radius:6px"></div>
-          </div>
-        </div>
-
-        <div id="calendar-grid-container" class="calendar-grid"></div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 4: AI RESEARCH HUB                        ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="research-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>AI Research Hub</h2>
-            <p>Ground Gemini with Google Search to find accurate shortcut data and generate cards automatically.</p>
-          </div>
-        </header>
-
-        <div class="research-layout">
-          <!-- Left: Input -->
-          <div class="card" style="display:flex;flex-direction:column;gap:16px">
-            <div class="form-group">
-              <label for="ai-api-key">Gemini API Key</label>
-              <input type="password" id="ai-api-key" placeholder="AIza...">
-            </div>
-            <div class="form-group">
-              <label for="ai-prompt">Research Topic</label>
-              <textarea id="ai-prompt" rows="4" placeholder="e.g. AutoCAD Trim command, Civil 3D alignment creation, ETABS seismic load..."></textarea>
-            </div>
-            <button class="btn-action btn-primary-action" id="btn-ai-generate" style="width:100%">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-              Generate with AI
-            </button>
-            <div id="ai-loading-container" class="id-hidden" style="display:flex;gap:10px;align-items:center;padding:12px;background:var(--bg-tertiary);border-radius:8px">
-              <div class="ai-spinner"></div>
-              <span id="ai-loading-text" style="font-size:0.85rem;color:var(--text-secondary)">Grounding on Google Search…</span>
-            </div>
-
-            <!-- Paste Importer -->
-            <div style="border-top:1px solid var(--border-color);padding-top:16px">
-              <label class="form-label" style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);display:block;margin-bottom:8px">Or Paste AI Output</label>
-              <textarea id="ai-paste-input" rows="5" placeholder="Paste ChatGPT/Claude response here..."></textarea>
-              <button class="btn-action btn-ghost-action" id="btn-parse-paste" style="width:100%;margin-top:8px">Parse & Fill Editor</button>
-            </div>
-          </div>
-
-          <!-- Right: Results -->
-          <div class="card">
-            <div id="research-empty-state" style="text-align:center;padding:48px 24px;color:var(--text-muted)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-              <p style="font-weight:600">Enter a topic above and click Generate</p>
-            </div>
-            <div id="research-results-display" class="id-hidden">
-              <div class="research-result-row">
-                <span class="res-label">Software</span>
-                <span id="res-software" class="res-value"></span>
-              </div>
-              <div class="research-result-row">
-                <span class="res-label">Keys</span>
-                <span id="res-keys" class="res-value res-keys-value"></span>
-              </div>
-              <div class="research-result-row">
-                <span class="res-label">Action</span>
-                <span id="res-action" class="res-value"></span>
-              </div>
-              <div class="research-result-row">
-                <span class="res-label">Description</span>
-                <span id="res-desc" class="res-value" style="font-size:0.88rem;line-height:1.5"></span>
-              </div>
-              <div class="research-result-row">
-                <span class="res-label">Steps</span>
-                <ol id="res-steps" style="padding-left:16px;font-size:0.88rem;line-height:1.7;color:var(--text-secondary)"></ol>
-              </div>
-              <div class="research-result-row">
-                <span class="res-label">Pro Tip</span>
-                <span id="res-protip" class="res-value" style="font-size:0.88rem;color:var(--warning)"></span>
-              </div>
-              <div style="display:flex;gap:10px;margin-top:16px">
-                <button class="btn-action btn-primary-action" id="btn-import-research-to-studio" style="flex:1">Load to Editor</button>
-                <button class="btn-action btn-secondary-action" id="btn-save-research-to-hub" style="flex:1">Save to Hub</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 5: DATABASE MANAGER                       ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="database-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>🗄️ Database Manager</h2>
-            <p>Manage, search, edit, export, and backup all calendar entries & shortcut datasets</p>
-          </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn-action btn-primary-action" id="db-btn-export-json">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export JSON
-            </button>
-            <button class="btn-action btn-secondary-action" id="db-btn-import-json">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Import JSON
-            </button>
-            <input type="file" id="db-file-import-input" accept=".json" style="display:none">
-        </header>
-
-        <!-- Google Sheets Cloud Sync Integration Card -->
-        <div class="card" style="padding:16px 20px; background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(56,189,248,0.08)); border:1px solid rgba(16,185,129,0.3); margin-bottom:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:36px; height:36px; border-radius:8px; background:#10b981; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.1rem;">📊</div>
-              <div>
-                <h3 style="font-size:0.95rem; font-weight:800; color:var(--text-primary); margin:0;">Google Sheets Cloud Sync API</h3>
-                <p style="font-size:0.75rem; color:var(--text-muted); margin:2px 0 0 0;">Keep your master post database always synced to Google Sheets in the cloud</p>
-              </div>
-            </div>
-
-            <div style="display:flex; gap:10px; flex:1; max-width:550px; align-items:center;">
-              <input type="text" id="gsheet-api-url" placeholder="Paste Google Apps Script Web App URL or Published CSV URL..." style="flex:1; padding:8px 12px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary);">
-              <button class="btn-action btn-secondary-action" id="btn-gsheet-fetch" style="font-size:0.78rem; padding:8px 12px; white-space:nowrap;">📥 Sync FROM Cloud</button>
-              <button class="btn-action btn-primary-action" id="btn-gsheet-push" style="font-size:0.78rem; padding:8px 12px; white-space:nowrap;">📤 Push TO Cloud</button>
-              <button class="btn-action btn-ghost-action" id="btn-gsheet-instructions" style="font-size:0.78rem; padding:8px 12px;" title="Setup Instructions & Apps Script Code">❓ Setup</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stats Overview Cards -->
-        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:14px;">
-          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
-            <div style="width:40px; height:40px; border-radius:10px; background:var(--accent-dim); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">📅</div>
-            <div>
-              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Calendar Entries</span>
-              <h3 id="db-stat-calendar-count" style="font-size:1.3rem; font-weight:800; margin-top:2px;">84</h3>
-            </div>
-          </div>
-          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
-            <div style="width:40px; height:40px; border-radius:10px; background:var(--success-dim); color:var(--success); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">✅</div>
-            <div>
-              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Posted / Completed</span>
-              <h3 id="db-stat-posted-count" style="font-size:1.3rem; font-weight:800; margin-top:2px;">0 / 84</h3>
-            </div>
-          </div>
-          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
-            <div style="width:40px; height:40px; border-radius:10px; background:rgba(168,85,247,0.15); color:#a855f7; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">⚡</div>
-            <div>
-              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Library Shortcuts</span>
-              <h3 id="db-stat-shortcuts-count" style="font-size:1.3rem; font-weight:800; margin-top:2px;">3</h3>
-            </div>
-          </div>
-          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
-            <div style="width:40px; height:40px; border-radius:10px; background:rgba(245,158,11,0.15); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">💾</div>
-            <div>
-              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Disk Sync Status</span>
-              <h3 id="db-stat-sync-status" style="font-size:0.85rem; font-weight:700; margin-top:4px; color:var(--text-secondary);">Sandbox</h3>
-            </div>
-          </div>
-        </div>
-
-        <!-- Filter & Search Toolbar -->
-        <div class="card" style="padding:14px 18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
-          <div style="display:flex; gap:10px; flex:1; min-width:280px; align-items:center;">
-            <input type="text" id="db-search-input" placeholder="🔍 Search by title, keys, software, or script..." style="flex:1; padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
-            <select id="db-filter-software" style="padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
-              <option value="all">All Softwares</option>
-              <option value="AutoCAD">AutoCAD</option>
-              <option value="Revit">Revit</option>
-              <option value="Civil 3D">Civil 3D</option>
-              <option value="ETABS">ETABS</option>
-              <option value="SketchUp">SketchUp</option>
-            </select>
-          </div>
-          <button class="btn-action btn-ghost-action" id="db-btn-reset-factory" style="font-size:0.78rem;">🔄 Reset Factory DB</button>
-        </div>
-
-        <!-- Interactive Database Data Table -->
-        <div class="card" style="padding:0; overflow:hidden;">
-          <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
-              <thead>
-                <tr style="background:var(--bg-tertiary); border-bottom:1px solid var(--border); color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em;">
-                  <th style="padding:12px 16px;">Day</th>
-                  <th style="padding:12px 16px;">Software</th>
-                  <th style="padding:12px 16px;">Keys / Title</th>
-                  <th style="padding:12px 16px;">Format</th>
-                  <th style="padding:12px 16px;">Phase</th>
-                  <th style="padding:12px 16px;">Status</th>
-                  <th style="padding:12px 16px; text-align:right;">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="db-table-body">
-                <!-- Populated dynamically by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 6: INSTAGRAM PROFILE FEED GRID            ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="feed-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>📱 Instagram Profile Feed Grid</h2>
-            <p>Visual 3-column feed thumbnail wall to verify color rhythm, visual layout & post type balance</p>
-          </div>
-          <div style="display:flex; gap:10px; align-items:center;">
-            <select id="feed-filter-software" style="padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
-              <option value="all">All Softwares</option>
-              <option value="AutoCAD">AutoCAD</option>
-              <option value="Revit">Revit</option>
-              <option value="Civil 3D">Civil 3D</option>
-              <option value="ETABS">ETABS</option>
-              <option value="SketchUp">SketchUp</option>
-            </select>
-            <select id="feed-sort-by" style="padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
-              <option value="day">Order by Day #</option>
-              <option value="saves">Sort by Most Saved 💾</option>
-              <option value="likes">Sort by Most Liked ❤️</option>
-            </select>
-          </div>
-        </header>
-
-        <!-- 3-Column Instagram Profile Grid Container -->
-        <div id="feed-grid-container" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:16px;">
-          <!-- Dynamically populated thumbnails by app.js -->
-        </div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 7: BULK CONTENT IMPORTER & PARSER        ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="importer-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>⚡ Bulk Post Importer Studio</h2>
-            <p>Paste structured text content to instantly generate ready-to-export posts</p>
-          </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn-action btn-secondary-action" id="btn-importer-load-example">
-              📋 Load Example Format
-            </button>
-            <button class="btn-action btn-primary-action" id="btn-importer-parse">
-              ⚡ Parse & Build Posts
-            </button>
-          </div>
-        </header>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-          <!-- LEFT: Raw Text Input -->
-          <div class="card" style="display:flex; flex-direction:column; gap:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <label style="font-weight:800; font-size:0.9rem; color:var(--text-primary);">Paste Raw Post Content Below</label>
-              <span style="font-size:0.75rem; color:var(--text-muted);">Separate multiple posts with <code>---</code></span>
-            </div>
-            
-            <textarea id="importer-text-input" rows="18" placeholder="Software: AutoCAD&#10;Shortcut: F8 / ORTHO&#10;Action: Turn On Ortho Mode&#10;Description: Locks your cursor to horizontal or vertical movement...&#10;Steps:&#10;1. Press F8 to toggle Ortho mode.&#10;2. With Ortho on, start LINE command.&#10;3. Notice line snaps to 90 degrees.&#10;Pro Tip: Turn off F8 when drawing angled walls.&#10;Hashtags: #autocad #cadhacks #beginnertips&#10;---&#10;Software: AutoCAD&#10;Shortcut: L&#10;Action: Draw a Line..." style="width:100%; font-family:var(--font-mono); font-size:0.82rem; line-height:1.6; padding:14px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); resize:vertical;"></textarea>
-
-            <div style="display:flex; gap:10px; margin-top:6px;">
-              <button class="btn-action btn-primary-action" id="btn-importer-parse-bottom" style="flex:1;">
-                ⚡ Parse & Create Posts Now
-              </button>
-              <button class="btn-action btn-ghost-action" id="btn-importer-clear" style="font-size:0.8rem;">
-                🗑️ Clear Box
-              </button>
-            </div>
-          </div>
-
-          <!-- RIGHT: Parsed Posts Preview & Direct Import -->
-          <div class="card" style="display:flex; flex-direction:column; gap:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px;">
-              <h3 style="font-size:1rem; font-weight:800;">Parsed Posts (<span id="importer-parsed-count">0</span>)</h3>
-              <button class="btn-action btn-success-action" id="btn-importer-save-all" style="display:none; padding:6px 14px; font-size:0.78rem;">
-                ✅ Import All to Database
-              </button>
-            </div>
-
-            <div id="importer-empty-state" style="text-align:center; padding:60px 20px; color:var(--text-muted);">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px; height:48px; margin-bottom:12px; opacity:0.4;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-              <p style="font-weight:700; font-size:0.9rem;">No posts parsed yet</p>
-              <p style="font-size:0.8rem; margin-top:4px; opacity:0.7;">Click <b>"Load Example Format"</b> or paste text on the left and click <b>"Parse & Build Posts"</b>.</p>
-            </div>
-
-            <!-- Parsed Cards List Container -->
-            <div id="importer-parsed-list" style="display:flex; flex-direction:column; gap:12px; max-height:520px; overflow-y:auto; padding-right:4px;">
-              <!-- Populated dynamically -->
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 8: PRINTABLE PDF CHEAT SHEET GENERATOR   ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="cheatsheet-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>📄 Printable PDF Cheat Sheet Generator</h2>
-            <p>Generate high-resolution 1-page quick-reference guides grouped by software and category</p>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button class="btn-action btn-primary-action" id="btn-print-cheatsheet">
-              🖨️ Print / Save as PDF
-            </button>
-          </div>
-        </header>
-
-        <div class="card" id="cheatsheet-preview-container" style="background:#fff; color:#0f172a; padding:30px; border-radius:var(--r-lg); min-height:600px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-          <!-- Header for Cheat Sheet -->
-          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #0f2b46; padding-bottom:16px; margin-bottom:24px;">
-            <div>
-              <h1 style="font-family:'Chakra Petch', sans-serif; font-size:24px; font-weight:800; color:#0f2b46; text-transform:uppercase; margin:0;">Ludarp Civil Studio</h1>
-              <p style="font-size:12px; font-weight:700; color:#475569; margin:2px 0 0 0;">MASTER CAD & CIVIL ENGINEERING SHORTCUT QUICK REFERENCE GUIDE</p>
-            </div>
-            <div style="text-align:right;">
-              <span style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:#64748b; background:#f1f5f9; padding:4px 10px; border-radius:4px; border:1px solid #cbd5e1;">@ludarp.civil</span>
-            </div>
-          </div>
-
-          <!-- Content Grid populated dynamically -->
-          <div id="cheatsheet-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px;">
-            <!-- Rendered by app.js -->
-          </div>
-        </div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 9: QUIZ & FLASHCARD LEARNING ENGINE       ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="quiz-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>🎮 Quiz & Flashcard Learning Engine</h2>
-            <p>Gamified learning engine with flashcards and multiple-choice knowledge quizzes</p>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button class="btn-action btn-primary-action" id="btn-mode-flashcards">🎴 Flashcards Mode</button>
-            <button class="btn-action btn-secondary-action" id="btn-mode-quiz">🧠 Knowledge Quiz Mode</button>
-          </div>
-        </header>
-
-        <!-- FLASHCARDS CONTAINER -->
-        <div id="quiz-flashcards-container" style="display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px 0;">
-          <div id="flashcard-element" class="card" style="width:100%; max-width:540px; min-height:300px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 30px; cursor:pointer; position:relative; background:linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border:2px solid var(--accent); transition:transform 0.3s ease;">
-            <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted); position:absolute; top:16px; left:20px;" id="flashcard-software-badge"></span>
-            <span style="font-size:0.75rem; font-weight:800; color:var(--accent); position:absolute; top:16px; right:20px;" id="flashcard-count-badge">Card 0 / 0</span>
-            
-            <div id="flashcard-front">
-              <div style="font-family:var(--font-mono); font-size:3rem; font-weight:900; color:var(--accent); margin-bottom:12px;" id="flashcard-keys">—</div>
-              <h3 style="font-size:1.4rem; font-weight:800; color:var(--text-primary);" id="flashcard-action">No posts yet</h3>
-              <p style="font-size:0.85rem; color:var(--text-muted); margin-top:12px;">Add posts via ⚡ Bulk Post Importer or 📊 Google Sheets sync, then come back here to study!</p>
-            </div>
-
-            <div id="flashcard-back" style="display:none; flex-direction:column; gap:10px; text-align:left; width:100%;">
-              <p style="font-size:0.9rem; color:var(--text-primary);" id="flashcard-desc"></p>
-              <div style="font-size:0.8rem; color:var(--warning); font-weight:700; background:rgba(245,158,11,0.1); padding:8px 12px; border-radius:6px; border-left:3px solid var(--warning);" id="flashcard-protip"></div>
-              <div style="font-size:0.8rem; color:var(--error); font-weight:700; background:rgba(239,68,68,0.1); padding:8px 12px; border-radius:6px; border-left:3px solid var(--error); margin-top:4px;" id="flashcard-mistake"></div>
-            </div>
-          </div>
-
-          <div style="display:flex; gap:14px; align-items:center;">
-            <button class="btn-action btn-secondary-action" id="btn-flashcard-prev">← Previous</button>
-            <button class="btn-action btn-ghost-action" id="btn-flashcard-flip">🔄 Flip Card</button>
-            <button class="btn-action btn-primary-action" id="btn-flashcard-next">Next →</button>
-          </div>
-        </div>
-
-        <!-- QUIZ CONTAINER -->
-        <div id="quiz-game-container" style="display:none; flex-direction:column; align-items:center; gap:20px; padding:20px 0;">
-          <div class="card" style="width:100%; max-width:600px; display:flex; flex-direction:column; gap:20px; padding:30px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px;">
-              <span style="font-weight:800; font-size:0.85rem; color:var(--accent);" id="quiz-question-number">Question 1 of 5</span>
-              <span style="font-weight:800; font-size:0.85rem; color:var(--warning);" id="quiz-score-badge">Score: 0</span>
-            </div>
-
-            <h3 style="font-size:1.1rem; font-weight:800; color:var(--text-primary); line-height:1.4;" id="quiz-question-text">Add your posts first to start the quiz!</h3>
-
-            <div id="quiz-options-container" style="display:flex; flex-direction:column; gap:10px;">
-              <!-- Rendered by app.js -->
-            </div>
-
-            <div id="quiz-feedback-box" style="display:none; padding:12px; border-radius:var(--r-md); font-weight:700; font-size:0.85rem;"></div>
-
-            <button class="btn-action btn-primary-action" id="btn-quiz-next-question" style="display:none; align-self:flex-end;">Next Question →</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ╔══════════════════════════════════════════════════╗
-           ║   TAB 10: CLOUD SHEET VIEWER                    ║
-           ╚══════════════════════════════════════════════════╝ -->
-      <section id="cloudviewer-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>☁️ Cloud Sheet Viewer</h2>
-            <p>Live view of all posts stored in your Google Sheet master database</p>
-          </div>
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <button class="btn-action btn-primary-action" id="btn-cloudviewer-refresh">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-              Refresh from Cloud
-            </button>
-            <button class="btn-action btn-secondary-action" id="btn-cloudviewer-load-all">
-              ⬇️ Load All into App DB
-            </button>
-            <span id="cloudviewer-count-badge" style="font-size:0.78rem; font-weight:800; color:var(--text-muted); padding:6px 12px; border:1px solid var(--border); border-radius:20px;">0 rows</span>
-          </div>
-        </header>
-
-        <!-- Search & Filter toolbar -->
-        <div class="card" style="padding:12px 16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
-          <input type="text" id="cloudviewer-search" placeholder="🔍 Search by shortcut, action, description..." style="flex:1; min-width:220px; padding:8px 12px; font-size:0.82rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary);">
-          <select id="cloudviewer-filter-software" style="padding:8px 12px; font-size:0.82rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary);">
-            <option value="">All Software</option>
-            <option value="AutoCAD">AutoCAD</option>
-            <option value="Revit">Revit</option>
-            <option value="Civil 3D">Civil 3D</option>
-            <option value="ETABS">ETABS</option>
-            <option value="SketchUp">SketchUp</option>
-          </select>
-          <select id="cloudviewer-filter-difficulty" style="padding:8px 12px; font-size:0.82rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary);">
-            <option value="">All Difficulties</option>
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-            <option value="Expert">Expert</option>
-          </select>
-          <select id="cloudviewer-view-mode" style="padding:8px 12px; font-size:0.82rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary);">
-            <option value="table">📋 Table View</option>
-            <option value="cards">🃏 Card Grid View</option>
-          </select>
-        </div>
-
-        <!-- Empty / Loading State -->
-        <div id="cloudviewer-empty" class="card" style="text-align:center; padding:60px 20px; color:var(--text-muted);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:52px; height:52px; margin-bottom:14px; opacity:0.35;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          <p style="font-weight:800; font-size:1rem; color:var(--text-primary);">No cloud data loaded yet</p>
-          <p style="font-size:0.82rem; margin-top:6px; opacity:0.7;">Click <b>Refresh from Cloud</b> to fetch your latest Google Sheet data</p>
-        </div>
-
-        <!-- TABLE VIEW -->
-        <div id="cloudviewer-table-wrap" style="display:none; overflow-x:auto;">
-          <table id="cloudviewer-table" style="width:100%; border-collapse:collapse; font-size:0.82rem;">
-            <thead id="cloudviewer-thead">
-              <!-- Rendered by app.js -->
-            </thead>
-            <tbody id="cloudviewer-tbody">
-              <!-- Rendered by app.js -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- CARDS GRID VIEW -->
-        <div id="cloudviewer-cards-grid" style="display:none; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:14px;">
-          <!-- Rendered by app.js -->
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════
-       ADD SHORTCUT MODAL
-  ══════════════════════════════════════════════════════════ -->
-  <div id="add-shortcut-modal" class="modal-overlay id-hidden">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3>Add New Shortcut</h3>
-        <button class="modal-close" id="btn-close-modal">&times;</button>
-      </div>
-      <form id="add-shortcut-form" class="modal-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="modal-software">Software</label>
-            <select id="modal-software">
-              <option value="AutoCAD">AutoCAD</option>
-              <option value="Revit">Revit</option>
-              <option value="Civil 3D">Civil 3D</option>
-              <option value="ETABS">ETABS</option>
-              <option value="SketchUp">SketchUp</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="modal-phase">Phase</label>
-            <select id="modal-phase">
-              <option value="basics">Basics</option>
-              <option value="advanced">Advanced</option>
-              <option value="workflow">Workflow</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="modal-keys">Shortcut Keys</label>
-          <input type="text" id="modal-keys" placeholder="e.g. TR" required>
-        </div>
-        <div class="form-group">
-          <label for="modal-action">Action Title</label>
-          <input type="text" id="modal-action" placeholder="e.g. Trim Objects" required>
-        </div>
-        <div class="form-group">
-          <label for="modal-desc">Description</label>
-          <textarea id="modal-desc" rows="2" placeholder="Brief description..."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="modal-pro-tip">Pro Tip (optional)</label>
-          <textarea id="modal-pro-tip" rows="2" placeholder="Expert tip..."></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-action btn-ghost-action" id="btn-cancel-modal">Cancel</button>
-          <button type="submit" class="btn-action btn-primary-action">Save Shortcut</button>
-        </div>
-      </form>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       TAB 4: PRINTABLE PDF CHEAT SHEET
+       ========================================================================= -->
+  <main class="tab-section" id="tab-cheatsheet">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2 style="font-size:1.35rem; font-weight:900; margin:0;">📄 AutoCAD Master Cheat Sheet</h2>
+      <button onclick="window.print()" style="padding:12px 24px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; cursor:pointer; font-size:0.88rem;">
+        🖨️ Print / Save PDF
+      </button>
+    </div>
+
+    <div id="cheatsheet-table-container" style="background:var(--bg-secondary); border:1px solid var(--border-accent); border-radius:20px; padding:24px; overflow-x:auto;">
+      <!-- Table populated dynamically -->
+    </div>
+  </main>
+
+  <!-- Detail Modal Overlay -->
+  <div class="modal-overlay" id="detail-modal" style="display:none;">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <div id="modal-content"></div>
     </div>
   </div>
 
-  <!-- GOOGLE SHEETS SETUP MODAL -->
-  <div id="gsheet-setup-modal" class="modal-overlay id-hidden">
-    <div class="modal-box" style="max-width:640px;">
-      <div class="modal-header">
-        <h3>📊 Google Sheets 2-Way Sync Setup Guide</h3>
-        <button class="modal-close" id="btn-close-gsheet-modal">&times;</button>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:14px; font-size:0.85rem; color:var(--text-primary); line-height:1.5;">
-        <p>Follow these 3 steps to link your master post database directly to a Google Sheet:</p>
-        
-        <ol style="padding-left:20px; display:flex; flex-direction:column; gap:8px;">
-          <li>Create a new <b>Google Sheet</b> in your Google Drive.</li>
-          <li>Open <b>Extensions ➔ Apps Script</b> in the top menu bar of Google Sheets.</li>
-          <li>Delete any existing code, paste the Apps Script code below, and click <b>Deploy ➔ New deployment ➔ Web app</b> (Select <i>Who has access: Anyone</i>).</li>
-          <li>Copy your generated <b>Web App URL</b> and paste it into the Cloud Sync bar!</li>
-        </ol>
-
-        <label style="font-weight:800; font-size:0.8rem; color:var(--accent); margin-top:6px;">📋 Apps Script Code — paste this exactly (supports JSONP to fix CORS):</label>
-        <textarea id="gsheet-script-code" rows="22" readonly style="font-family:var(--font-mono); font-size:0.75rem; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--r-md); padding:10px;">function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  var result = [];
-  if (data.length > 1) {
-    var headers = data[0];
-    for (var i = 1; i < data.length; i++) {
-      var obj = {};
-      for (var j = 0; j < headers.length; j++) obj[headers[j]] = data[i][j];
-      result.push(obj);
-    }
-  }
-  var json = JSON.stringify(result);
-  // JSONP support — bypasses CORS for browser fetch
-  var cb = e.parameter.callback;
-  if (cb) {
-    return ContentService.createTextOutput(cb + '(' + json + ')')
-      .setMimeType(ContentService.MimeType.JAVASCRIPT);
-  }
-  return ContentService.createTextOutput(json)
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var raw = (e.parameter && e.parameter.data) ? e.parameter.data : (e.postData ? e.postData.contents : '[]');
-  var items = JSON.parse(raw);
-  sheet.clear();
-  if (items.length > 0) {
-    var headers = Object.keys(items[0]);
-    sheet.appendRow(headers);
-    items.forEach(function(item) {
-      var row = headers.map(function(h) {
-        var val = item[h];
-        return (typeof val === 'object') ? JSON.stringify(val) : (val || '');
-      });
-      sheet.appendRow(row);
-    });
-  }
-  return ContentService.createTextOutput(JSON.stringify({ status: "success", rows: items.length }))
-    .setMimeType(ContentService.MimeType.JSON);
-}</textarea>
-        
-        <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-          <button class="btn-action btn-primary-action" id="btn-copy-gsheet-script" style="font-size:0.8rem;">📋 Copy Apps Script Code</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notifications -->
-  <div id="toast-container" class="toast-container"></div>
-
-  <!-- Data & Logic -->
   <script src="calendar_data.js"></script>
-  <script src="app.js"></script>
+  <script>
+    let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
+    if (!calendarDb.length && typeof autocadCalendar !== 'undefined') {
+      calendarDb = autocadCalendar;
+    }
+    const completedDays = new Set(JSON.parse(localStorage.getItem('ludarp_completed_calendar')) || []);
+    const publishedPosts = calendarDb.filter(post => post.posted || completedDays.has(String(post.day)));
+
+    // Tab Switcher
+    const navBtns = document.querySelectorAll('.pub-nav-btn[data-tab]');
+    const tabSections = document.querySelectorAll('.tab-section');
+
+    navBtns.forEach(btn => {
+      btn.onclick = () => {
+        const target = btn.getAttribute('data-tab');
+        navBtns.forEach(b => b.classList.remove('active'));
+        tabSections.forEach(s => s.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(`tab-${target}`).classList.add('active');
+      };
+    });
+
+    // 1. Render Published Feed (Strict: Only posts marked posted/done by user!)
+    function renderPublishedFeed() {
+      const grid = document.getElementById('pub-feed-grid');
+      grid.innerHTML = '';
+
+      if (publishedPosts.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: rgba(15, 23, 42, 0.7); border: 1px dashed var(--border-accent); border-radius: 20px;">
+            <div style="font-size: 2.8rem; margin-bottom: 12px;">📭</div>
+            <h3 style="margin: 0 0 8px 0; font-size: 1.2rem; color: var(--text-primary); font-weight: 900;">No Published Posts Yet</h3>
+            <p style="margin: 0 auto; font-size: 0.88rem; color: var(--text-secondary); max-width: 420px; line-height: 1.6;">
+              Mark posts as <b>Posted ✓</b> in your Admin Dashboard to publish them here on your public website!
+            </p>
+            <a href="admin.html" style="display: inline-block; margin-top: 18px; padding: 10px 24px; background: var(--accent); color: #000; font-weight: 900; font-size: 0.88rem; border-radius: 20px; text-decoration: none;">
+              Open Admin Dashboard ➔
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      publishedPosts.forEach(post => {
+        grid.appendChild(createCadCard(post));
+      });
+    }
+
+    // Helper Card Builder
+    function createCadCard(post) {
+      const card = document.createElement('div');
+      card.className = 'cad-card';
+      const key = post.shortcut || post.keys || 'CAD';
+      const title = post.action || (post.title ? post.title.replace(/^[^:]+:\s*/, '') : 'Shortcut');
+      const desc = post.description || post.desc || '';
+
+      card.innerHTML = `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span class="card-key-tag">${key}</span>
+            <span style="font-size:0.7rem; font-weight:800; color:var(--accent-purple); text-transform:uppercase; background:rgba(168,85,247,0.15); padding:3px 9px; border-radius:8px; border:1px solid rgba(168,85,247,0.3);">${post.difficulty || 'Beginner'}</span>
+          </div>
+          <h3 style="font-size:1.08rem; font-weight:900; margin:0 0 6px 0; color:var(--text-primary); line-height:1.3;">${title}</h3>
+          <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.45; margin:0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${desc}</p>
+        </div>
+        <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:0.76rem; color:var(--text-muted); font-weight:600;">
+          <span>Day ${post.day} • ${post.category || 'General'}</span>
+          <span style="color:var(--accent); font-weight:800;">View Steps ➔</span>
+        </div>
+      `;
+      card.onclick = () => openModal(post);
+      return card;
+    }
+
+    // Modal Details
+    function openModal(post) {
+      const modal = document.getElementById('detail-modal');
+      const content = document.getElementById('modal-content');
+      const key = post.shortcut || post.keys || 'CAD';
+      const title = post.action || (post.title ? post.title.replace(/^[^:]+:\s*/, '') : 'Shortcut');
+      const desc = post.description || post.desc || '';
+      const steps = post.steps || post.bullets || [];
+
+      let stepsHtml = steps.map(s => `<li style="margin-bottom:8px;">${s}</li>`).join('');
+
+      content.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+          <span class="card-key-tag" style="font-size:1.4rem;">${key}</span>
+          <div>
+            <h2 style="margin:0; font-size:1.35rem; font-weight:900;">${title}</h2>
+            <span style="font-size:0.76rem; color:var(--accent); font-weight:700;">${post.category || 'AutoCAD'} • ${post.difficulty || 'Beginner'}</span>
+          </div>
+        </div>
+        <p style="color:var(--text-secondary); line-height:1.6; font-size:0.92rem;">${desc}</p>
+        ${steps.length > 0 ? `<h4 style="margin-top:20px; color:var(--accent); font-size:0.98rem; font-weight:800;">Execution Steps:</h4><ol style="padding-left:20px; color:var(--text-primary); line-height:1.65; font-size:0.9rem;">${stepsHtml}</ol>` : ''}
+        ${post.proTip ? `<div style="background:var(--bg-tertiary); padding:14px 18px; border-left:4px solid var(--accent-orange); border-radius:10px; margin-top:20px; font-size:0.86rem; color:#fde68a;"><strong>💡 Pro Tip:</strong> ${post.proTip}</div>` : ''}
+        <button onclick="navigator.clipboard.writeText('${key}'); alert('📋 Copied shortcut key ${key} to clipboard!')" style="width:100%; margin-top:22px; padding:14px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; font-size:0.92rem; cursor:pointer;">
+          📋 Copy Shortcut (${key})
+        </button>
+      `;
+
+      modal.style.display = 'flex';
+    }
+
+    document.getElementById('modal-close-btn').onclick = () => {
+      document.getElementById('detail-modal').style.display = 'none';
+    };
+
+    // 2. Render Search Hub
+    function renderHub() {
+      const grid = document.getElementById('hub-cards-grid');
+      const searchVal = document.getElementById('hub-search-input').value.toLowerCase().trim();
+      const catVal = document.getElementById('hub-cat-filter').value;
+
+      grid.innerHTML = '';
+
+      const filtered = calendarDb.filter(post => {
+        const matchesCat = catVal === 'all' || post.category === catVal;
+        const text = `${post.shortcut} ${post.keys} ${post.action} ${post.title} ${post.description} ${post.desc}`.toLowerCase();
+        const matchesSearch = !searchVal || text.includes(searchVal);
+        return matchesCat && matchesSearch;
+      });
+
+      filtered.forEach(post => {
+        grid.appendChild(createCadCard(post));
+      });
+    }
+
+    document.getElementById('hub-search-input').oninput = renderHub;
+    document.getElementById('hub-cat-filter').onchange = renderHub;
+
+    // 3. Level-Based 10-Question Quiz System
+    let selectedLevel = 'Beginner';
+    let currentQuizPool = [];
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+
+    const btnBeg = document.getElementById('btn-level-beginner');
+    const btnInt = document.getElementById('btn-level-intermediate');
+    const btnAdv = document.getElementById('btn-level-advanced');
+
+    btnBeg.onclick = () => setQuizLevel('Beginner');
+    btnInt.onclick = () => setQuizLevel('Intermediate');
+    btnAdv.onclick = () => setQuizLevel('Advanced');
+
+    function setQuizLevel(lvl) {
+      selectedLevel = lvl;
+      btnBeg.className = 'level-btn ' + (lvl === 'Beginner' ? 'active-beginner' : '');
+      btnInt.className = 'level-btn ' + (lvl === 'Intermediate' ? 'active-intermediate' : '');
+      btnAdv.className = 'level-btn ' + (lvl === 'Advanced' ? 'active-advanced' : '');
+
+      startQuizSet();
+    }
+
+    function startQuizSet() {
+      document.getElementById('quiz-game-body').style.display = 'block';
+      document.getElementById('quiz-results-screen').style.display = 'none';
+
+      // Filter pool by difficulty level
+      let pool = calendarDb.filter(p => {
+        if (selectedLevel === 'Beginner') return (p.difficulty === 'Beginner');
+        if (selectedLevel === 'Intermediate') return (p.difficulty === 'Intermediate');
+        return (p.difficulty === 'Advanced' || p.difficulty === 'Expert');
+      });
+
+      if (pool.length < 10) pool = calendarDb;
+
+      // Shuffle and pick 10 questions
+      currentQuizPool = pool.sort(() => 0.5 - Math.random()).slice(0, 10);
+      currentQuizIndex = 0;
+      quizScore = 0;
+
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      if (currentQuizIndex >= 10 || currentQuizIndex >= currentQuizPool.length) {
+        // Finish Quiz Set
+        document.getElementById('quiz-game-body').style.display = 'none';
+        document.getElementById('quiz-results-screen').style.display = 'block';
+        document.getElementById('quiz-final-score-text').textContent = `Level: ${selectedLevel} • Final Score: ${quizScore} / 100`;
+        return;
+      }
+
+      const q = currentQuizPool[currentQuizIndex];
+      const targetKey = q.shortcut || q.keys;
+
+      document.getElementById('quiz-question-counter').textContent = `Question ${currentQuizIndex + 1} of 10`;
+      document.getElementById('quiz-score-val').textContent = `${quizScore} / 100`;
+      document.getElementById('quiz-progress-fill').style.width = `${((currentQuizIndex + 1) / 10) * 100}%`;
+      document.getElementById('quiz-question-text').textContent = `What is the shortcut for "${q.action}"?`;
+      document.getElementById('quiz-next-btn').style.display = 'none';
+
+      // Wrong options
+      const wrongKeys = calendarDb
+        .map(p => p.shortcut || p.keys)
+        .filter(k => k && k !== targetKey);
+      
+      const shuffledWrong = wrongKeys.sort(() => 0.5 - Math.random()).slice(0, 3);
+      const options = [targetKey, ...shuffledWrong].sort(() => 0.5 - Math.random());
+
+      const optionsEl = document.getElementById('quiz-options-container');
+      optionsEl.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option-btn';
+        btn.innerHTML = `<span>${opt}</span> <span style="font-family:'JetBrains Mono'; font-weight:800; font-size:0.85rem; opacity:0.6;">[Press to Select]</span>`;
+
+        btn.onclick = () => {
+          if (opt === targetKey) {
+            btn.classList.add('correct');
+            quizScore += 10;
+            document.getElementById('quiz-score-val').textContent = `${quizScore} / 100`;
+          } else {
+            btn.classList.add('wrong');
+          }
+          document.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
+          document.getElementById('quiz-next-btn').style.display = 'inline-block';
+        };
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    document.getElementById('quiz-next-btn').onclick = () => {
+      currentQuizIndex++;
+      renderQuizQuestion();
+    };
+
+    document.getElementById('quiz-restart-btn').onclick = () => {
+      startQuizSet();
+    };
+
+    // 4. Render Printable Master Cheat Sheet Table
+    function renderCheatSheet() {
+      const container = document.getElementById('cheatsheet-table-container');
+      let html = `<table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border-accent); color:var(--accent);">
+            <th style="padding:12px;">Shortcut</th>
+            <th style="padding:12px;">Action / Description</th>
+            <th style="padding:12px;">Category</th>
+            <th style="padding:12px;">Difficulty Level</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      calendarDb.forEach(p => {
+        const key = p.shortcut || p.keys || 'CAD';
+        const action = p.action || p.title;
+        html += `
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px; font-family:'JetBrains Mono',monospace; font-weight:900; color:var(--accent);">${key}</td>
+            <td style="padding:12px;"><strong style="color:var(--text-primary);">${action}</strong><br><span style="font-size:0.8rem; color:var(--text-secondary);">${p.description || p.desc || ''}</span></td>
+            <td style="padding:12px; color:var(--text-muted); font-weight:600;">${p.category || 'General'}</td>
+            <td style="padding:12px;"><span style="font-size:0.75rem; font-weight:800; color:var(--accent-purple); background:rgba(168,85,247,0.15); padding:3px 10px; border-radius:8px; border:1px solid rgba(168,85,247,0.3);">${p.difficulty || 'Beginner'}</span></td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    // Init
+    renderPublishedFeed();
+    renderHub();
+    setQuizLevel('Beginner');
+    renderCheatSheet();
+  </script>
 </body>
 </html>
