@@ -368,9 +368,23 @@ function updateCardPreview() {
   const softwareVal = contentSoftwareSelect.value;
   cardSoftwareName.textContent = softwareVal.toUpperCase();
   
-  // Update keys & action title
+  // Update keys, symbol & action title
   const keysVal = contentKeysInput.value.trim() || "KEY";
   cardKeys.textContent = keysVal;
+
+  const contentSymbolInput = document.getElementById('content-symbol');
+  const cardSymbol = document.getElementById('card-symbol');
+  if (cardSymbol) {
+    const symVal = contentSymbolInput ? contentSymbolInput.value.trim() : '';
+    if (symVal) {
+      cardSymbol.textContent = symVal;
+      const toggleElemSymbol = document.getElementById('toggle-elem-symbol');
+      cardSymbol.style.display = (!toggleElemSymbol || toggleElemSymbol.checked) ? 'inline-block' : 'none';
+    } else {
+      cardSymbol.style.display = 'none';
+    }
+  }
+
   cardAction.textContent = contentActionInput.value.trim() || "Action Title";
   
   // Update description
@@ -1842,6 +1856,8 @@ function loadCalendarItemToEditor(item) {
   
   // Set values in Creator Studio inputs
   contentKeysInput.value = keys;
+  const contentSymbolInput = document.getElementById('content-symbol');
+  if (contentSymbolInput) contentSymbolInput.value = item.symbol || '⚡';
   contentActionInput.value = action;
   
   // Build description
@@ -2868,11 +2884,33 @@ function resetCreatorStudioForm() {
   // ── Element Visibility Checkboxes Binding ─────────────────────────────────
   const toggleElemSoftware = document.getElementById('toggle-elem-software');
   const toggleElemHandle = document.getElementById('toggle-elem-handle');
+  const toggleElemSymbol = document.getElementById('toggle-elem-symbol');
   const toggleElemKeycap = document.getElementById('toggle-elem-keycap');
   const toggleElemTitle = document.getElementById('toggle-elem-title');
   const toggleElemDesc = document.getElementById('toggle-elem-desc');
   const toggleElemSteps = document.getElementById('toggle-elem-steps');
   const toggleElemMistake = document.getElementById('toggle-elem-mistake');
+
+  if (toggleElemSymbol) {
+    toggleElemSymbol.addEventListener('change', () => {
+      const el = document.getElementById('card-symbol');
+      if (el) el.style.display = toggleElemSymbol.checked ? 'inline-block' : 'none';
+    });
+  }
+
+  const symbolQuickPicker = document.getElementById('symbol-quick-picker');
+  if (symbolQuickPicker) {
+    symbolQuickPicker.querySelectorAll('.symbol-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const contentSymbolInput = document.getElementById('content-symbol');
+        if (contentSymbolInput) {
+          contentSymbolInput.value = chip.textContent.trim();
+          contentSymbolInput.dispatchEvent(new Event('input'));
+          showToast(`Selected symbol: ${chip.textContent.trim()}`);
+        }
+      });
+    });
+  }
 
   if (toggleElemSoftware) {
     toggleElemSoftware.addEventListener('change', () => {
@@ -3063,6 +3101,7 @@ function resetCreatorStudioForm() {
     return `ID: ${item.id || ('AC-' + String(item.day || 1).padStart(3, '0'))}
 Software: ${item.software || 'AutoCAD'}
 Shortcut: ${keys}
+Symbol: ${item.symbol || '⚡'}
 Action: ${action}
 Category: ${item.category || item.phase || 'General'}
 Difficulty: ${item.difficulty || 'Everyone'}
@@ -3086,6 +3125,7 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
   function getActiveEditorAsItem() {
     const sw = contentSoftware ? contentSoftware.value : 'AutoCAD';
     const keys = contentKeysInput ? contentKeysInput.value : '';
+    const symbolVal = document.getElementById('content-symbol') ? document.getElementById('content-symbol').value : '⚡';
     const action = contentActionInput ? contentActionInput.value : '';
     const desc = contentDescInput ? contentDescInput.value : '';
     const proTip = contentProTipInput ? contentProTipInput.value : '';
@@ -3103,6 +3143,7 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
       day: activeCalendarDayNum,
       software: sw,
       keys: keys,
+      symbol: symbolVal,
       action: action,
       title: keys ? `${keys}: ${action}` : action,
       category: category,
@@ -3688,6 +3729,7 @@ function parseRawTextToPosts(rawText) {
 
     let sw = 'Ludarp Civil Studio';
     let shortcut = '';
+    let symbolVal = '⚡';
     let action = '';
     let descLines = [];
     let steps = [];
@@ -3716,6 +3758,10 @@ function parseRawTextToPosts(rawText) {
         currentField = 'shortcut';
         const val = line.replace(/^shortcut:\s*/i, '').trim();
         if (val) shortcut = val;
+      } else if (/^symbol:/i.test(line) || /^icon:/i.test(line)) {
+        currentField = 'symbol';
+        const val = line.replace(/^(?:symbol|icon):\s*/i, '').trim();
+        if (val) symbolVal = val;
       } else if (/^action:/i.test(line)) {
         currentField = 'action';
         const val = line.replace(/^action:\s*/i, '').trim();
@@ -3770,6 +3816,8 @@ function parseRawTextToPosts(rawText) {
           sw = line;
         } else if (currentField === 'shortcut' && !shortcut) {
           shortcut = line;
+        } else if (currentField === 'symbol') {
+          symbolVal = line;
         } else if (currentField === 'action' && !action) {
           action = line;
         } else if (currentField === 'description') {
@@ -3799,6 +3847,7 @@ function parseRawTextToPosts(rawText) {
         id: customId || `LCS-${String(idx + 1).padStart(3, '0')}`,
         software: sw || 'Ludarp Civil Studio',
         keys: shortcut || 'START',
+        symbol: symbolVal || '⚡',
         action: action || 'Shortcut Action',
         title: shortcut ? `${shortcut}: ${action}` : action,
         category: category || 'Introduction',

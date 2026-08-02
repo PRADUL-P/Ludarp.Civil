@@ -339,9 +339,36 @@
                 </div>
               </div>
 
-              <div class="form-group" id="key-field">
-                <label for="content-keys">Shortcut Keys</label>
-                <input type="text" id="content-keys" placeholder="e.g. TR or NCOPY" value="">
+              <div class="form-row" style="display:flex; gap:10px;">
+                <div class="form-group" id="key-field" style="flex:2;">
+                  <label for="content-keys">Shortcut Keys</label>
+                  <input type="text" id="content-keys" placeholder="e.g. TR or NCOPY" value="">
+                </div>
+                <div class="form-group" id="symbol-field" style="flex:1;">
+                  <label for="content-symbol">Symbol / Icon</label>
+                  <input type="text" id="content-symbol" placeholder="e.g. ✂️ or 📐" value="⚡">
+                </div>
+              </div>
+
+              <!-- Quick Symbol Picker Palette -->
+              <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; margin-top:-4px;" id="symbol-quick-picker">
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Trim">✂️</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Dimension">📐</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Measure">📏</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Circle">⭕</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Box / Boundary">🔲</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Mirror / Swap">🔀</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Rotate">🔄</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Quick Action">⚡</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Target Point">🎯</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Block / Pin">📌</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Hatch / Wall">🧱</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Site Map">🗺️</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Pencil / Line">🖊️</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Zoom / Find">🔍</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Layers / View">👁️</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Settings">⚙️</span>
+                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Building / Structure">🏗️</span>
               </div>
 
               <div class="form-group">
@@ -577,6 +604,9 @@
                       <input type="checkbox" id="toggle-elem-handle" checked style="accent-color:var(--accent);"> Handle @ludarp
                     </label>
                     <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-symbol" checked style="accent-color:var(--accent);"> Command Symbol
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
                       <input type="checkbox" id="toggle-elem-keycap" checked style="accent-color:var(--accent);"> Keycap Box
                     </label>
                     <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
@@ -749,7 +779,8 @@
                 <!-- Body -->
                 <div class="card-body">
                   <div class="shortcut-box">
-                    <div class="keycap-container">
+                    <div class="keycap-container" style="display:flex; align-items:center; gap:10px;">
+                      <div class="keycap-symbol" id="card-symbol" style="font-size:2.2rem; filter:drop-shadow(0 0 10px rgba(56,189,248,0.5));">⚡</div>
                       <div class="keycap" id="card-keys">TR</div>
                     </div>
                     <div class="action-title" id="card-action">Trim Objects</div>
