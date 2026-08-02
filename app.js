@@ -1741,7 +1741,7 @@ function loadCalendarItemToEditor(item) {
   contentDescInput.value = descText;
   
   // Set pro-tip if any
-  contentProTipInput.value = (item.proTip) ? item.proTip : (item.hashtags && item.hashtags.length > 0) ? `Tags: ${item.hashtags.join(' ')}` : 'Save this post for your next project!';
+  contentProTipInput.value = item.proTip ? item.proTip : 'Save & share this AutoCAD tip for your next drawing project!';
   
   // Set hashtags if any
   if (contentHashtagsInput) {
