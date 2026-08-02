@@ -3106,40 +3106,45 @@ function resetCreatorStudioForm() {
     });
   }
 
-  const btnCheckAllElems = document.getElementById('btn-check-all-elems');
-  const btnUncheckAllElems = document.getElementById('btn-uncheck-all-elems');
-
-  if (btnCheckAllElems && elemVisibilityBody) {
-    btnCheckAllElems.addEventListener('click', () => {
-      elemVisibilityBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-        cb.checked = true;
-        cb.dispatchEvent(new Event('change'));
-      });
-      updateCardPreview();
-      showToast("☑️ All post elements checked!");
-    });
-  }
-
-  if (btnUncheckAllElems && elemVisibilityBody) {
-    btnUncheckAllElems.addEventListener('click', () => {
-      elemVisibilityBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-        cb.checked = false;
-        cb.dispatchEvent(new Event('change'));
-      });
-      updateCardPreview();
-      showToast("☐ All post elements unchecked!");
-    });
-  }
-
+  // Declare first so buttons can reference the body
   const toggleElemVisibilitySettings = document.getElementById('toggle-elem-visibility-settings');
   const elemVisibilityBody = document.getElementById('elem-visibility-body');
   const arrowElemVisibility = document.getElementById('arrow-elem-visibility');
 
   if (toggleElemVisibilitySettings && elemVisibilityBody) {
-    toggleElemVisibilitySettings.addEventListener('click', () => {
+    toggleElemVisibilitySettings.addEventListener('click', (e) => {
+      // Don't toggle when clicking the Check All / None buttons inside the header
+      if (e.target.closest('button')) return;
       const isHidden = elemVisibilityBody.style.display === 'none';
       elemVisibilityBody.style.display = isHidden ? 'grid' : 'none';
       if (arrowElemVisibility) arrowElemVisibility.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+  }
+
+  const btnCheckAllElems = document.getElementById('btn-check-all-elems');
+  const btnUncheckAllElems = document.getElementById('btn-uncheck-all-elems');
+
+  if (btnCheckAllElems && elemVisibilityBody) {
+    btnCheckAllElems.addEventListener('click', (e) => {
+      e.stopPropagation();
+      elemVisibilityBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+        cb.dispatchEvent(new Event('change'));
+      });
+      updateCardPreview();
+      showToast("☑️ All elements shown!");
+    });
+  }
+
+  if (btnUncheckAllElems && elemVisibilityBody) {
+    btnUncheckAllElems.addEventListener('click', (e) => {
+      e.stopPropagation();
+      elemVisibilityBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+        cb.dispatchEvent(new Event('change'));
+      });
+      updateCardPreview();
+      showToast("☐ All elements hidden!");
     });
   }
 
