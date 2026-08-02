@@ -3798,6 +3798,37 @@ const gsheetSetupModal = document.getElementById('gsheet-setup-modal');
 const btnCloseGsheetModal = document.getElementById('btn-close-gsheet-modal');
 const btnCopyGsheetScript = document.getElementById('btn-copy-gsheet-script');
 
+// ── JSONP helper — bypasses CORS for Google Apps Script GET requests ──────────
+// Google Apps Script redirects through accounts.google.com, blocking fetch().
+// JSONP injects a <script> tag instead — no CORS restriction applies.
+function fetchJSONP(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'ludarp_jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+    const timeout = setTimeout(() => {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('JSONP timeout — Apps Script did not respond in time'));
+    }, 15000);
+
+    window[cbName] = (data) => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      resolve(data);
+    };
+
+    const sep = url.includes('?') ? '&' : '?';
+    const script = document.createElement('script');
+    script.src = url + sep + 'callback=' + cbName;
+    script.onerror = () => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      reject(new Error('JSONP script load failed — check your Apps Script URL'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
 // Load saved Google Sheet URL from LocalStorage (or use permanent default)
 const LUDARP_GSHEET_DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbyVUADznw9S_gp1rZNfMC_p9pMHxLXuKgkO2ycd7Z3pF1lMcpac8hAYDLjkvPR-D524/exec';
 
@@ -3844,17 +3875,15 @@ if (btnGsheetFetch) {
     }
 
     try {
-      showToast('⏳ Fetching live posts from Google Sheet...', 'info');
-      const res = await fetch(url);
-      const data = await res.json();
+      showToast('⏳ Fetching live posts from Google Sheet via JSONP...', 'info');
+      const data = await fetchJSONP(url);
 
       if (Array.isArray(data) && data.length > 0) {
-        // Parse arrays/JSON strings in fetched objects
         const sanitized = data.map((item, i) => ({
           ...item,
           day: Number(item.day) || i + 1,
-          bullets: typeof item.bullets === 'string' ? JSON.parse(item.bullets || '[]') : (item.bullets || []),
-          hashtags: typeof item.hashtags === 'string' ? JSON.parse(item.hashtags || '[]') : (item.hashtags || [])
+          bullets: typeof item.bullets === 'string' ? tryParse(item.bullets, []) : (item.bullets || []),
+          hashtags: typeof item.hashtags === 'string' ? tryParse(item.hashtags, []) : (item.hashtags || [])
         }));
 
         calendarDb = sanitized;
@@ -3865,11 +3894,11 @@ if (btnGsheetFetch) {
         saveAllDataToSyncFile();
         showToast(`✅ Synced ${calendarDb.length} posts from Google Sheet Cloud!`, 'success');
       } else {
-        showToast('⚠️ No post rows found in Google Sheet response.', 'warning');
+        showToast('⚠️ Google Sheet returned no rows. Push your posts first.', 'warning');
       }
     } catch (err) {
       console.error('Google Sheet Sync Error:', err);
-      showToast('❌ Failed to fetch from Google Sheet. Ensure URL is public or Apps Script web app is deployed.', 'error');
+      showToast('❌ ' + err.message, 'error');
     }
   };
 }
@@ -4009,8 +4038,7 @@ async function fetchCloudViewerData() {
   }
 
   try {
-    const res = await fetch(savedUrl);
-    const data = await res.json();
+    const data = await fetchJSONP(savedUrl);
 
     if (!Array.isArray(data) || data.length === 0) {
       if (emptyEl) {

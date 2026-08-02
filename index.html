@@ -1254,29 +1254,32 @@
           <li>Copy your generated <b>Web App URL</b> and paste it into the Cloud Sync bar!</li>
         </ol>
 
-        <label style="font-weight:800; font-size:0.8rem; color:var(--accent); margin-top:6px;">📋 Apps Script Code (Updated — paste this exactly):</label>
-        <textarea id="gsheet-script-code" rows="16" readonly style="font-family:var(--font-mono); font-size:0.75rem; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--r-md); padding:10px;">function doGet(e) {
+        <label style="font-weight:800; font-size:0.8rem; color:var(--accent); margin-top:6px;">📋 Apps Script Code — paste this exactly (supports JSONP to fix CORS):</label>
+        <textarea id="gsheet-script-code" rows="22" readonly style="font-family:var(--font-mono); font-size:0.75rem; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--r-md); padding:10px;">function doGet(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = sheet.getDataRange().getValues();
-  var output;
-  if (data.length <= 1) {
-    output = ContentService.createTextOutput("[]");
-  } else {
+  var result = [];
+  if (data.length > 1) {
     var headers = data[0];
-    var result = [];
     for (var i = 1; i < data.length; i++) {
       var obj = {};
       for (var j = 0; j < headers.length; j++) obj[headers[j]] = data[i][j];
       result.push(obj);
     }
-    output = ContentService.createTextOutput(JSON.stringify(result));
   }
-  return output.setMimeType(ContentService.MimeType.JSON);
+  var json = JSON.stringify(result);
+  // JSONP support — bypasses CORS for browser fetch
+  var cb = e.parameter.callback;
+  if (cb) {
+    return ContentService.createTextOutput(cb + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(json)
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  // Form POST sends data as e.parameter.data
   var raw = (e.parameter && e.parameter.data) ? e.parameter.data : (e.postData ? e.postData.contents : '[]');
   var items = JSON.parse(raw);
   sheet.clear();
