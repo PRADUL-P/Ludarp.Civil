@@ -389,17 +389,43 @@
                 <!-- Image Position & Size Controls -->
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
                   <div>
-                    <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Image Position</label>
+                    <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Preset Position</label>
                     <select id="image-position-select" style="padding:4px 8px; font-size:0.75rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
-                      <option value="bottom" selected>📍 Bottom Side (Above Footer)</option>
-                      <option value="middle">📍 Middle Area (Between Desc & Steps)</option>
-                      <option value="top">📍 Top Badge (Next to Keycap)</option>
-                      <option value="full">🖼️ Hero Banner (Above Desc)</option>
+                      <option value="bottom-center" selected>📍 Bottom Center</option>
+                      <option value="bottom-left">📍 Bottom Left</option>
+                      <option value="bottom-right">📍 Bottom Right</option>
+                      <option value="middle-center">📍 Middle Center</option>
+                      <option value="middle-left">📍 Middle Left</option>
+                      <option value="middle-right">📍 Middle Right</option>
+                      <option value="top-left">📍 Top Left (Badge)</option>
+                      <option value="top-right">📍 Top Right (Header)</option>
+                      <option value="hero">🖼️ Full Width Hero</option>
+                      <option value="custom">🎨 Freeform Custom Offsets</option>
                     </select>
                   </div>
                   <div>
-                    <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Image Max Height (<span id="val-image-height">160</span>px)</label>
-                    <input type="range" id="image-height-slider" min="60" max="360" value="160" style="width:100%; accent-color:var(--accent);">
+                    <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Image Height (<span id="val-image-height">160</span>px)</label>
+                    <input type="range" id="image-height-slider" min="40" max="400" value="160" style="width:100%; accent-color:var(--accent);">
+                  </div>
+                </div>
+
+                <!-- Custom Position Sliders & Alignment -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px; background:var(--bg-secondary); padding:8px; border-radius:var(--r-md); border:1px solid var(--border);">
+                  <div>
+                    <label style="font-size:0.65rem; color:var(--text-secondary); font-weight:700;">Horizontal Shift X (<span id="val-image-offset-x">0</span>px)</label>
+                    <input type="range" id="image-offset-x-slider" min="-180" max="180" value="0" style="width:100%; accent-color:var(--accent);">
+                  </div>
+                  <div>
+                    <label style="font-size:0.65rem; color:var(--text-secondary); font-weight:700;">Vertical Shift Y (<span id="val-image-offset-y">0</span>px)</label>
+                    <input type="range" id="image-offset-y-slider" min="-180" max="180" value="0" style="width:100%; accent-color:var(--accent);">
+                  </div>
+                  <div style="grid-column: span 2; display:flex; justify-content:space-between; align-items:center;">
+                    <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Alignment</label>
+                    <div style="display:flex; gap:4px;" id="image-align-group">
+                      <button type="button" class="btn-img-align" data-align="left" style="padding:2px 8px; font-size:0.7rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; color:var(--text-primary); cursor:pointer;">Left</button>
+                      <button type="button" class="btn-img-align active" data-align="center" style="padding:2px 8px; font-size:0.7rem; background:var(--accent); color:#000; border:none; border-radius:4px; font-weight:800; cursor:pointer;">Center</button>
+                      <button type="button" class="btn-img-align" data-align="right" style="padding:2px 8px; font-size:0.7rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; color:var(--text-primary); cursor:pointer;">Right</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -802,6 +828,11 @@
                 <div class="card-bg-grid" id="card-bg-grid"></div>
                 <div class="vignette-overlay" id="card-vignette"></div>
                 <div class="card-watermark" id="card-watermark">A</div>
+
+                <!-- Freeform Custom Floating Image Overlay Slot -->
+                <div id="card-image-custom-wrap" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:15; pointer-events:none;">
+                  <img id="card-image-custom" style="max-width:320px; max-height:220px; border-radius:8px; border:2px solid var(--accent); object-fit:cover; box-shadow:0 8px 25px rgba(0,0,0,0.6);" src="" alt="Custom Floating Image">
+                </div>
 
                 <!-- CAD UCS Axis Icon -->
                 <div class="ucs-axis-icon" id="card-ucs-icon">

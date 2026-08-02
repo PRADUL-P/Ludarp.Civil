@@ -392,10 +392,20 @@ function updateCardPreview() {
 
   // Update Custom Image Slots
   const imageUrlVal = document.getElementById('content-image-url') ? document.getElementById('content-image-url').value.trim() : '';
-  const imagePosVal = document.getElementById('image-position-select') ? document.getElementById('image-position-select').value : 'bottom';
+  const imagePosVal = document.getElementById('image-position-select') ? document.getElementById('image-position-select').value : 'bottom-center';
   const imageHeightVal = document.getElementById('image-height-slider') ? document.getElementById('image-height-slider').value : '160';
+  const offsetXVal = document.getElementById('image-offset-x-slider') ? document.getElementById('image-offset-x-slider').value : '0';
+  const offsetYVal = document.getElementById('image-offset-y-slider') ? document.getElementById('image-offset-y-slider').value : '0';
+
   const valImageHeightEl = document.getElementById('val-image-height');
+  const valImageOffsetXEl = document.getElementById('val-image-offset-x');
+  const valImageOffsetYEl = document.getElementById('val-image-offset-y');
   if (valImageHeightEl) valImageHeightEl.textContent = imageHeightVal;
+  if (valImageOffsetXEl) valImageOffsetXEl.textContent = offsetXVal;
+  if (valImageOffsetYEl) valImageOffsetYEl.textContent = offsetYVal;
+
+  const activeAlignBtn = document.querySelector('#image-align-group .btn-img-align.active');
+  const alignVal = activeAlignBtn ? activeAlignBtn.getAttribute('data-align') : 'center';
 
   const toggleElemImage = document.getElementById('toggle-elem-image');
   const isImageVisible = (!toggleElemImage || toggleElemImage.checked) && imageUrlVal !== '';
@@ -404,30 +414,49 @@ function updateCardPreview() {
     top: document.getElementById('card-image-top'),
     hero: document.getElementById('card-image-hero-wrap'),
     middle: document.getElementById('card-image-middle-wrap'),
-    bottom: document.getElementById('card-image-bottom-wrap')
+    bottom: document.getElementById('card-image-bottom-wrap'),
+    custom: document.getElementById('card-image-custom-wrap')
   };
 
   if (slots.top) slots.top.style.display = 'none';
   if (slots.hero) slots.hero.style.display = 'none';
   if (slots.middle) slots.middle.style.display = 'none';
   if (slots.bottom) slots.bottom.style.display = 'none';
+  if (slots.custom) slots.custom.style.display = 'none';
 
   if (isImageVisible) {
-    if (imagePosVal === 'top' && slots.top) {
+    const textAlignCss = alignVal === 'left' ? 'left' : alignVal === 'right' ? 'right' : 'center';
+    const transformShift = `translate(${offsetXVal}px, ${offsetYVal}px)`;
+
+    if (imagePosVal === 'custom' && slots.custom) {
+      const img = document.getElementById('card-image-custom');
+      if (img) {
+        img.src = imageUrlVal;
+        img.style.maxHeight = `${imageHeightVal}px`;
+      }
+      slots.custom.style.transform = `translate(calc(-50% + ${offsetXVal}px), calc(-50% + ${offsetYVal}px))`;
+      slots.custom.style.display = 'block';
+    } else if (imagePosVal.startsWith('top') && slots.top) {
       slots.top.src = imageUrlVal;
       slots.top.style.maxHeight = `${Math.min(imageHeightVal, 60)}px`;
+      slots.top.style.transform = transformShift;
       slots.top.style.display = 'inline-block';
-    } else if (imagePosVal === 'full' && slots.hero) {
+    } else if (imagePosVal === 'hero' && slots.hero) {
       const img = document.getElementById('card-image-hero');
-      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; }
+      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; img.style.transform = transformShift; }
+      slots.hero.style.textAlign = textAlignCss;
       slots.hero.style.display = 'block';
-    } else if (imagePosVal === 'middle' && slots.middle) {
+    } else if (imagePosVal.startsWith('middle') && slots.middle) {
       const img = document.getElementById('card-image-middle');
-      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; }
+      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; img.style.transform = transformShift; }
+      const slotAlign = imagePosVal.includes('left') ? 'left' : imagePosVal.includes('right') ? 'right' : textAlignCss;
+      slots.middle.style.textAlign = slotAlign;
       slots.middle.style.display = 'block';
     } else if (slots.bottom) {
       const img = document.getElementById('card-image-bottom');
-      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; }
+      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; img.style.transform = transformShift; }
+      const slotAlign = imagePosVal.includes('left') ? 'left' : imagePosVal.includes('right') ? 'right' : textAlignCss;
+      slots.bottom.style.textAlign = slotAlign;
       slots.bottom.style.display = 'block';
     }
   }
@@ -2979,11 +3008,31 @@ function resetCreatorStudioForm() {
     });
   }
 
-  [contentImageUrlInput, imagePositionSelect, imageHeightSlider, toggleElemImage].forEach(el => {
+  const imageOffsetXSlider = document.getElementById('image-offset-x-slider');
+  const imageOffsetYSlider = document.getElementById('image-offset-y-slider');
+
+  [contentImageUrlInput, imagePositionSelect, imageHeightSlider, imageOffsetXSlider, imageOffsetYSlider, toggleElemImage].forEach(el => {
     if (el) {
       el.addEventListener('input', updateCardPreview);
       el.addEventListener('change', updateCardPreview);
     }
+  });
+
+  const alignBtns = document.querySelectorAll('#image-align-group .btn-img-align');
+  alignBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      alignBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'var(--bg-tertiary)';
+        b.style.color = 'var(--text-primary)';
+        b.style.fontWeight = 'normal';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#000';
+      btn.style.fontWeight = '800';
+      updateCardPreview();
+    });
   });
 
   if (toggleElemSymbol) {
