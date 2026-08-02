@@ -1707,7 +1707,7 @@ function loadCalendarItemToEditor(item) {
   activeStudioShortcutId = null;
 
   // Clean titles to separate keys and action
-  let keys = `DAY ${item.day}`;
+  let keys = item.keys || 'CAD';
   let action = item.title;
   
   const colonMatch = item.title.match(/^([^:]+):\s*(.*)$/);
@@ -1719,7 +1719,7 @@ function loadCalendarItemToEditor(item) {
   // Update Studio View Headers dynamically
   const dayTitleEl = document.getElementById('day-title');
   const daySubEl = document.getElementById('day-sub');
-  if (dayTitleEl) dayTitleEl.textContent = `Day ${item.day}: ${action}`;
+  if (dayTitleEl) dayTitleEl.textContent = action;
   if (daySubEl) daySubEl.textContent = (item.phase || '').toUpperCase();
 
   // Reset software and select AutoCAD since this is AutoCAD calendar
@@ -2491,7 +2491,6 @@ function renderSidebarDaysList() {
       
       item.innerHTML = `
         <span class="dchk">${isCompleted ? '✓' : ''}</span>
-        <span class="dnum">D${post.day}</span>
         <span class="dtitle">${post.title}</span>
       `;
       
