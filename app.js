@@ -715,46 +715,57 @@ if (stepsContainer) {
 // 3. Tab Switching Navigation
 // ==========================================================================
 
-sidebarButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Toggle active navigation buttons
-    sidebarButtons.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    // Toggle visible views
-    const targetTab = btn.getAttribute('data-tab');
-    tabViews.forEach(view => {
-      view.classList.remove('active');
-      if (view.id === `${targetTab}-view`) {
-        view.classList.add('active');
-      }
-    });
-    
-    // Toggle contextual sidebar elements
-    if (sidebarStudioContext) {
-      sidebarStudioContext.style.display = (targetTab === 'studio') ? 'flex' : 'none';
-    }
-    
-    // If switching to hub view, reload grid
-    if (targetTab === 'hub') {
+function switchTab(targetTab) {
+  const allNavBtns = document.querySelectorAll('.nav-btn');
+  const allTabViews = document.querySelectorAll('.tab-view');
+  
+  allNavBtns.forEach(b => {
+    const isActive = b.getAttribute('data-tab') === targetTab;
+    b.classList.toggle('active', isActive);
+  });
+
+  allTabViews.forEach(view => {
+    const isActive = view.id === `${targetTab}-view`;
+    view.classList.toggle('active', isActive);
+  });
+
+  const ctxSidebar = document.getElementById('sidebar-studio-context');
+  if (ctxSidebar) {
+    ctxSidebar.style.display = (targetTab === 'studio') ? 'flex' : 'none';
+  }
+
+  try {
+    if (targetTab === 'hub' && typeof renderShortcutsHub === 'function') {
       renderShortcutsHub();
-    } else if (targetTab === 'calendar') {
+    } else if (targetTab === 'calendar' && typeof renderCalendarHub === 'function') {
       renderCalendarHub();
-    } else if (targetTab === 'database') {
+    } else if (targetTab === 'database' && typeof renderDatabaseManagerTable === 'function') {
       renderDatabaseManagerTable();
-    } else if (targetTab === 'feed') {
+    } else if (targetTab === 'feed' && typeof renderInstagramFeedGrid === 'function') {
       renderInstagramFeedGrid();
-    } else if (targetTab === 'importer') {
-      // Importer tab active
-    } else if (targetTab === 'cheatsheet') {
+    } else if (targetTab === 'cheatsheet' && typeof renderCheatSheet === 'function') {
       renderCheatSheet();
-    } else if (targetTab === 'quiz') {
+    } else if (targetTab === 'quiz' && typeof initQuizAndFlashcards === 'function') {
       initQuizAndFlashcards();
-    } else if (targetTab === 'cloudviewer') {
+    } else if (targetTab === 'cloudviewer' && typeof initCloudViewer === 'function') {
       initCloudViewer();
     }
+  } catch (err) {
+    console.error("Tab view render error:", err);
+  }
+}
+
+const bindSidebarNav = () => {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const targetTab = btn.getAttribute('data-tab');
+      if (targetTab) switchTab(targetTab);
+    };
   });
-});
+};
+bindSidebarNav();
+document.addEventListener('DOMContentLoaded', bindSidebarNav);
 
 // ==========================================================================
 // 4. Visual Card Styles & Themes
@@ -2581,14 +2592,6 @@ if (btnParsePaste) {
 // 10.9 File System Access API & IndexedDB Sync
 // ==========================================================================
 
-const typeCommandBtn = document.getElementById('type-command');
-const typeListBtn = document.getElementById('type-list');
-const typeCarouselBtn = document.getElementById('type-carousel');
-const keyField = document.getElementById('key-field');
-const stepsLabel = document.getElementById('steps-label');
-const carouselScriptGroup = document.getElementById('carousel-script-group');
-const carouselMultiScriptInput = document.getElementById('carousel-multi-script');
-
 function setType(type, triggerSync = true) {
   const btnCmd = typeCommandBtn || document.getElementById('type-command');
   const btnLst = typeListBtn || document.getElementById('type-list');
@@ -3142,7 +3145,7 @@ async function initDiskSync() {
 // 11. Initializer Hook
 // ==========================================================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initApp() {
   renderShortcutsHub();
   updateCalendarProgress(); // Fix Progress display showing 0/83 initially
   renderSidebarDaysList();
@@ -3904,7 +3907,13 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
       arrowOverlaySettings.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
     });
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 
 // ==========================================================================
 // 12. Database Manager Tab Engine
@@ -3924,32 +3933,40 @@ const dbStatShortcutsCount = document.getElementById('db-stat-shortcuts-count');
 const dbStatSyncStatus = document.getElementById('db-stat-sync-status');
 
 function renderDatabaseManagerTable() {
-  if (!dbTableBody) return;
-  
+  const tableBody = document.getElementById('db-table-body');
+  const statCal = document.getElementById('db-stat-calendar-count');
+  const statPosted = document.getElementById('db-stat-posted-count');
+  const statShortcuts = document.getElementById('db-stat-shortcuts-count');
+  const statSync = document.getElementById('db-stat-sync-status');
+  const searchInput = document.getElementById('db-search-input');
+  const filterSoft = document.getElementById('db-filter-software');
+
   // Stats update
-  const totalCal = calendarDb.length;
-  const postedCal = calendarDb.filter(item => completedCalendarDays.has(String(item.day))).length;
-  const totalShortcuts = shortcutDb.length;
-  
-  if (dbStatCalendarCount) dbStatCalendarCount.textContent = totalCal;
-  if (dbStatPostedCount) dbStatPostedCount.textContent = `${postedCal} / ${totalCal}`;
-  if (dbStatShortcutsCount) dbStatShortcutsCount.textContent = totalShortcuts;
-  if (dbStatSyncStatus) dbStatSyncStatus.textContent = fileHandle ? fileHandle.name : 'Local Sandbox';
-  
-  const searchVal = dbSearchInput ? dbSearchInput.value.toLowerCase().trim() : '';
-  const softwareFilter = dbFilterSoftware ? dbFilterSoftware.value : 'all';
-  
-  dbTableBody.innerHTML = '';
-  
-  const filtered = calendarDb.filter(item => {
+  const totalCal = Array.isArray(calendarDb) ? calendarDb.length : 0;
+  const postedCal = Array.isArray(calendarDb) ? calendarDb.filter(item => completedCalendarDays.has(String(item.day))).length : 0;
+  const totalShortcuts = Array.isArray(shortcutDb) ? shortcutDb.length : 0;
+
+  if (statCal) statCal.textContent = totalCal;
+  if (statPosted) statPosted.textContent = `${postedCal} / ${totalCal}`;
+  if (statShortcuts) statShortcuts.textContent = totalShortcuts;
+  if (statSync) statSync.textContent = fileHandle ? fileHandle.name : 'Local Sandbox';
+
+  if (!tableBody) return;
+
+  const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const softwareFilter = filterSoft ? filterSoft.value : 'all';
+
+  tableBody.innerHTML = '';
+
+  const filtered = (Array.isArray(calendarDb) ? calendarDb : []).filter(item => {
     const matchesSoftware = softwareFilter === 'all' || (item.software || 'AutoCAD') === softwareFilter;
-    const itemText = `${item.day} ${item.title} ${item.keys || ''} ${item.software || ''} ${item.phase || ''} ${item.desc || ''}`.toLowerCase();
+    const itemText = `${item.day || ''} ${item.title || item.action || ''} ${item.keys || ''} ${item.software || ''} ${item.phase || ''} ${item.desc || ''}`.toLowerCase();
     const matchesSearch = !searchVal || itemText.includes(searchVal);
     return matchesSoftware && matchesSearch;
   });
-  
+
   if (filtered.length === 0) {
-    dbTableBody.innerHTML = `
+    tableBody.innerHTML = `
       <tr>
         <td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">
           No database entries found matching filters.
@@ -3958,23 +3975,25 @@ function renderDatabaseManagerTable() {
     `;
     return;
   }
-  
+
   filtered.forEach(item => {
     const isCompleted = completedCalendarDays.has(String(item.day));
     const tr = document.createElement('tr');
     tr.style.cssText = 'border-bottom:1px solid var(--border); transition:0.15s background;';
-    
-    // Parse keys and title
+
+    // Parse keys and title safely
     let keys = item.keys || 'CAD';
-    let action = item.title;
-    const colonMatch = item.title.match(/^([^:]+):\s*(.*)$/);
-    if (colonMatch) {
-      keys = colonMatch[1].trim();
-      action = colonMatch[2].trim();
+    let action = item.title || item.action || 'Untitled Post';
+    if (typeof item.title === 'string') {
+      const colonMatch = item.title.match(/^([^:]+):\s*(.*)$/);
+      if (colonMatch) {
+        keys = colonMatch[1].trim();
+        action = colonMatch[2].trim();
+      }
     }
-    
+
     tr.innerHTML = `
-      <td style="padding:10px 16px; font-family:var(--font-mono); font-weight:700; color:var(--accent);">Day ${item.day}</td>
+      <td style="padding:10px 16px; font-family:var(--font-mono); font-weight:700; color:var(--accent);">Lesson ${item.day || '-'}</td>
       <td style="padding:10px 16px; font-weight:700;">${item.software || 'AutoCAD'}</td>
       <td style="padding:10px 16px;">
         <span style="font-family:var(--font-mono); font-weight:800; color:var(--text-primary); background:var(--bg-tertiary); padding:2px 6px; border-radius:4px; border:1px solid var(--border);">${keys}</span>
@@ -3999,57 +4018,72 @@ function renderDatabaseManagerTable() {
         </div>
       </td>
     `;
-    
+
     // Bind row button events
-    tr.querySelector('[data-action="load"]').onclick = () => {
-      activeCalendarDayNum = item.day;
-      loadCalendarItemToEditor(item);
-      document.querySelector('.nav-btn[data-tab="studio"]').click();
-      showToast(`Loaded Day ${item.day}: "${action}" into Creator Studio!`);
-    };
+    const loadBtn = tr.querySelector('[data-action="load"]');
+    if (loadBtn) {
+      loadBtn.onclick = () => {
+        activeCalendarDayNum = item.day;
+        loadCalendarItemToEditor(item);
+        if (typeof switchTab === 'function') switchTab('studio');
+        showToast(`Loaded Lesson ${item.day}: "${action}" into Creator Studio!`);
+      };
+    }
 
-    tr.querySelector('[data-action="copy-script"]').onclick = () => {
-      const scriptText = generateScriptTextFromItem(item);
-      navigator.clipboard.writeText(scriptText).then(() => {
-        showToast(`📜 Day ${item.day} Text Script copied!`, 'success');
-      });
-    };
+    const scriptBtn = tr.querySelector('[data-action="copy-script"]');
+    if (scriptBtn) {
+      scriptBtn.onclick = () => {
+        const scriptText = generateScriptTextFromItem(item);
+        navigator.clipboard.writeText(scriptText).then(() => {
+          showToast(`📜 Lesson ${item.day} Text Script copied!`, 'success');
+        });
+      };
+    }
 
-    tr.querySelector('[data-action="copy-json"]').onclick = () => {
-      const jsonText = generateJsonFromItem(item);
-      navigator.clipboard.writeText(jsonText).then(() => {
-        showToast(`📦 Day ${item.day} JSON copied!`, 'success');
-      });
-    };
-    
-    tr.querySelector('[data-action="toggle"]').onclick = () => {
-      const dayStr = String(item.day);
-      if (completedCalendarDays.has(dayStr)) {
-        completedCalendarDays.delete(dayStr);
-        showToast(`Day ${dayStr} marked as Pending.`);
-      } else {
-        completedCalendarDays.add(dayStr);
-        showToast(`✅ Day ${dayStr} marked as Posted!`, 'success');
-      }
-      localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
-      updateCalendarProgress();
-      renderSidebarDaysList();
-      renderDatabaseManagerTable();
-      saveAllDataToSyncFile();
-    };
-    
-    tr.querySelector('[data-action="delete"]').onclick = () => {
-      if (confirm(`Are you sure you want to delete Day ${item.day}: "${item.title}"?`)) {
-        calendarDb = calendarDb.filter(d => String(d.day) !== String(item.day));
-        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+    const jsonBtn = tr.querySelector('[data-action="copy-json"]');
+    if (jsonBtn) {
+      jsonBtn.onclick = () => {
+        const jsonText = generateJsonFromItem(item);
+        navigator.clipboard.writeText(jsonText).then(() => {
+          showToast(`📦 Lesson ${item.day} JSON copied!`, 'success');
+        });
+      };
+    }
+
+    const toggleBtn = tr.querySelector('[data-action="toggle"]');
+    if (toggleBtn) {
+      toggleBtn.onclick = () => {
+        const dayStr = String(item.day);
+        if (completedCalendarDays.has(dayStr)) {
+          completedCalendarDays.delete(dayStr);
+          showToast(`Lesson ${dayStr} marked as Pending.`);
+        } else {
+          completedCalendarDays.add(dayStr);
+          showToast(`✅ Lesson ${dayStr} marked as Posted!`, 'success');
+        }
+        localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
+        updateCalendarProgress();
         renderSidebarDaysList();
         renderDatabaseManagerTable();
         saveAllDataToSyncFile();
-        showToast(`Deleted Day ${item.day} from database.`, 'info');
-      }
-    };
-    
-    dbTableBody.appendChild(tr);
+      };
+    }
+
+    const delBtn = tr.querySelector('[data-action="delete"]');
+    if (delBtn) {
+      delBtn.onclick = () => {
+        if (confirm(`Are you sure you want to delete Lesson ${item.day}: "${item.title}"?`)) {
+          calendarDb = calendarDb.filter(d => String(d.day) !== String(item.day));
+          localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+          renderSidebarDaysList();
+          renderDatabaseManagerTable();
+          saveAllDataToSyncFile();
+          showToast(`Deleted Lesson ${item.day} from database.`, 'info');
+        }
+      };
+    }
+
+    tableBody.appendChild(tr);
   });
 }
 
