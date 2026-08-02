@@ -545,6 +545,8 @@ sidebarButtons.forEach(btn => {
       renderDatabaseManagerTable();
     } else if (targetTab === 'feed') {
       renderInstagramFeedGrid();
+    } else if (targetTab === 'importer') {
+      // Importer tab active
     }
   });
 });
@@ -3204,3 +3206,230 @@ document.addEventListener('keydown', (e) => {
     if (btnNext) btnNext.click();
   }
 });
+
+// ==========================================================================
+// 16. Bulk Content Importer Studio Engine
+// ==========================================================================
+const importerTextInput = document.getElementById('importer-text-input');
+const btnImporterLoadExample = document.getElementById('btn-importer-load-example');
+const btnImporterParse = document.getElementById('btn-importer-parse');
+const btnImporterParseBottom = document.getElementById('btn-importer-parse-bottom');
+const btnImporterClear = document.getElementById('btn-importer-clear');
+const btnImporterSaveAll = document.getElementById('btn-importer-save-all');
+
+const importerEmptyState = document.getElementById('importer-empty-state');
+const importerParsedList = document.getElementById('importer-parsed-list');
+const importerParsedCount = document.getElementById('importer-parsed-count');
+
+let currentParsedPosts = [];
+
+const EXAMPLE_POST_TEXT = `Software: AutoCAD
+Shortcut: F8 / ORTHO
+Action: Turn On Ortho Mode
+Description: Locks your cursor to perfectly horizontal or vertical movement — the first thing every beginner should learn before drawing anything.
+Steps:
+1. Press F8 to toggle Ortho mode on or off.
+2. With Ortho on, start any draw command like LINE.
+3. Move your mouse — notice it only snaps to 0°, 90°, 180°, or 270°.
+Pro Tip: Ortho is great for walls and straight layouts, but turn it off (F8 again) when you need angled lines.
+Hashtags: #autocad #autocadbasics #beginnertips #cadforbeginners
+---
+Software: AutoCAD
+Shortcut: F3 / OSNAP
+Action: Turn On Object Snap
+Description: Makes your cursor automatically snap to precise points like endpoints, midpoints, and intersections — essential for accurate drawings.
+Steps:
+1. Press F3 to toggle Object Snap on or off.
+2. Right-click the OSNAP icon in the status bar and choose snap points.
+3. Start drawing — your cursor will show a colored marker when snapping.
+Pro Tip: Beginners should start with just Endpoint, Midpoint, and Intersection enabled.
+Hashtags: #autocad #osnap #cadbasics #beginnertips #drafting
+---
+Software: AutoCAD
+Shortcut: L
+Action: Draw a Line
+Description: Creates a straight line segment between two or more points — the single most-used command in AutoCAD.
+Steps:
+1. Type 'L' and hit Enter (or Spacebar).
+2. Click your starting point in the drawing area.
+3. Click your endpoint, then press Enter to finish.
+Pro Tip: Hold Shift while drawing to temporarily snap to orthogonal (90°) angles.
+Hashtags: #autocad #linecommand #cadbasics #beginnertips`;
+
+if (btnImporterLoadExample) {
+  btnImporterLoadExample.addEventListener('click', () => {
+    if (importerTextInput) {
+      importerTextInput.value = EXAMPLE_POST_TEXT;
+      showToast("📋 Loaded example format! Click 'Parse & Build Posts'.");
+      parseAndRenderBulkPosts();
+    }
+  });
+}
+
+if (btnImporterClear) {
+  btnImporterClear.addEventListener('click', () => {
+    if (importerTextInput) importerTextInput.value = '';
+    currentParsedPosts = [];
+    renderParsedPostsList();
+  });
+}
+
+function parseRawTextToPosts(rawText) {
+  if (!rawText || !rawText.trim()) return [];
+  const blocks = rawText.split(/---+/);
+  const parsed = [];
+
+  blocks.forEach((block, idx) => {
+    const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+    if (lines.length === 0) return;
+
+    let sw = 'AutoCAD';
+    let shortcut = '';
+    let action = '';
+    let desc = '';
+    let steps = [];
+    let protip = '';
+    let hashtags = '';
+
+    let inSteps = false;
+
+    lines.forEach(line => {
+      if (/^software:/i.test(line)) {
+        sw = line.split(/:(.+)/)[1].trim();
+      } else if (/^shortcut:/i.test(line)) {
+        shortcut = line.split(/:(.+)/)[1].trim();
+      } else if (/^action:/i.test(line)) {
+        action = line.split(/:(.+)/)[1].trim();
+      } else if (/^description:/i.test(line)) {
+        desc = line.split(/:(.+)/)[1].trim();
+        inSteps = false;
+      } else if (/^steps:/i.test(line)) {
+        inSteps = true;
+      } else if (/^pro tip:/i.test(line) || /^protip:/i.test(line)) {
+        protip = line.split(/:(.+)/)[1].trim();
+        inSteps = false;
+      } else if (/^hashtags:/i.test(line)) {
+        hashtags = line.split(/:(.+)/)[1].trim();
+        inSteps = false;
+      } else if (inSteps) {
+        const cleanStep = line.replace(/^\d+[\.\)]\s*/, '').trim();
+        if (cleanStep) steps.push(cleanStep);
+      }
+    });
+
+    if (action || shortcut || desc) {
+      parsed.push({
+        id: `parsed-${Date.now()}-${idx}`,
+        software: sw || 'AutoCAD',
+        keys: shortcut || 'CAD',
+        action: action || 'Shortcut Action',
+        title: shortcut ? `${shortcut}: ${action}` : action,
+        desc: desc || 'Description goes here.',
+        bullets: steps.length > 0 ? steps : ['Step 1: Execute command on keyboard'],
+        proTip: protip || 'Save for later!',
+        hashtags: hashtags || '#autocad #civilengineering #drafting',
+        format: 'post',
+        markerStyle: 'number'
+      });
+    }
+  });
+
+  return parsed;
+}
+
+function parseAndRenderBulkPosts() {
+  const text = importerTextInput ? importerTextInput.value : '';
+  currentParsedPosts = parseRawTextToPosts(text);
+  renderParsedPostsList();
+}
+
+function renderParsedPostsList() {
+  if (!importerParsedList || !importerEmptyState) return;
+
+  importerParsedList.innerHTML = '';
+  if (importerParsedCount) importerParsedCount.textContent = currentParsedPosts.length;
+
+  if (currentParsedPosts.length === 0) {
+    importerEmptyState.style.display = 'block';
+    if (btnImporterSaveAll) btnImporterSaveAll.style.display = 'none';
+    return;
+  }
+
+  importerEmptyState.style.display = 'none';
+  if (btnImporterSaveAll) btnImporterSaveAll.style.display = 'block';
+
+  currentParsedPosts.forEach((post, index) => {
+    const cardEl = document.createElement('div');
+    cardEl.style.cssText = 'padding:14px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); display:flex; flex-direction:column; gap:8px;';
+
+    const stepsListHtml = post.bullets.map((st, i) => `<li style="margin-left:16px;">${st}</li>`).join('');
+
+    cardEl.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-family:var(--font-mono); font-weight:800; color:var(--accent); background:var(--bg-secondary); padding:2px 8px; border-radius:4px; border:1px solid var(--border);">${post.keys}</span>
+          <strong style="font-size:0.9rem; color:var(--text-primary);">${post.action}</strong>
+        </div>
+        <span style="font-size:0.7rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">${post.software}</span>
+      </div>
+
+      <p style="font-size:0.8rem; color:var(--text-secondary); margin:0;">${post.desc}</p>
+
+      <ol style="font-size:0.75rem; color:var(--text-muted); padding-left:14px; margin:4px 0;">
+        ${stepsListHtml}
+      </ol>
+
+      <div style="font-size:0.75rem; color:var(--warning); font-weight:700;">💡 Pro Tip: ${post.proTip}</div>
+
+      <div style="display:flex; gap:8px; margin-top:6px; justify-content:flex-end;">
+        <button class="btn-action btn-primary-action" style="padding:4px 10px; font-size:0.75rem;" data-action="load-studio">Load in Creator Studio</button>
+        <button class="btn-action btn-secondary-action" style="padding:4px 10px; font-size:0.75rem;" data-action="add-db">+ Add to Calendar DB</button>
+      </div>
+    `;
+
+    cardEl.querySelector('[data-action="load-studio"]').onclick = () => {
+      loadCalendarItemToEditor(post);
+      document.querySelector('.nav-btn[data-tab="studio"]').click();
+      showToast(`Loaded "${post.action}" into Creator Studio!`);
+    };
+
+    cardEl.querySelector('[data-action="add-db"]').onclick = () => {
+      const maxDay = calendarDb.reduce((max, item) => Math.max(max, Number(item.day) || 0), 0);
+      post.day = maxDay + 1;
+      calendarDb.push(post);
+      localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+      updateCalendarProgress();
+      renderSidebarDaysList();
+      renderDatabaseManagerTable();
+      saveAllDataToSyncFile();
+      showToast(`✅ Added Day ${post.day}: "${post.action}" to Database!`, 'success');
+    };
+
+    importerParsedList.appendChild(cardEl);
+  });
+}
+
+if (btnImporterParse) btnImporterParse.addEventListener('click', parseAndRenderBulkPosts);
+if (btnImporterParseBottom) btnImporterParseBottom.addEventListener('click', parseAndRenderBulkPosts);
+
+if (btnImporterSaveAll) {
+  btnImporterSaveAll.addEventListener('click', () => {
+    if (currentParsedPosts.length === 0) return;
+
+    let maxDay = calendarDb.reduce((max, item) => Math.max(max, Number(item.day) || 0), 0);
+
+    currentParsedPosts.forEach(post => {
+      maxDay++;
+      const itemCopy = { ...post, day: maxDay };
+      calendarDb.push(itemCopy);
+    });
+
+    localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+    updateCalendarProgress();
+    renderSidebarDaysList();
+    renderDatabaseManagerTable();
+    saveAllDataToSyncFile();
+
+    showToast(`✅ Imported all ${currentParsedPosts.length} posts to database!`, 'success');
+  });
+}

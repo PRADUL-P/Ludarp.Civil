@@ -82,6 +82,15 @@
           </svg>
           Feed Grid
         </button>
+        <button class="nav-btn" data-tab="importer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/>
+            <line x1="9" y1="15" x2="15" y2="15"/>
+          </svg>
+          Bulk Post Importer
+        </button>
       </nav>
 
       <!-- Production Line (Calendar Days Sidebar) -->
@@ -860,6 +869,68 @@
         <!-- 3-Column Instagram Profile Grid Container -->
         <div id="feed-grid-container" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:16px;">
           <!-- Dynamically populated thumbnails by app.js -->
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 7: BULK CONTENT IMPORTER & PARSER        ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="importer-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>⚡ Bulk Post Importer Studio</h2>
+            <p>Paste structured text content to instantly generate ready-to-export posts</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-action btn-secondary-action" id="btn-importer-load-example">
+              📋 Load Example Format
+            </button>
+            <button class="btn-action btn-primary-action" id="btn-importer-parse">
+              ⚡ Parse & Build Posts
+            </button>
+          </div>
+        </header>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+          <!-- LEFT: Raw Text Input -->
+          <div class="card" style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label style="font-weight:800; font-size:0.9rem; color:var(--text-primary);">Paste Raw Post Content Below</label>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Separate multiple posts with <code>---</code></span>
+            </div>
+            
+            <textarea id="importer-text-input" rows="18" placeholder="Software: AutoCAD&#10;Shortcut: F8 / ORTHO&#10;Action: Turn On Ortho Mode&#10;Description: Locks your cursor to horizontal or vertical movement...&#10;Steps:&#10;1. Press F8 to toggle Ortho mode.&#10;2. With Ortho on, start LINE command.&#10;3. Notice line snaps to 90 degrees.&#10;Pro Tip: Turn off F8 when drawing angled walls.&#10;Hashtags: #autocad #cadhacks #beginnertips&#10;---&#10;Software: AutoCAD&#10;Shortcut: L&#10;Action: Draw a Line..." style="width:100%; font-family:var(--font-mono); font-size:0.82rem; line-height:1.6; padding:14px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); resize:vertical;"></textarea>
+
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button class="btn-action btn-primary-action" id="btn-importer-parse-bottom" style="flex:1;">
+                ⚡ Parse & Create Posts Now
+              </button>
+              <button class="btn-action btn-ghost-action" id="btn-importer-clear" style="font-size:0.8rem;">
+                🗑️ Clear Box
+              </button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Parsed Posts Preview & Direct Import -->
+          <div class="card" style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px;">
+              <h3 style="font-size:1rem; font-weight:800;">Parsed Posts (<span id="importer-parsed-count">0</span>)</h3>
+              <button class="btn-action btn-success-action" id="btn-importer-save-all" style="display:none; padding:6px 14px; font-size:0.78rem;">
+                ✅ Import All to Database
+              </button>
+            </div>
+
+            <div id="importer-empty-state" style="text-align:center; padding:60px 20px; color:var(--text-muted);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px; height:48px; margin-bottom:12px; opacity:0.4;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+              <p style="font-weight:700; font-size:0.9rem;">No posts parsed yet</p>
+              <p style="font-size:0.8rem; margin-top:4px; opacity:0.7;">Click <b>"Load Example Format"</b> or paste text on the left and click <b>"Parse & Build Posts"</b>.</p>
+            </div>
+
+            <!-- Parsed Cards List Container -->
+            <div id="importer-parsed-list" style="display:flex; flex-direction:column; gap:12px; max-height:520px; overflow-y:auto; padding-right:4px;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
         </div>
       </section>
 
