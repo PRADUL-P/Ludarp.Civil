@@ -3814,3 +3814,108 @@ function renderQuizQuestion() {
     optsContainer.appendChild(btn);
   });
 }
+
+// ==========================================================================
+// 19. Google Sheets Cloud Sync Engine
+// ==========================================================================
+const gsheetApiUrlInput = document.getElementById('gsheet-api-url');
+const btnGsheetFetch = document.getElementById('btn-gsheet-fetch');
+const btnGsheetPush = document.getElementById('btn-gsheet-push');
+const btnGsheetInstructions = document.getElementById('btn-gsheet-instructions');
+const gsheetSetupModal = document.getElementById('gsheet-setup-modal');
+const btnCloseGsheetModal = document.getElementById('btn-close-gsheet-modal');
+const btnCopyGsheetScript = document.getElementById('btn-copy-gsheet-script');
+
+// Load saved Google Sheet URL from LocalStorage
+if (gsheetApiUrlInput) {
+  const savedUrl = localStorage.getItem('ludarp_gsheet_url');
+  if (savedUrl) gsheetApiUrlInput.value = savedUrl;
+
+  gsheetApiUrlInput.addEventListener('change', () => {
+    localStorage.setItem('ludarp_gsheet_url', gsheetApiUrlInput.value.trim());
+  });
+}
+
+// Modal Toggle
+if (btnGsheetInstructions && gsheetSetupModal) {
+  btnGsheetInstructions.onclick = () => gsheetSetupModal.classList.remove('id-hidden');
+}
+if (btnCloseGsheetModal && gsheetSetupModal) {
+  btnCloseGsheetModal.onclick = () => gsheetSetupModal.classList.add('id-hidden');
+}
+
+// Copy Code Button
+if (btnCopyGsheetScript) {
+  btnCopyGsheetScript.onclick = () => {
+    const codeArea = document.getElementById('gsheet-script-code');
+    if (codeArea) {
+      codeArea.select();
+      navigator.clipboard.writeText(codeArea.value);
+      showToast('📋 Apps Script code copied to clipboard!', 'success');
+    }
+  };
+}
+
+// Fetch posts FROM Google Sheet
+if (btnGsheetFetch) {
+  btnGsheetFetch.onclick = async () => {
+    const url = gsheetApiUrlInput ? gsheetApiUrlInput.value.trim() : '';
+    if (!url) {
+      showToast('⚠️ Please enter your Google Apps Script or Published CSV URL first.', 'error');
+      return;
+    }
+
+    try {
+      showToast('⏳ Fetching live posts from Google Sheet...', 'info');
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (Array.isArray(data) && data.length > 0) {
+        // Parse arrays/JSON strings in fetched objects
+        const sanitized = data.map((item, i) => ({
+          ...item,
+          day: Number(item.day) || i + 1,
+          bullets: typeof item.bullets === 'string' ? JSON.parse(item.bullets || '[]') : (item.bullets || []),
+          hashtags: typeof item.hashtags === 'string' ? JSON.parse(item.hashtags || '[]') : (item.hashtags || [])
+        }));
+
+        calendarDb = sanitized;
+        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+        updateCalendarProgress();
+        renderSidebarDaysList();
+        renderDatabaseManagerTable();
+        saveAllDataToSyncFile();
+        showToast(`✅ Synced ${calendarDb.length} posts from Google Sheet Cloud!`, 'success');
+      } else {
+        showToast('⚠️ No post rows found in Google Sheet response.', 'warning');
+      }
+    } catch (err) {
+      console.error('Google Sheet Sync Error:', err);
+      showToast('❌ Failed to fetch from Google Sheet. Ensure URL is public or Apps Script web app is deployed.', 'error');
+    }
+  };
+}
+
+// Push posts TO Google Sheet
+if (btnGsheetPush) {
+  btnGsheetPush.onclick = async () => {
+    const url = gsheetApiUrlInput ? gsheetApiUrlInput.value.trim() : '';
+    if (!url) {
+      showToast('⚠️ Please enter your Google Apps Script Web App URL first.', 'error');
+      return;
+    }
+
+    try {
+      showToast('⏳ Pushing posts to Google Sheet Cloud...', 'info');
+      await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(calendarDb)
+      });
+      showToast(`📤 Successfully pushed ${calendarDb.length} posts to Google Sheet!`, 'success');
+    } catch (err) {
+      console.error('Google Sheet Push Error:', err);
+      showToast('❌ Failed to push to Google Sheet. Make sure your Apps Script has a doPost() function.', 'error');
+    }
+  };
+}

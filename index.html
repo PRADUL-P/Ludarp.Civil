@@ -820,8 +820,27 @@
               Import JSON
             </button>
             <input type="file" id="db-file-import-input" accept=".json" style="display:none">
-          </div>
         </header>
+
+        <!-- Google Sheets Cloud Sync Integration Card -->
+        <div class="card" style="padding:16px 20px; background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(56,189,248,0.08)); border:1px solid rgba(16,185,129,0.3); margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:36px; height:36px; border-radius:8px; background:#10b981; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.1rem;">📊</div>
+              <div>
+                <h3 style="font-size:0.95rem; font-weight:800; color:var(--text-primary); margin:0;">Google Sheets Cloud Sync API</h3>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin:2px 0 0 0;">Keep your master post database always synced to Google Sheets in the cloud</p>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; flex:1; max-width:550px; align-items:center;">
+              <input type="text" id="gsheet-api-url" placeholder="Paste Google Apps Script Web App URL or Published CSV URL..." style="flex:1; padding:8px 12px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary);">
+              <button class="btn-action btn-secondary-action" id="btn-gsheet-fetch" style="font-size:0.78rem; padding:8px 12px; white-space:nowrap;">📥 Sync FROM Cloud</button>
+              <button class="btn-action btn-primary-action" id="btn-gsheet-push" style="font-size:0.78rem; padding:8px 12px; white-space:nowrap;">📤 Push TO Cloud</button>
+              <button class="btn-action btn-ghost-action" id="btn-gsheet-instructions" style="font-size:0.78rem; padding:8px 12px;" title="Setup Instructions & Apps Script Code">❓ Setup</button>
+            </div>
+          </div>
+        </div>
 
         <!-- Stats Overview Cards -->
         <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:14px;">
@@ -1139,6 +1158,63 @@
           <button type="submit" class="btn-action btn-primary-action">Save Shortcut</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- GOOGLE SHEETS SETUP MODAL -->
+  <div id="gsheet-setup-modal" class="modal-overlay id-hidden">
+    <div class="modal-box" style="max-width:640px;">
+      <div class="modal-header">
+        <h3>📊 Google Sheets 2-Way Sync Setup Guide</h3>
+        <button class="modal-close" id="btn-close-gsheet-modal">&times;</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px; font-size:0.85rem; color:var(--text-primary); line-height:1.5;">
+        <p>Follow these 3 steps to link your master post database directly to a Google Sheet:</p>
+        
+        <ol style="padding-left:20px; display:flex; flex-direction:column; gap:8px;">
+          <li>Create a new <b>Google Sheet</b> in your Google Drive.</li>
+          <li>Open <b>Extensions ➔ Apps Script</b> in the top menu bar of Google Sheets.</li>
+          <li>Delete any existing code, paste the Apps Script code below, and click <b>Deploy ➔ New deployment ➔ Web app</b> (Select <i>Who has access: Anyone</i>).</li>
+          <li>Copy your generated <b>Web App URL</b> and paste it into the Cloud Sync bar!</li>
+        </ol>
+
+        <label style="font-weight:800; font-size:0.8rem; color:var(--accent); margin-top:6px;">📋 Apps Script Code:</label>
+        <textarea id="gsheet-script-code" rows="8" readonly style="font-family:var(--font-mono); font-size:0.75rem; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--r-md); padding:10px;">function doGet() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
+  var headers = data[0];
+  var result = [];
+  for (var i = 1; i < data.length; i++) {
+    var obj = {};
+    for (var j = 0; j < headers.length; j++) obj[headers[j]] = data[i][j];
+    result.push(obj);
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var items = JSON.parse(e.postData.contents);
+  sheet.clear();
+  if (items.length > 0) {
+    var headers = Object.keys(items[0]);
+    sheet.appendRow(headers);
+    items.forEach(function(item) {
+      var row = headers.map(function(h) { 
+        var val = item[h];
+        return (typeof val === 'object') ? JSON.stringify(val) : (val || ''); 
+      });
+      sheet.appendRow(row);
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
+}</textarea>
+        
+        <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+          <button class="btn-action btn-primary-action" id="btn-copy-gsheet-script" style="font-size:0.8rem;">📋 Copy Apps Script Code</button>
+        </div>
+      </div>
     </div>
   </div>
 
