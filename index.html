@@ -1178,37 +1178,45 @@
           <li>Copy your generated <b>Web App URL</b> and paste it into the Cloud Sync bar!</li>
         </ol>
 
-        <label style="font-weight:800; font-size:0.8rem; color:var(--accent); margin-top:6px;">📋 Apps Script Code:</label>
-        <textarea id="gsheet-script-code" rows="8" readonly style="font-family:var(--font-mono); font-size:0.75rem; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--r-md); padding:10px;">function doGet() {
+        <label style="font-weight:800; font-size:0.8rem; color:var(--accent); margin-top:6px;">📋 Apps Script Code (Updated — paste this exactly):</label>
+        <textarea id="gsheet-script-code" rows="16" readonly style="font-family:var(--font-mono); font-size:0.75rem; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--r-md); padding:10px;">function doGet(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
-  var headers = data[0];
-  var result = [];
-  for (var i = 1; i < data.length; i++) {
-    var obj = {};
-    for (var j = 0; j < headers.length; j++) obj[headers[j]] = data[i][j];
-    result.push(obj);
+  var output;
+  if (data.length <= 1) {
+    output = ContentService.createTextOutput("[]");
+  } else {
+    var headers = data[0];
+    var result = [];
+    for (var i = 1; i < data.length; i++) {
+      var obj = {};
+      for (var j = 0; j < headers.length; j++) obj[headers[j]] = data[i][j];
+      result.push(obj);
+    }
+    output = ContentService.createTextOutput(JSON.stringify(result));
   }
-  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  return output.setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var items = JSON.parse(e.postData.contents);
+  // Form POST sends data as e.parameter.data
+  var raw = (e.parameter && e.parameter.data) ? e.parameter.data : (e.postData ? e.postData.contents : '[]');
+  var items = JSON.parse(raw);
   sheet.clear();
   if (items.length > 0) {
     var headers = Object.keys(items[0]);
     sheet.appendRow(headers);
     items.forEach(function(item) {
-      var row = headers.map(function(h) { 
+      var row = headers.map(function(h) {
         var val = item[h];
-        return (typeof val === 'object') ? JSON.stringify(val) : (val || ''); 
+        return (typeof val === 'object') ? JSON.stringify(val) : (val || '');
       });
       sheet.appendRow(row);
     });
   }
-  return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify({ status: "success", rows: items.length }))
+    .setMimeType(ContentService.MimeType.JSON);
 }</textarea>
         
         <div style="display:flex; justify-content:flex-end; margin-top:10px;">

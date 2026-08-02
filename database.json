@@ -83,50 +83,7 @@
       "gridColor": "rgba(180,140,90,0.15)"
     }
   ],
-  "shortcuts": [
-    {
-      "id": "sc-01",
-      "software": "AutoCAD",
-      "phase": "basics",
-      "keys": "TR",
-      "action": "Trim Objects",
-      "desc": "Trims elements to meet the edges of other selected elements.",
-      "steps": [
-        "Type 'TR' on your keyboard and hit Enter.",
-        "Select cutting edges or press Enter to select all.",
-        "Click the parts of the lines you want to remove."
-      ],
-      "proTip": "Hold SHIFT while using Trim to quickly extend lines instead!"
-    },
-    {
-      "id": "sc-02",
-      "software": "AutoCAD",
-      "phase": "basics",
-      "keys": "EX",
-      "action": "Extend Objects",
-      "desc": "Extends lines or objects to meet the boundary edges of another object.",
-      "steps": [
-        "Press 'EX' on your keyboard and press Enter.",
-        "Select boundary edges or hit Enter to pick all objects as boundaries.",
-        "Click the lines you want to extend toward the boundary."
-      ],
-      "proTip": "Hold SHIFT while using Extend to switch into Trim mode on the fly!"
-    },
-    {
-      "id": "sc-03",
-      "software": "Revit",
-      "phase": "modeling",
-      "keys": "OF",
-      "action": "Offset Line or Wall",
-      "desc": "Creates a copy of a sketch line, model line, or wall at a parallel distance.",
-      "steps": [
-        "Press 'OF' on your keyboard to activate the Offset tool.",
-        "Hover over the face or edges and click once.",
-        "Drag your cursor inside or outside, type the offset dimension, and hit Enter."
-      ],
-      "proTip": "Double-click on any other face to repeat the exact same offset distance instantly!"
-    }
-  ],
+  "shortcuts": [],
   "calendar": [],
   "completed": []
 }

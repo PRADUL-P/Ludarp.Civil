@@ -3569,10 +3569,13 @@ function renderCheatSheet() {
   if (!grid) return;
   grid.innerHTML = '';
 
-  const posts = calendarDb.length > 0 ? calendarDb : parseRawTextToPosts(EXAMPLE_POST_TEXT);
+  const posts = calendarDb;
 
   if (posts.length === 0) {
-    grid.innerHTML = `<div style="grid-column:span 2; text-align:center; padding:40px; color:#64748b; font-weight:700;">No posts available to generate cheat sheet. Add posts in Bulk Importer!</div>`;
+    grid.innerHTML = `<div style="grid-column:span 2; text-align:center; padding:60px 20px; color:#64748b; font-weight:700;">
+      <p style="font-size:1.1rem; color:#0f2b46; margin-bottom:8px;">No posts in database yet</p>
+      <p style="font-size:0.85rem; font-weight:500;">Import your posts in ⚡ <b>Bulk Post Importer</b> or sync from 📊 <b>Google Sheets</b> to generate your printable PDF cheat sheet!</p>
+    </div>`;
     return;
   }
 
@@ -3897,25 +3900,61 @@ if (btnGsheetFetch) {
 }
 
 // Push posts TO Google Sheet
+// Google Apps Script blocks direct CORS POST from browsers.
+// Strategy: send as a form POST via a hidden iframe which bypasses CORS entirely.
 if (btnGsheetPush) {
-  btnGsheetPush.onclick = async () => {
+  btnGsheetPush.onclick = () => {
     const url = gsheetApiUrlInput ? gsheetApiUrlInput.value.trim() : '';
     if (!url) {
       showToast('⚠️ Please enter your Google Apps Script Web App URL first.', 'error');
       return;
     }
+    if (calendarDb.length === 0) {
+      showToast('⚠️ No posts to push. Add posts first!', 'error');
+      return;
+    }
 
     try {
-      showToast('⏳ Pushing posts to Google Sheet Cloud...', 'info');
-      await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(calendarDb)
-      });
-      showToast(`📤 Successfully pushed ${calendarDb.length} posts to Google Sheet!`, 'success');
+      showToast('⏳ Pushing posts to Google Sheet via form bridge...', 'info');
+
+      // Remove any old hidden form/iframe
+      const oldForm = document.getElementById('gsheet-push-form');
+      const oldFrame = document.getElementById('gsheet-push-frame');
+      if (oldForm) oldForm.remove();
+      if (oldFrame) oldFrame.remove();
+
+      // Create a hidden iframe as target (avoids page navigation)
+      const iframe = document.createElement('iframe');
+      iframe.name = 'gsheet-push-frame';
+      iframe.id = 'gsheet-push-frame';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      // Create a hidden form that posts to the Apps Script URL
+      const form = document.createElement('form');
+      form.id = 'gsheet-push-form';
+      form.method = 'POST';
+      form.action = url;
+      form.target = 'gsheet-push-frame';
+      form.style.display = 'none';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'data';
+      input.value = JSON.stringify(calendarDb);
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      // Show success after short delay (form submission is fire-and-forget)
+      setTimeout(() => {
+        showToast(`📤 Pushed ${calendarDb.length} posts to Google Sheet! Check your sheet to confirm rows appeared.`, 'success');
+      }, 2500);
+
     } catch (err) {
       console.error('Google Sheet Push Error:', err);
-      showToast('❌ Failed to push to Google Sheet. Make sure your Apps Script has a doPost() function.', 'error');
+      showToast('❌ Push failed: ' + err.message, 'error');
     }
   };
 }
