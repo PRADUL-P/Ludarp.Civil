@@ -200,6 +200,12 @@
           </svg>
           🔒 Logout Admin
         </button>
+        <button class="nav-btn" onclick="if(confirm('Clear cache and reload original database?')){localStorage.clear(); location.reload(true);}" style="color: var(--warning); border-top: 1px dashed var(--border); margin-top: 4px;" title="Clears local browser cache and restores clean database">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          🔄 Reset Cache & Reload
+        </button>
       </nav>
 
       <!-- Post Library Sidebar -->
@@ -1663,7 +1669,7 @@ function doPost(e) {
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Data & Logic -->
-  <script src="calendar_data.js"></script>
-  <script src="app.js"></script>
+  <script src="calendar_data.js?v=2.2"></script>
+  <script src="app.js?v=2.2"></script>
 </body>
 </html>
