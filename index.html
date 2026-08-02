@@ -3,41 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ludarp Civil Studio & Hub - Instagram Automation</title>
-  <!-- Google Fonts: Plus Jakarta Sans for UI, JetBrains Mono for Shortcuts -->
+  <title>Ludarp Civil Studio — AutoCAD Content Engine</title>
+  <meta name="description" content="Professional AutoCAD Instagram content creation studio for civil engineers. Create, schedule and export blueprint-styled posts.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Text:wght@700;800;900&family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <!-- html2canvas for client-side image generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
   <div class="app-container">
-    
-    <!-- Sidebar Navigation -->
+
+    <!-- ═══════════════════════════════════════════════════════
+         SIDEBAR NAVIGATION
+    ══════════════════════════════════════════════════════════ -->
     <aside class="sidebar">
+      <!-- Brand -->
       <div class="brand">
-        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
-        </svg>
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
+          </svg>
+        </div>
         <div class="brand-text">
           <h1>Ludarp Civil</h1>
-          <span>Studio & Hub</span>
+          <span>Content Engine v2</span>
         </div>
       </div>
-      
+
+      <!-- Navigation -->
       <nav class="nav-menu">
         <button class="nav-btn active" data-tab="studio">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <rect width="18" height="18" x="3" y="3" rx="2"/>
             <circle cx="9" cy="9" r="2"/>
             <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
           </svg>
           Creator Studio
         </button>
         <button class="nav-btn" data-tab="hub">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
             <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
             <line x1="12" y1="22.08" x2="12" y2="12"/>
@@ -45,325 +51,299 @@
           Shortcut Hub
         </button>
         <button class="nav-btn" data-tab="calendar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <rect width="18" height="18" x="3" y="4" rx="2"/>
             <line x1="16" y1="2" x2="16" y2="6"/>
             <line x1="8" y1="2" x2="8" y2="6"/>
             <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
           Content Calendar
         </button>
+        <button class="nav-btn" data-tab="research">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          </svg>
+          AI Research Hub
+        </button>
       </nav>
-      
+
+      <!-- Production Line (Calendar Days Sidebar) -->
+      <div id="sidebar-studio-context" class="sidebar-section">
+        <div class="sidebar-section-header">
+          <span class="sidebar-section-label">Production Line</span>
+          <span id="sidebar-progress-count" class="sidebar-badge">0 / 0</span>
+        </div>
+        <div class="sidebar-progress-bar-wrap">
+          <div id="sidebar-progress-bar" class="sidebar-progress-fill"></div>
+        </div>
+        <div id="sidebar-days-list" class="sidebar-days-list">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- DB Sync Controls -->
+      <div class="sidebar-sync-block">
+        <div class="sync-status-card">
+          <div class="sync-indicator" id="sync-dot"></div>
+          <div id="sync-status" class="sync-label">Local Sandbox</div>
+        </div>
+        <button class="btn-sync" id="btn-connect-file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;flex-shrink:0">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          Link JSON File
+        </button>
+        <div class="sync-backup-row">
+          <button class="btn-backup" id="btn-export-backup" title="Export backup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export
+          </button>
+          <button class="btn-backup" id="btn-import-backup" title="Import backup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Import
+          </button>
+        </div>
+        <input type="file" id="file-import-backup" accept=".json" style="display:none">
+      </div>
+
+      <!-- Footer -->
       <div class="sidebar-footer">
-        <p>Active Platform: <strong>Instagram</strong></p>
         <div class="pulse-indicator"></div>
+        <p>Instagram • Active</p>
       </div>
     </aside>
-    
-    <!-- Main Content Area -->
+
+    <!-- ═══════════════════════════════════════════════════════
+         MAIN CONTENT
+    ══════════════════════════════════════════════════════════ -->
     <main class="main-content">
-      
-      <!-- Tab 1: Creator Studio -->
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 1: CREATOR STUDIO                         ║
+           ╚══════════════════════════════════════════════════╝ -->
       <section id="studio-view" class="tab-view active">
-        <header class="view-header">
-          <div>
-            <h2>Creator Studio</h2>
-            <p>Generate highly stylized, ready-to-post graphics and copy for your Instagram feed.</p>
+
+        <!-- Studio Header -->
+        <header class="studio-header">
+          <div class="studio-header-left">
+            <div class="studio-day-nav">
+              <button class="btn-day-arrow" id="btn-prev" title="Previous Day">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <div class="studio-day-info">
+                <span id="day-sub" class="day-phase-badge">PHASE 1 — 2D BASICS</span>
+                <h2 id="day-title" class="day-title">Day 1: Trim Objects</h2>
+              </div>
+              <button class="btn-day-arrow" id="btn-next" title="Next Day">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
           </div>
-          <div class="canvas-toggle-group">
-            <button class="toggle-btn active" id="btn-format-square">Square Post (1:1)</button>
-            <button class="toggle-btn" id="btn-format-story">Story/Reel (9:16)</button>
+          <div class="studio-header-right">
+            <div class="canvas-toggle-group">
+              <button class="toggle-btn active" id="btn-format-square">1:1 Post</button>
+              <button class="toggle-btn" id="btn-format-story">9:16 Reel</button>
+            </div>
           </div>
         </header>
-        
+
+        <!-- Studio Body -->
         <div class="studio-layout">
-          <!-- Editor Controls Panel -->
+
+          <!-- LEFT: Editor Controls -->
           <div class="controls-panel card">
-            <div class="panel-section">
-              <h3>1. Branding Details</h3>
-              <div class="form-group">
-                <label for="brand-handle">Instagram Handle</label>
-                <div class="input-wrapper">
-                  <span class="input-prefix">@</span>
-                  <input type="text" id="brand-handle" placeholder="yourpage" value="ludarp_civil">
-                </div>
-              </div>
+
+            <!-- Card Type Toggle -->
+            <div class="type-toggle-group">
+              <button type="button" class="type-toggle-btn active" id="type-command">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                Single Command
+              </button>
+              <button type="button" class="type-toggle-btn" id="type-list">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Shortcut List
+              </button>
             </div>
-            
-            <div class="panel-section">
-              <h3>2. Style Theme</h3>
-              <div class="style-presets">
-                <button class="style-preset-btn active" data-style="blueprint" style="background: linear-gradient(135deg, #0e1e38, #0a1128); color: #38bdf8;">
-                  Blueprint Blue
-                </button>
-                <button class="style-preset-btn" data-style="slate-orange" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #f97316;">
-                  Tech Slate
-                </button>
-                <button class="style-preset-btn" data-style="neon-caution" style="background: linear-gradient(135deg, #09090b, #18181b); color: #eab308;">
-                  Caution Yellow
-                </button>
-                <button class="style-preset-btn" data-style="concrete" style="background: linear-gradient(135deg, #27272a, #3f3f46); color: #10b981;">
-                  Concrete Mint
-                </button>
-                <button class="style-preset-btn" id="custom-theme-trigger" data-style="custom">
-                  Custom...
-                </button>
-              </div>
-              
-              <!-- Custom Style Colors (Hidden unless Custom style selected) -->
-              <div id="custom-colors-container" class="custom-colors-grid hidden">
-                <div class="color-picker-group">
-                  <label for="color-bg-start">Bg Start</label>
-                  <input type="color" id="color-bg-start" value="#1e1b4b">
+
+            <!-- Form Fields -->
+            <div class="form-fields">
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="content-software">Software</label>
+                  <select id="content-software">
+                    <option value="AutoCAD">AutoCAD</option>
+                    <option value="Revit">Revit</option>
+                    <option value="Civil 3D">Civil 3D</option>
+                    <option value="ETABS">ETABS</option>
+                    <option value="SketchUp">SketchUp</option>
+                  </select>
                 </div>
-                <div class="color-picker-group">
-                  <label for="color-bg-end">Bg End</label>
-                  <input type="color" id="color-bg-end" value="#311042">
-                </div>
-                <div class="color-picker-group">
-                  <label for="color-accent">Accent</label>
-                  <input type="color" id="color-accent" value="#f43f5e">
-                </div>
-                <div class="color-picker-group">
-                  <label for="color-text">Text Color</label>
-                  <input type="color" id="color-text" value="#ffffff">
+                <div class="form-group">
+                  <label for="brand-handle">Handle</label>
+                  <div class="input-wrapper">
+                    <span class="input-prefix">@</span>
+                    <input type="text" id="brand-handle" placeholder="yourpage" value="ludarp_civil">
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div class="panel-section">
-              <h3>3. Shortcut Content</h3>
-              
-              <div class="form-group">
-                <label for="content-software">Software</label>
-                <select id="content-software">
-                  <option value="AutoCAD">AutoCAD</option>
-                  <option value="Revit">Revit</option>
-                  <option value="Civil 3D">Civil 3D</option>
-                  <option value="ETABS">ETABS</option>
-                  <option value="SketchUp">SketchUp</option>
-                </select>
-              </div>
-              
-              <div class="form-group">
+
+              <div class="form-group" id="key-field">
                 <label for="content-keys">Shortcut Keys</label>
-                <input type="text" id="content-keys" placeholder="e.g. TR, WA, F5" value="TR">
+                <input type="text" id="content-keys" placeholder="e.g. TR or NCOPY" value="TR">
               </div>
-              
+
               <div class="form-group">
-                <label for="content-action">Command Action</label>
-                <input type="text" id="content-action" placeholder="e.g. Trim Lines" value="Trim Objects">
+                <label for="content-action">Title / Action</label>
+                <input type="text" id="content-action" placeholder="e.g. Trim Objects" value="Trim Objects">
               </div>
-              
+
               <div class="form-group">
-                <label for="content-desc">Short Description</label>
-                <textarea id="content-desc" rows="2" placeholder="What does this shortcut do?">Trims elements to meet the edges of other selected elements.</textarea>
+                <label for="content-desc">Description</label>
+                <textarea id="content-desc" rows="2" placeholder="Explain the command briefly...">Trims elements to meet the edges of other selected elements.</textarea>
               </div>
-              
-              <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <label style="margin-bottom: 0;">Step-by-Step Instructions</label>
-                  <button type="button" id="btn-add-step" style="background: none; border: none; color: var(--accent-color); font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">+ Add Step</button>
+
+              <div class="form-group" id="steps-field">
+                <div class="steps-header">
+                  <label id="steps-label">Steps</label>
+                  <button type="button" id="btn-add-step" class="btn-add-step">+ Add Step</button>
                 </div>
                 <div id="steps-container">
-                  <div class="step-input-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">1</span>
-                    <input type="text" class="step-input" placeholder="Step 1" value="Type 'TR' on your keyboard and hit Enter." style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
-                    <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
-                  </div>
-                  <div class="step-input-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">2</span>
-                    <input type="text" class="step-input" placeholder="Step 2" value="Select cutting edges (optional) or press Enter for all." style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
-                    <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
-                  </div>
-                  <div class="step-input-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">3</span>
-                    <input type="text" class="step-input" placeholder="Step 3" value="Click the parts of the lines you want to remove." style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
-                    <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+                  <div class="step-input-row">
+                    <span class="step-number">1</span>
+                    <input type="text" class="step-input" placeholder="Step 1" value="Type 'TR' and press Enter.">
+                    <button type="button" class="btn-remove-step">&times;</button>
                   </div>
                 </div>
               </div>
-              
-              <div class="form-group">
-                <label for="content-pro-tip">Pro Tip (Value-Add Box)</label>
-                <input type="text" id="content-pro-tip" placeholder="e.g., Hold Shift while trimming to Extend instead!" value="Hold SHIFT while using Trim to quickly extend lines instead!">
+
+              <div class="form-group" id="protip-field">
+                <label for="content-pro-tip">Pro Tip</label>
+                <textarea id="content-pro-tip" rows="2" placeholder="Value-add pro tip...">Hold Shift while trimming to Extend lines instead.</textarea>
               </div>
-              
+
               <div class="form-group">
                 <label for="content-hashtags">Hashtags</label>
-                <textarea id="content-hashtags" rows="2" placeholder="e.g. #autocad #civilengineering #drafting" style="padding: 10px 14px; font-size: 0.85rem; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); width: 100%; font-family: var(--font-ui); resize: vertical;">#autocad #cadhacks #drafting #civilengineering</textarea>
+                <textarea id="content-hashtags" rows="2" placeholder="#autocad ...">#autocad #cadhacks #drafting #civilengineering</textarea>
               </div>
             </div>
-            
-            <div class="panel-section">
-              <h3>4. Bulk Export (Automation)</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
-                Render your entire shortcut library into a single ZIP file containing all post graphics and a matching captions list.
-              </p>
-              <div class="form-group">
-                <label>Filter Software to Include</label>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 4px;">
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: none; color: var(--text-primary); cursor: pointer;">
-                    <input type="checkbox" class="bulk-software-checkbox" value="AutoCAD" checked style="width: auto;"> AutoCAD
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: none; color: var(--text-primary); cursor: pointer;">
-                    <input type="checkbox" class="bulk-software-checkbox" value="Revit" checked style="width: auto;"> Revit
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: none; color: var(--text-primary); cursor: pointer;">
-                    <input type="checkbox" class="bulk-software-checkbox" value="Civil 3D" checked style="width: auto;"> Civil 3D
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: none; color: var(--text-primary); cursor: pointer;">
-                    <input type="checkbox" class="bulk-software-checkbox" value="ETABS" checked style="width: auto;"> ETABS
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: none; color: var(--text-primary); cursor: pointer;">
-                    <input type="checkbox" class="bulk-software-checkbox" value="SketchUp" checked style="width: auto;"> SketchUp
-                  </label>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button class="btn-action btn-primary-action" id="btn-export-image">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Image
+              </button>
+              <button class="btn-action btn-purple-action" id="btn-export-carousel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10M7 12h10M7 17h10"/></svg>
+                Export ZIP
+              </button>
+              <div class="btn-action-row">
+                <button class="btn-action btn-success-action" id="btn-mark-day-done" style="display:none; flex:1;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <span>Mark Done</span>
+                </button>
+                <button class="btn-action btn-secondary-action" id="btn-save-to-library" style="flex:1;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  Save to Hub
+                </button>
+              </div>
+              <button class="btn-action btn-ghost-action" id="btn-copy-caption">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copy Caption
+              </button>
+            </div>
+
+            <!-- Style Themes -->
+            <div class="style-themes-section">
+              <label class="theme-section-label">Visual Theme</label>
+              <div class="style-presets">
+                <button class="style-preset-btn active" data-style="blueprint" style="background:linear-gradient(135deg,#0a1628,#0d1f3c);color:#38bdf8;border-color:#1e3a5f">⬛ Blueprint</button>
+                <button class="style-preset-btn" data-style="obsidian" style="background:linear-gradient(135deg,#09090b,#18181b);color:#fff;border-color:#333">⚫ Obsidian</button>
+                <button class="style-preset-btn" data-style="amber" style="background:linear-gradient(135deg,#1c1407,#2d1f05);color:#f59e0b;border-color:#534109">🟡 Amber</button>
+                <button class="style-preset-btn" data-style="custom" id="custom-theme-trigger" style="background:linear-gradient(135deg,#18181b,#27272a);color:#94a3b8;border:1px dashed #555">🎨 Custom</button>
+              </div>
+              <div id="custom-colors-container" class="custom-colors-grid hidden">
+                <div class="color-picker-group">
+                  <label>BG Start</label>
+                  <input type="color" id="color-bg-start" value="#0a0a14">
+                </div>
+                <div class="color-picker-group">
+                  <label>BG End</label>
+                  <input type="color" id="color-bg-end" value="#12121f">
+                </div>
+                <div class="color-picker-group">
+                  <label>Accent</label>
+                  <input type="color" id="color-accent" value="#38bdf8">
+                </div>
+                <div class="color-picker-group">
+                  <label>Text</label>
+                  <input type="color" id="color-text" value="#f1f5f9">
                 </div>
               </div>
-              <button class="primary-btn" id="btn-bulk-export" style="width: 100%; margin-top: 10px; background-color: var(--success); color: #000000;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                  <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
-                  <polyline points="7.5 19.79 7.5 14.63 12 17.23 16.5 14.63 16.5 19.79"/>
-                  <polyline points="3.27 14.21 12 19.3 20.73 14.21"/>
-                  <polyline points="3.27 9.79 12 14.88 20.73 9.79"/>
-                </svg>
-                Bulk Generate & Download ZIP
-              </button>
-              
-              <!-- Progress Indicator -->
-              <div id="bulk-progress-container" class="id-hidden" style="margin-top: 14px; padding: 12px; background-color: var(--bg-tertiary); border-radius: 8px; border: 1px solid var(--border-color);">
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; margin-bottom: 6px;">
-                  <span id="bulk-progress-status" style="color: var(--accent-color);">Rendering Posts...</span>
-                  <span id="bulk-progress-percent">0%</span>
-                </div>
-                <div style="width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; position: relative;">
-                  <div id="bulk-progress-bar" style="width: 0%; height: 100%; background-color: var(--success); transition: width 0.1s ease;"></div>
-                </div>
-              </div>
             </div>
-            
-            <div class="panel-section">
-              <h3>5. AI Research & Generator</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
-                Provide any civil engineering topic (e.g., drawing contours, foundation sizing). The AI will research the web and generate the tool, shortcut keys, and instructions.
-              </p>
-              
-              <div class="form-group" style="margin-bottom: 12px;">
-                <label for="ai-api-key">Gemini API Key</label>
-                <input type="password" id="ai-api-key" placeholder="Enter Gemini API Key (stored locally)" style="padding: 10px 14px; font-size: 0.85rem;">
-              </div>
-              
-              <div class="form-group" style="margin-bottom: 12px;">
-                <label for="ai-prompt">Topic / Search Query</label>
-                <textarea id="ai-prompt" rows="2" placeholder="e.g. How to draw a survey contour boundary in Civil 3D" style="padding: 10px 14px; font-size: 0.85rem; resize: vertical;"></textarea>
-              </div>
-              
-              <button class="primary-btn" id="btn-ai-generate" style="width: 100%; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #ffffff; border: 1px solid rgba(168, 85, 247, 0.3);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon" style="color: #ffffff;">
-                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-                  <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"/>
-                  <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"/>
-                </svg>
-                Research & Generate Card
-              </button>
-              
-              <!-- AI Generation Loading State -->
-              <div id="ai-loading-container" class="id-hidden" style="margin-top: 14px; padding: 12px; background-color: var(--bg-tertiary); border-radius: 8px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;">
-                <div class="spinner" style="width: 20px; height: 20px; border: 2px solid var(--border-color); border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                <span id="ai-loading-text" style="font-size: 0.8rem; color: var(--text-secondary);">Researching shortcuts on Google...</span>
-              </div>
-            </div>
-            
-            <div class="panel-section">
-              <h3>6. Paste ChatGPT / Claude Draft</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
-                Paste any shortcut text generated by ChatGPT or Claude. The system will auto-extract keys, actions, steps, and tips.
-              </p>
-              
-              <div class="form-group" style="margin-bottom: 12px;">
-                <label for="ai-paste-input">AI Text Output</label>
-                <textarea id="ai-paste-input" rows="4" placeholder="Paste ChatGPT / Claude text here... e.g.&#10;Software: AutoCAD&#10;Shortcut: TR&#10;Action: Trim Lines&#10;Steps:&#10;1. Type TR&#10;2. Select line..." style="padding: 10px 14px; font-size: 0.85rem; resize: vertical; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); width: 100%; font-family: var(--font-ui);"></textarea>
-              </div>
-              
-              <button class="secondary-btn" id="btn-parse-paste" style="width: 100%; border: 1px solid var(--accent-color); color: var(--accent-color); background: transparent;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon" style="color: var(--accent-color); vertical-align: middle; margin-right: 4px;">
-                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-                </svg>
-                Parse & Populate Card
-              </button>
-            </div>
-            
-            <div class="panel-section actions-section">
-              <button class="primary-btn" id="btn-export-image" style="width: 100%; margin-bottom: 8px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7 10 12 15 17 10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Export Single Image
-              </button>
-              <button class="primary-btn" id="btn-export-carousel" style="width: 100%; margin-bottom: 8px; background: linear-gradient(135deg, #a855f7, #6366f1); color: white; border: none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon" style="color: white;">
-                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                  <path d="M7 7h10M7 12h10M7 17h10"/>
-                </svg>
-                Export Carousel (ZIP)
-              </button>
-              <button class="secondary-btn" id="btn-copy-caption" style="width: 100%;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-                </svg>
-                Copy Instagram Caption
-              </button>
-            </div>
+
           </div>
-          
-          <!-- Visual Live Preview Canvas -->
+
+          <!-- RIGHT: Live Preview Canvas -->
           <div class="preview-panel">
             <div class="preview-header">
-              <span>LIVE RENDER PREVIEW (SCALED FOR UI)</span>
-              <span id="preview-aspect-label">1080 x 1080 PX</span>
+              <div class="preview-header-left">
+                <div class="preview-live-dot"></div>
+                <span>LIVE PREVIEW</span>
+              </div>
+              <span id="preview-aspect-label" class="preview-size-label">1080 × 1080 PX</span>
             </div>
-            
-            <!-- Scaled container where actual 1080px canvas resides -->
-            <div class="canvas-outer-wrapper" id="canvas-wrapper-square">
-              <!-- Actual 1080x1080 canvas element rendered using CSS transform scaling -->
+
+            <div class="canvas-outer-wrapper" id="canvas-wrapper-square" style="position:relative;overflow:hidden">
+              <!-- CAD Crosshairs -->
+              <div id="cad-crosshair-h" style="position:absolute;left:0;width:100%;height:1px;border-top:1px dotted rgba(255,107,53,0.4);pointer-events:none;display:none;z-index:10;"></div>
+              <div id="cad-crosshair-v" style="position:absolute;top:0;width:1px;height:100%;border-left:1px dotted rgba(255,107,53,0.4);pointer-events:none;display:none;z-index:10;"></div>
+
+              <!-- Instagram Post Canvas -->
               <div id="instagram-post-canvas" class="instagram-card format-square theme-blueprint">
                 <div class="card-bg-grid"></div>
-                <div class="glow-orb orb-1"></div>
-                <div class="glow-orb orb-2"></div>
-                
-                <!-- Card Header: Branding and Software -->
+                <div class="card-watermark" id="card-watermark">A</div>
+
+                <!-- Crop Marks -->
+                <div class="viewport-crosshair ch-top-left"></div>
+                <div class="viewport-crosshair ch-top-right"></div>
+                <div class="viewport-crosshair ch-bottom-left"></div>
+                <div class="viewport-crosshair ch-bottom-right"></div>
+
+                <!-- Header Row -->
                 <div class="card-header-row">
                   <div class="software-badge">
                     <span id="card-software-name">AUTOCAD</span>
                   </div>
                   <div class="creator-tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="instagram-icon">
-                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                      <rect width="20" height="20" x="2" y="2" rx="5"/>
                       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
                     </svg>
                     <span id="card-handle-text">@ludarp_civil</span>
                   </div>
                 </div>
-                
-                <!-- Main Graphic Content -->
+
+                <!-- Body -->
                 <div class="card-body">
                   <div class="shortcut-box">
-                    <div class="key-pill" id="card-keys">TR</div>
+                    <div class="keycap-container">
+                      <div class="keycap" id="card-keys">TR</div>
+                    </div>
                     <div class="action-title" id="card-action">Trim Objects</div>
                   </div>
-                  
-                  <div class="card-description" id="card-desc">
-                    Trims elements to meet the edges of other selected elements.
-                  </div>
-                  
-                  <!-- Tutorial Steps -->
+                  <div class="card-description" id="card-desc">Trims elements to meet the edges of other selected elements.</div>
                   <div class="card-steps" id="card-steps-list">
                     <div class="card-step-item">
                       <div class="card-step-num">01</div>
@@ -371,7 +351,7 @@
                     </div>
                     <div class="card-step-item">
                       <div class="card-step-num">02</div>
-                      <div class="card-step-text">Select cutting edges (optional) or press Enter for all.</div>
+                      <div class="card-step-text">Select cutting edges or press Enter for all.</div>
                     </div>
                     <div class="card-step-item">
                       <div class="card-step-num">03</div>
@@ -379,183 +359,297 @@
                     </div>
                   </div>
                 </div>
-                
-                <!-- Value Add Banner -->
+
+                <!-- Footer -->
                 <div class="card-footer-row">
                   <div class="pro-tip-box">
+                    <div class="sticky-tape tape-left"></div>
+                    <div class="sticky-tape tape-right"></div>
                     <div class="pro-tip-tag">PRO TIP</div>
-                    <div class="pro-tip-text" id="card-pro-tip">
-                      Hold SHIFT while using Trim to quickly extend lines instead!
+                    <div class="pro-tip-text" id="card-pro-tip">Hold SHIFT while using Trim to quickly extend lines instead!</div>
+                  </div>
+                  <div class="footer-meta-container">
+                    <div class="cta-message">
+                      <span>Save for later</span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-icon"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                    </div>
+                    <div class="cad-title-block">
+                      <div class="tb-row">
+                        <div class="tb-cell cell-drawn" style="flex:2">
+                          <span class="tb-label">DRW BY</span>
+                          <span class="tb-value" id="tb-drawn-by">ludarp_civil</span>
+                        </div>
+                        <div class="tb-cell cell-rev" style="flex:1">
+                          <span class="tb-label">REV</span>
+                          <span class="tb-value" id="tb-rev">R0</span>
+                        </div>
+                      </div>
+                      <div class="tb-row">
+                        <div class="tb-cell cell-scale" style="flex:1">
+                          <span class="tb-label">SCALE</span>
+                          <span class="tb-value" id="tb-scale">1:1</span>
+                        </div>
+                        <div class="tb-cell cell-dwg" style="flex:2">
+                          <span class="tb-label">DWG NO</span>
+                          <span class="tb-value" id="tb-dwg-no">CAD-01</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="cta-message">
-                    <span>Save for later</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="cta-icon">
-                      <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
-                    </svg>
-                  </div>
                 </div>
+
+              </div><!-- /instagram-post-canvas -->
+            </div><!-- /canvas-outer-wrapper -->
+          </div><!-- /preview-panel -->
+
+        </div><!-- /studio-layout -->
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 2: SHORTCUT HUB                           ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="hub-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>Shortcut Hub</h2>
+            <p>Your library of saved CAD shortcuts — edit any card or bulk export.</p>
+          </div>
+          <button class="btn-action btn-primary-action" id="btn-open-add-modal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Shortcut
+          </button>
+        </header>
+
+        <!-- Search & Filters -->
+        <div class="hub-filters card">
+          <div class="hub-search-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hub-search-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="hub-search-input" placeholder="Search shortcuts, commands, descriptions…">
+          </div>
+          <div class="hub-filter-row">
+            <div class="hub-tab-btns" id="hub-software-tabs">
+              <button class="hub-tab-btn active" data-software="all">All</button>
+              <button class="hub-tab-btn" data-software="AutoCAD">AutoCAD</button>
+              <button class="hub-tab-btn" data-software="Revit">Revit</button>
+              <button class="hub-tab-btn" data-software="Civil 3D">Civil 3D</button>
+              <button class="hub-tab-btn" data-software="ETABS">ETABS</button>
+              <button class="hub-tab-btn" data-software="SketchUp">SketchUp</button>
+            </div>
+            <select id="hub-sort-select" style="flex-shrink:0">
+              <option value="recent">Recently Added</option>
+              <option value="alpha">A → Z</option>
+              <option value="software">By Software</option>
+            </select>
+          </div>
+          <div id="hub-phase-tabs" class="hub-tab-btns" style="margin-top:0">
+            <button class="hub-tab-btn active" data-phase="all">All Phases</button>
+            <button class="hub-tab-btn" data-phase="basics">Basics</button>
+            <button class="hub-tab-btn" data-phase="advanced">Advanced</button>
+            <button class="hub-tab-btn" data-phase="workflow">Workflow</button>
+          </div>
+          <p id="search-feedback-count" style="font-size:0.8rem;color:var(--text-muted);margin-top:4px"></p>
+        </div>
+
+        <!-- Shortcuts Grid -->
+        <div id="shortcuts-grid-container" class="shortcuts-grid"></div>
+
+        <!-- Bulk Export Section -->
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:12px">Bulk Export</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="AutoCAD" checked> AutoCAD</label>
+            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="Revit"> Revit</label>
+            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="Civil 3D"> Civil 3D</label>
+            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="ETABS"> ETABS</label>
+            <label class="bulk-check-label"><input type="checkbox" class="bulk-software-checkbox" value="SketchUp"> SketchUp</label>
+            <button class="btn-action btn-purple-action" id="btn-bulk-export">Export All as ZIP</button>
+          </div>
+          <div id="bulk-progress-container" class="id-hidden" style="margin-top:16px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span id="bulk-progress-status" style="font-size:0.8rem;color:var(--text-secondary)">Generating...</span>
+              <span id="bulk-progress-percent" style="font-size:0.8rem;color:var(--accent-color);font-weight:700">0%</span>
+            </div>
+            <div style="height:6px;background:var(--border-color);border-radius:4px;overflow:hidden">
+              <div id="bulk-progress-bar" style="height:100%;width:0%;background:var(--accent-color);transition:width 0.3s ease"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 3: CONTENT CALENDAR                       ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="calendar-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>Content Calendar</h2>
+            <p>83-day AutoCAD posting schedule — check off days as you post them.</p>
+          </div>
+          <select id="calendar-phase-select" style="min-width:180px">
+            <option value="all">All Phases</option>
+            <option value="Phase 1 & 2: 2D & 3D Basics">Phase 1&2 — Basics</option>
+            <option value="Phase 3: Advanced & Productivity">Phase 3 — Advanced</option>
+            <option value="Phase 4: Career & Workflow">Phase 4 — Workflow</option>
+          </select>
+        </header>
+
+        <div class="calendar-progress-bar card" style="padding:16px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-weight:700;font-size:0.9rem">Overall Progress</span>
+            <div style="display:flex;gap:10px;align-items:center">
+              <span id="calendar-progress-count" style="font-weight:800;color:var(--accent-color);font-family:var(--font-mono)">0 / 83</span>
+              <span id="calendar-progress-percent" style="font-size:0.8rem;color:var(--text-muted)">(0%)</span>
+            </div>
+          </div>
+          <div style="height:8px;background:var(--border-color);border-radius:6px;overflow:hidden">
+            <div id="calendar-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--success),#34d399);transition:width 0.4s ease;border-radius:6px"></div>
+          </div>
+        </div>
+
+        <div id="calendar-grid-container" class="calendar-grid"></div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 4: AI RESEARCH HUB                        ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="research-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>AI Research Hub</h2>
+            <p>Ground Gemini with Google Search to find accurate shortcut data and generate cards automatically.</p>
+          </div>
+        </header>
+
+        <div class="research-layout">
+          <!-- Left: Input -->
+          <div class="card" style="display:flex;flex-direction:column;gap:16px">
+            <div class="form-group">
+              <label for="ai-api-key">Gemini API Key</label>
+              <input type="password" id="ai-api-key" placeholder="AIza...">
+            </div>
+            <div class="form-group">
+              <label for="ai-prompt">Research Topic</label>
+              <textarea id="ai-prompt" rows="4" placeholder="e.g. AutoCAD Trim command, Civil 3D alignment creation, ETABS seismic load..."></textarea>
+            </div>
+            <button class="btn-action btn-primary-action" id="btn-ai-generate" style="width:100%">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              Generate with AI
+            </button>
+            <div id="ai-loading-container" class="id-hidden" style="display:flex;gap:10px;align-items:center;padding:12px;background:var(--bg-tertiary);border-radius:8px">
+              <div class="ai-spinner"></div>
+              <span id="ai-loading-text" style="font-size:0.85rem;color:var(--text-secondary)">Grounding on Google Search…</span>
+            </div>
+
+            <!-- Paste Importer -->
+            <div style="border-top:1px solid var(--border-color);padding-top:16px">
+              <label class="form-label" style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);display:block;margin-bottom:8px">Or Paste AI Output</label>
+              <textarea id="ai-paste-input" rows="5" placeholder="Paste ChatGPT/Claude response here..."></textarea>
+              <button class="btn-action btn-ghost-action" id="btn-parse-paste" style="width:100%;margin-top:8px">Parse & Fill Editor</button>
+            </div>
+          </div>
+
+          <!-- Right: Results -->
+          <div class="card">
+            <div id="research-empty-state" style="text-align:center;padding:48px 24px;color:var(--text-muted)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              <p style="font-weight:600">Enter a topic above and click Generate</p>
+            </div>
+            <div id="research-results-display" class="id-hidden">
+              <div class="research-result-row">
+                <span class="res-label">Software</span>
+                <span id="res-software" class="res-value"></span>
+              </div>
+              <div class="research-result-row">
+                <span class="res-label">Keys</span>
+                <span id="res-keys" class="res-value res-keys-value"></span>
+              </div>
+              <div class="research-result-row">
+                <span class="res-label">Action</span>
+                <span id="res-action" class="res-value"></span>
+              </div>
+              <div class="research-result-row">
+                <span class="res-label">Description</span>
+                <span id="res-desc" class="res-value" style="font-size:0.88rem;line-height:1.5"></span>
+              </div>
+              <div class="research-result-row">
+                <span class="res-label">Steps</span>
+                <ol id="res-steps" style="padding-left:16px;font-size:0.88rem;line-height:1.7;color:var(--text-secondary)"></ol>
+              </div>
+              <div class="research-result-row">
+                <span class="res-label">Pro Tip</span>
+                <span id="res-protip" class="res-value" style="font-size:0.88rem;color:var(--warning)"></span>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:16px">
+                <button class="btn-action btn-primary-action" id="btn-import-research-to-studio" style="flex:1">Load to Editor</button>
+                <button class="btn-action btn-secondary-action" id="btn-save-research-to-hub" style="flex:1">Save to Hub</button>
               </div>
             </div>
           </div>
         </div>
       </section>
-      
-      <!-- Tab 2: Shortcut Hub (Follower Directory) -->
-      <section id="hub-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>Shortcut Hub (Public Directory)</h2>
-            <p>Your followers visit this link-in-bio page to search, copy, and explore software shortcuts.</p>
-          </div>
-          <button class="primary-btn" id="btn-open-add-modal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Add Shortcut
-          </button>
-        </header>
-        
-        <!-- Filter and Search Bar -->
-        <div class="hub-filter-bar card">
-          <div class="search-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input type="text" id="hub-search-input" placeholder="Search by shortcut, action, or description...">
-          </div>
-          
-          <div class="hub-tabs">
-            <button class="hub-tab-btn active" data-software="all">All Software</button>
-            <button class="hub-tab-btn" data-software="AutoCAD">AutoCAD</button>
-            <button class="hub-tab-btn" data-software="Revit">Revit</button>
-            <button class="hub-tab-btn" data-software="Civil 3D">Civil 3D</button>
-            <button class="hub-tab-btn" data-software="ETABS">ETABS</button>
-            <button class="hub-tab-btn" data-software="SketchUp">SketchUp</button>
-          </div>
-          
-          <div class="hub-tabs" id="hub-phase-tabs" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
-            <button class="hub-tab-btn active" data-phase="all">All Phases</button>
-            <button class="hub-tab-btn" data-phase="basics">2D & 3D Basics</button>
-            <button class="hub-tab-btn" data-phase="advanced">Advanced Tips</button>
-            <button class="hub-tab-btn" data-phase="workflow">Workflow Compression</button>
-          </div>
-        </div>
-        
-        <!-- Shortcuts Grid -->
-        <div class="shortcuts-grid" id="shortcuts-grid-container">
-          <!-- Dynamic cards injected via JS -->
-        </div>
-      </section>
-      
-      <!-- Tab 3: Content Calendar -->
-      <section id="calendar-view" class="tab-view">
-        <header class="view-header">
-          <div>
-            <h2>AutoCAD Content Calendar</h2>
-            <p>Select any day of the 82-day AutoCAD curriculum to load, customize, and export.</p>
-          </div>
-          <div style="display: flex; gap: 12px; align-items: center;">
-            <select id="calendar-phase-select" style="padding: 8px 12px; border-radius: 8px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); font-family: var(--font-ui); font-size: 0.9rem; cursor: pointer;">
-              <option value="all">All Phases</option>
-              <option value="Phase 1 & 2: 2D & 3D Basics">Phase 1 & 2: 2D & 3D Basics</option>
-              <option value="Phase 3: Advanced Tips">Phase 3: Advanced Tips</option>
-              <option value="Phase 3.5: Workflow Compression">Phase 3.5: Workflow Compression</option>
-            </select>
-          </div>
-        </header>
 
-        <!-- Progress Tracker Banner -->
-        <div class="calendar-progress-banner card" style="display: flex; flex-direction: column; gap: 10px; padding: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 2px;">AutoCAD Posting Progress</h3>
-              <p style="font-size: 0.85rem; color: var(--text-secondary);">Track completed days and keep your posting calendar organized.</p>
-            </div>
-            <div style="text-align: right;">
-              <span id="calendar-progress-count" style="font-size: 1.5rem; font-weight: 800; color: var(--success);">0 / 83</span>
-              <span id="calendar-progress-percent" style="font-size: 0.9rem; color: var(--text-secondary); margin-left: 4px;">(0%)</span>
-            </div>
-          </div>
-          <div style="width: 100%; height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden;">
-            <div id="calendar-progress-bar" style="width: 0%; height: 100%; background-color: var(--success); transition: width 0.3s ease;"></div>
-          </div>
-        </div>
-
-        <!-- Calendar Days Grid -->
-        <div class="calendar-grid" id="calendar-grid-container">
-          <!-- Dynamic cards injected via JS -->
-        </div>
-      </section>
-      
     </main>
   </div>
-  
-  <!-- Modal: Add New Shortcut -->
-  <div class="modal-backdrop id-hidden" id="add-shortcut-modal">
-    <div class="modal card">
+
+  <!-- ═══════════════════════════════════════════════════════
+       ADD SHORTCUT MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div id="add-shortcut-modal" class="modal-overlay id-hidden">
+    <div class="modal-box">
       <div class="modal-header">
-        <h3>Add New Shortcut to Library</h3>
-        <button class="close-modal-btn" id="btn-close-modal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+        <h3>Add New Shortcut</h3>
+        <button class="modal-close" id="btn-close-modal">&times;</button>
       </div>
-      <form id="add-shortcut-form">
-        <div class="form-group">
-          <label for="modal-software">Software</label>
-          <select id="modal-software" required>
-            <option value="AutoCAD">AutoCAD</option>
-            <option value="Revit">Revit</option>
-            <option value="Civil 3D">Civil 3D</option>
-            <option value="ETABS">ETABS</option>
-            <option value="SketchUp">SketchUp</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="modal-phase">Phase</label>
-          <select id="modal-phase" required>
-            <option value="basics">2D & 3D Basics</option>
-            <option value="advanced">Advanced Tips</option>
-            <option value="workflow">Workflow Compression</option>
-          </select>
+      <form id="add-shortcut-form" class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="modal-software">Software</label>
+            <select id="modal-software">
+              <option value="AutoCAD">AutoCAD</option>
+              <option value="Revit">Revit</option>
+              <option value="Civil 3D">Civil 3D</option>
+              <option value="ETABS">ETABS</option>
+              <option value="SketchUp">SketchUp</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="modal-phase">Phase</label>
+            <select id="modal-phase">
+              <option value="basics">Basics</option>
+              <option value="advanced">Advanced</option>
+              <option value="workflow">Workflow</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
           <label for="modal-keys">Shortcut Keys</label>
           <input type="text" id="modal-keys" placeholder="e.g. TR" required>
         </div>
         <div class="form-group">
-          <label for="modal-action">Command Action</label>
+          <label for="modal-action">Action Title</label>
           <input type="text" id="modal-action" placeholder="e.g. Trim Objects" required>
         </div>
         <div class="form-group">
           <label for="modal-desc">Description</label>
-          <textarea id="modal-desc" rows="2" placeholder="Enter shortcut description..." required></textarea>
+          <textarea id="modal-desc" rows="2" placeholder="Brief description..."></textarea>
         </div>
         <div class="form-group">
-          <label for="modal-pro-tip">Pro Tip (Optional)</label>
-          <input type="text" id="modal-pro-tip" placeholder="e.g. Hold Shift to extend.">
+          <label for="modal-pro-tip">Pro Tip (optional)</label>
+          <textarea id="modal-pro-tip" rows="2" placeholder="Expert tip..."></textarea>
         </div>
         <div class="modal-footer">
-          <button type="button" class="secondary-btn" id="btn-cancel-modal">Cancel</button>
-          <button type="submit" class="primary-btn">Save Shortcut</button>
+          <button type="button" class="btn-action btn-ghost-action" id="btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-action btn-primary-action">Save Shortcut</button>
         </div>
       </form>
     </div>
   </div>
-  
-  <!-- Toast Notification System -->
-  <div class="toast-container" id="toast-container"></div>
-  
-  <!-- JSZip for Bulk Exports -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <!-- Content Calendar Data -->
+
+  <!-- Toast Notifications -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Data & Logic -->
   <script src="calendar_data.js"></script>
-  <!-- Core Logic Script -->
   <script src="app.js"></script>
 </body>
 </html>

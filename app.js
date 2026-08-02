@@ -181,6 +181,28 @@ let shortcutDb = JSON.parse(localStorage.getItem('ludarp_shortcuts')) || default
 // State variables
 let currentFormat = "square"; // "square" or "story"
 let activeStylePreset = "blueprint";
+let activeStudioShortcutId = null; // Track currently loaded shortcut from library
+let latestGeneratedResearch = null; // Store latest AI generated result object
+let fileHandle = null; // Stored FileSystemFileHandle for disk sync
+
+// Mutable calendar schedule database
+let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
+if (calendarDb.length === 0 && typeof autocadCalendar !== 'undefined') {
+  calendarDb = JSON.parse(JSON.stringify(autocadCalendar));
+  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+}
+let activeCalendarDayNum = "1"; // Default to day "1" string
+
+// Dynamic Sidebar Controls
+const sidebarStudioContext = document.getElementById('sidebar-studio-context');
+const sidebarDaysList = document.getElementById('sidebar-days-list');
+const sidebarProgressCount = document.getElementById('sidebar-progress-count');
+const sidebarProgressBar = document.getElementById('sidebar-progress-bar');
+const syncStatusText = document.getElementById('sync-status');
+const btnConnectFile = document.getElementById('btn-connect-file');
+const btnExportBackup = document.getElementById('btn-export-backup');
+const btnImportBackup = document.getElementById('btn-import-backup');
+const fileImportBackup = document.getElementById('file-import-backup');
 
 // DOM Elements
 const sidebarButtons = document.querySelectorAll('.nav-btn');
@@ -211,13 +233,23 @@ const cardAction = document.getElementById('card-action');
 const cardDesc = document.getElementById('card-desc');
 const cardStepsList = document.getElementById('card-steps-list');
 const cardProTip = document.getElementById('card-pro-tip');
+const cardWatermark = document.getElementById('card-watermark');
+
+// CAD Title Block Elements
+const tbDrawnBy = document.getElementById('tb-drawn-by');
+const tbScale = document.getElementById('tb-scale');
+const tbRev = document.getElementById('tb-rev');
+const tbDwgNo = document.getElementById('tb-dwg-no');
+const btnMarkDayDone = document.getElementById('btn-mark-day-done');
 
 // Action Buttons
 const btnExportImage = document.getElementById('btn-export-image');
 const btnExportCarousel = document.getElementById('btn-export-carousel');
+const btnSaveToLibrary = document.getElementById('btn-save-to-library');
 const btnCopyCaption = document.getElementById('btn-copy-caption');
 const stylePresetBtns = document.querySelectorAll('.style-preset-btn');
 const customColorsContainer = document.getElementById('custom-colors-container');
+
 
 // Custom Color Pickers
 const pickerBgStart = document.getElementById('color-bg-start');
@@ -227,6 +259,8 @@ const pickerText = document.getElementById('color-text');
 
 // Public Hub Elements
 const hubSearchInput = document.getElementById('hub-search-input');
+const hubSortSelect = document.getElementById('hub-sort-select');
+const searchFeedbackCount = document.getElementById('search-feedback-count');
 const hubTabBtns = document.querySelectorAll('.hub-tab-btn');
 const hubPhaseTabBtns = document.querySelectorAll('#hub-phase-tabs .hub-tab-btn');
 const shortcutsGridContainer = document.getElementById('shortcuts-grid-container');
@@ -256,6 +290,18 @@ const btnAiGenerate = document.getElementById('btn-ai-generate');
 const aiLoadingContainer = document.getElementById('ai-loading-container');
 const aiLoadingText = document.getElementById('ai-loading-text');
 
+// Research Hub Results Elements
+const researchEmptyState = document.getElementById('research-empty-state');
+const researchResultsDisplay = document.getElementById('research-results-display');
+const resSoftware = document.getElementById('res-software');
+const resKeys = document.getElementById('res-keys');
+const resAction = document.getElementById('res-action');
+const resDesc = document.getElementById('res-desc');
+const resSteps = document.getElementById('res-steps');
+const resProTip = document.getElementById('res-protip');
+const btnImportResearchToStudio = document.getElementById('btn-import-research-to-studio');
+const btnSaveResearchToHub = document.getElementById('btn-save-research-to-hub');
+
 // ChatGPT / Claude Importer Elements
 const aiPasteInput = document.getElementById('ai-paste-input');
 const btnParsePaste = document.getElementById('btn-parse-paste');
@@ -281,7 +327,8 @@ function updateCardPreview() {
   cardSoftwareName.textContent = softwareVal.toUpperCase();
   
   // Update keys & action title
-  cardKeys.textContent = contentKeysInput.value.trim() || "KEY";
+  const keysVal = contentKeysInput.value.trim() || "KEY";
+  cardKeys.textContent = keysVal;
   cardAction.textContent = contentActionInput.value.trim() || "Action Title";
   
   // Update description
@@ -306,6 +353,24 @@ function updateCardPreview() {
     }
   });
   
+  // Update CAD Title Block Elements dynamically
+  if (tbDrawnBy) {
+    tbDrawnBy.textContent = handleVal.replace('@', '').toLowerCase();
+  }
+  if (tbScale) {
+    const isStory = instagramCard && instagramCard.classList.contains('format-story');
+    tbScale.textContent = isStory ? "9:16" : "1:1";
+  }
+  if (tbRev) {
+    // Standard starting revision
+    tbRev.textContent = "R0";
+  }
+  if (tbDwgNo) {
+    const prefix = softwareVal.substring(0, 3).toUpperCase();
+    const sanitizedKey = keysVal.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    tbDwgNo.textContent = `${prefix}-${sanitizedKey}`;
+  }
+  
   // Update Pro Tip
   const proTipText = contentProTipInput.value.trim();
   const proTipBox = instagramCard.querySelector('.pro-tip-box');
@@ -315,15 +380,35 @@ function updateCardPreview() {
   } else {
     proTipBox.style.display = 'none';
   }
+
+  // Update background watermark letter
+  const watermarkMap = {
+    'AutoCAD':  'A',
+    'Revit':    'R',
+    'Civil 3D': 'C',
+    'ETABS':    'E',
+    'SketchUp': 'S'
+  };
+  if (cardWatermark) {
+    cardWatermark.textContent = watermarkMap[softwareVal] || softwareVal.charAt(0).toUpperCase();
+  }
 }
 
-// Bind event listeners to input elements for real-time visual syncing
+// Bind event listeners to input elements for real-time visual syncing and database auto-saving
 [brandHandleInput, contentSoftwareSelect, contentKeysInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput].forEach(el => {
-  if (el) el.addEventListener('input', updateCardPreview);
+  if (el) {
+    el.addEventListener('input', () => {
+      updateCardPreview();
+      saveCurrentDayData();
+    });
+  }
 });
 
 if (contentSoftwareSelect) {
-  contentSoftwareSelect.addEventListener('change', updateCardPreview);
+  contentSoftwareSelect.addEventListener('change', () => {
+    updateCardPreview();
+    saveCurrentDayData();
+  });
 }
 
 // Dynamic Steps Management
@@ -332,7 +417,10 @@ function bindStepRowEvents(row) {
   const btnRemove = row.querySelector('.btn-remove-step');
   
   if (input) {
-    input.addEventListener('input', updateCardPreview);
+    input.addEventListener('input', () => {
+      updateCardPreview();
+      saveCurrentDayData();
+    });
   }
   
   if (btnRemove) {
@@ -345,6 +433,7 @@ function bindStepRowEvents(row) {
       row.remove();
       reindexSteps();
       updateCardPreview();
+      saveCurrentDayData();
     });
   }
 }
@@ -376,6 +465,7 @@ if (btnAddStep) {
     bindStepRowEvents(newRow);
     newRow.querySelector('.step-input').focus();
     updateCardPreview();
+    saveCurrentDayData();
   });
 }
 
@@ -404,6 +494,11 @@ sidebarButtons.forEach(btn => {
         view.classList.add('active');
       }
     });
+    
+    // Toggle contextual sidebar elements
+    if (sidebarStudioContext) {
+      sidebarStudioContext.style.display = (targetTab === 'studio') ? 'block' : 'none';
+    }
     
     // If switching to hub view, reload grid
     if (targetTab === 'hub') {
@@ -465,10 +560,12 @@ function applyCustomColors() {
   softwareBadge.style.borderColor = accent;
   softwareBadge.style.color = accent;
   
-  const keyPill = instagramCard.querySelector('.key-pill');
-  keyPill.style.background = `linear-gradient(135deg, ${accent}, ${accent}cc)`;
-  keyPill.style.borderColor = '#ffffff';
-  keyPill.style.color = '#000000';
+  const keycap = instagramCard.querySelector('.keycap');
+  if (keycap) {
+    keycap.style.background = `linear-gradient(135deg, ${accent}, ${accent}cc)`;
+    keycap.style.borderColor = '#ffffff';
+    keycap.style.color = '#000000';
+  }
   
   const stepNums = instagramCard.querySelectorAll('.card-step-num');
   stepNums.forEach(num => num.style.color = accent);
@@ -486,40 +583,40 @@ function applyCustomColors() {
 }
 
 [pickerBgStart, pickerBgEnd, pickerAccent, pickerText].forEach(picker => {
-  picker.addEventListener('input', applyCustomColors);
+  if (picker) picker.addEventListener('input', applyCustomColors);
 });
 
 // ==========================================================================
 // 5. Canvas Format Swapping (Post aspect ratio scale)
 // ==========================================================================
 
-btnFormatSquare.addEventListener('click', () => {
-  currentFormat = "square";
-  btnFormatSquare.classList.add('active');
-  btnFormatStory.classList.remove('active');
-  
-  // Update Wrapper size for UI preview
-  canvasWrapper.id = "canvas-wrapper-square";
-  previewAspectLabel.textContent = "1080 x 1080 PX";
-  
-  // Re-class canvas
-  instagramCard.classList.remove('format-story');
-  instagramCard.classList.add('format-square');
-});
+if (btnFormatSquare) {
+  btnFormatSquare.addEventListener('click', () => {
+    currentFormat = "square";
+    btnFormatSquare.classList.add('active');
+    if (btnFormatStory) btnFormatStory.classList.remove('active');
+    if (canvasWrapper) canvasWrapper.id = "canvas-wrapper-square";
+    if (previewAspectLabel) previewAspectLabel.textContent = "1080 x 1080 PX";
+    if (instagramCard) {
+      instagramCard.classList.remove('format-story');
+      instagramCard.classList.add('format-square');
+    }
+  });
+}
 
-btnFormatStory.addEventListener('click', () => {
-  currentFormat = "story";
-  btnFormatStory.classList.add('active');
-  btnFormatSquare.classList.remove('active');
-  
-  // Update Wrapper size for UI preview
-  canvasWrapper.id = "canvas-wrapper-story";
-  previewAspectLabel.textContent = "1080 x 1920 PX";
-  
-  // Re-class canvas
-  instagramCard.classList.remove('format-square');
-  instagramCard.classList.add('format-story');
-});
+if (btnFormatStory) {
+  btnFormatStory.addEventListener('click', () => {
+    currentFormat = "story";
+    btnFormatStory.classList.add('active');
+    if (btnFormatSquare) btnFormatSquare.classList.remove('active');
+    if (canvasWrapper) canvasWrapper.id = "canvas-wrapper-story";
+    if (previewAspectLabel) previewAspectLabel.textContent = "1080 x 1920 PX";
+    if (instagramCard) {
+      instagramCard.classList.remove('format-square');
+      instagramCard.classList.add('format-story');
+    }
+  });
+}
 
 // ==========================================================================
 // 6. Export Instagram Card Image (html2canvas Clone Render)
@@ -640,7 +737,7 @@ function renderShortcutsHub() {
   
   shortcutsGridContainer.innerHTML = '';
   
-  const filtered = shortcutDb.filter(item => {
+  let filtered = shortcutDb.filter(item => {
     const matchesSoftware = activeSoftwareTab === 'all' || item.software === activeSoftwareTab;
     const matchesPhase = activePhaseTab === 'all' || (item.phase && item.phase === activePhaseTab);
     const matchesQuery = !query || 
@@ -653,11 +750,28 @@ function renderShortcutsHub() {
     return matchesSoftware && matchesPhase && matchesQuery;
   });
   
+  // Sort results
+  const sortVal = hubSortSelect ? hubSortSelect.value : 'recent';
+  if (sortVal === 'alpha') {
+    filtered.sort((a, b) => a.keys.localeCompare(b.keys));
+  } else if (sortVal === 'software') {
+    filtered.sort((a, b) => a.software.localeCompare(b.software));
+  }
+  
+  // Update matching results counter
+  if (searchFeedbackCount) {
+    if (query || activeSoftwareTab !== 'all' || activePhaseTab !== 'all') {
+      searchFeedbackCount.textContent = `Found ${filtered.length} shortcut${filtered.length === 1 ? '' : 's'} matching your filters.`;
+    } else {
+      searchFeedbackCount.textContent = `Showing all ${filtered.length} shortcuts in library.`;
+    }
+  }
+  
   if (filtered.length === 0) {
     shortcutsGridContainer.innerHTML = `
-      <div class="hub-empty-state card" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
-        <p>No shortcuts match your search or filter criteria.</p>
-        <span style="font-size: 0.8rem; color: var(--text-muted);">Try a different keyword or category.</span>
+      <div class="hub-empty-state card" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary); border: 2px dashed var(--border-color); border-radius: 12px;">
+        <p style="font-weight: 700; margin-bottom: 8px; font-size: 1.1rem; color: var(--accent-color);">No shortcuts found for "${query || 'your filters'}"</p>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Try AutoCAD command names like <strong>TR</strong>, <strong>CO</strong>, or check your active software / phase selectors.</span>
       </div>
     `;
     return;
@@ -750,6 +864,11 @@ function renderShortcutsHub() {
 // Load shortcut item properties into Creator Studio editor inputs
 // Load shortcut item properties into Creator Studio editor inputs
 function loadIntoCreatorStudio(item) {
+  // Update state variable to track the loaded item
+  activeStudioShortcutId = item.id;
+  activeCalendarDayNum = null;
+  if (btnMarkDayDone) btnMarkDayDone.style.display = 'none';
+  
   // Update inputs
   contentSoftwareSelect.value = item.software;
   contentKeysInput.value = item.keys;
@@ -791,6 +910,10 @@ if (hubSearchInput) {
   hubSearchInput.addEventListener('input', renderShortcutsHub);
 }
 
+if (hubSortSelect) {
+  hubSortSelect.addEventListener('change', renderShortcutsHub);
+}
+
 hubTabBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     if (!btn.hasAttribute('data-software')) return;
@@ -807,6 +930,151 @@ if (hubPhaseTabBtns) {
       btn.classList.add('active');
       renderShortcutsHub();
     });
+  });
+}
+
+// Save Creator Studio Card to Hub Library
+if (btnSaveToLibrary) {
+  btnSaveToLibrary.addEventListener('click', () => {
+    const keysVal = contentKeysInput.value.trim();
+    const actionVal = contentActionInput.value.trim();
+    if (!keysVal || !actionVal) {
+      showToast("Keys and action title are required to save to library.", "warning");
+      return;
+    }
+    
+    const softwareVal = contentSoftwareSelect.value;
+    const descVal = contentDescInput.value.trim() || "Manual shortcut draft";
+    const proTipVal = contentProTipInput.value.trim();
+    
+    const stepsVal = [];
+    getStepInputs().forEach(input => {
+      const text = input.value.trim();
+      if (text) stepsVal.push(text);
+    });
+    if (stepsVal.length === 0) {
+      stepsVal.push(`Type '${keysVal}' to activate the command.`);
+    }
+    
+    if (activeStudioShortcutId) {
+      const index = shortcutDb.findIndex(item => item.id === activeStudioShortcutId);
+      if (index !== -1) {
+        shortcutDb[index].software = softwareVal;
+        shortcutDb[index].keys = keysVal;
+        shortcutDb[index].action = actionVal;
+        shortcutDb[index].desc = descVal;
+        shortcutDb[index].steps = stepsVal;
+        shortcutDb[index].proTip = proTipVal;
+        
+        localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+        renderShortcutsHub();
+        saveAllDataToSyncFile();
+        showToast("Shortcut card updated in Hub library!");
+        return;
+      }
+    }
+    
+    // Create new entry
+    const id = `item-${Math.random().toString(36).substr(2, 9)}`;
+    const newShortcut = {
+      id,
+      software: softwareVal,
+      phase: 'basics',
+      keys: keysVal,
+      action: actionVal,
+      desc: descVal,
+      steps: stepsVal,
+      proTip: proTipVal
+    };
+    
+    shortcutDb.unshift(newShortcut);
+    activeStudioShortcutId = id;
+    localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+    renderShortcutsHub();
+    saveAllDataToSyncFile();
+    showToast("Saved as new shortcut card in Hub library!");
+  });
+}
+
+// ==========================================================================
+// Backup & Recovery Exporter/Importer (single registration)
+// ==========================================================================
+
+// Connect file system trigger binding
+if (btnConnectFile) btnConnectFile.addEventListener('click', connectLocalFile);
+
+// Export full backup
+if (btnExportBackup) {
+  btnExportBackup.addEventListener('click', () => {
+    try {
+      const backupData = {
+        version: "1.0",
+        timestamp: new Date().toISOString(),
+        shortcuts: shortcutDb,
+        calendar: calendarDb,
+        completed: Array.from(completedCalendarDays)
+      };
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ludarp_civil_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast("Library backup exported successfully!");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to export backup.", "error");
+    }
+  });
+}
+
+// Import backup JSON with backward compatibility
+if (btnImportBackup && fileImportBackup) {
+  btnImportBackup.addEventListener('click', () => fileImportBackup.click());
+  fileImportBackup.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const imported = JSON.parse(evt.target.result);
+        if (!imported.shortcuts || !Array.isArray(imported.shortcuts)) {
+          showToast("Invalid backup file format. Missing shortcuts data.", "error");
+          return;
+        }
+        
+        if (confirm(`Are you sure you want to import ${imported.shortcuts.length} shortcuts and overwrite your library?`)) {
+          shortcutDb = imported.shortcuts;
+          localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+          
+          let progressList = null;
+          if (imported.completed && Array.isArray(imported.completed)) {
+            progressList = imported.completed;
+          } else if (imported.calendarProgress && Array.isArray(imported.calendarProgress)) {
+            progressList = imported.calendarProgress;
+          }
+          
+          if (progressList) {
+            completedCalendarDays = new Set(progressList);
+            localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
+            updateCalendarProgress();
+            renderCalendarHub();
+            renderSidebarDaysList();
+          }
+          
+          renderShortcutsHub();
+          saveAllDataToSyncFile();
+          showToast("Library and progress restored successfully!");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Error reading file. Make sure it's valid JSON.", "error");
+      }
+      fileImportBackup.value = '';
+    };
+    reader.readAsText(file);
   });
 }
 
@@ -855,6 +1123,7 @@ addShortcutForm.addEventListener('submit', (e) => {
   
   closeModal();
   renderShortcutsHub();
+  saveAllDataToSyncFile();
   showToast("New shortcut saved to library!");
 });
 
@@ -1095,7 +1364,7 @@ btnAiGenerate.addEventListener('click', async () => {
   const topic = aiPromptInput.value.trim();
   
   if (!apiKey) {
-    showToast("Please enter a valid Gemini API Key in section 5.", "warning");
+    showToast("Please enter a valid Gemini API Key on the left.", "warning");
     return;
   }
   
@@ -1107,13 +1376,15 @@ btnAiGenerate.addEventListener('click', async () => {
   // Update UI loading states
   btnAiGenerate.disabled = true;
   btnAiGenerate.style.opacity = '0.5';
-  aiLoadingContainer.classList.remove('id-hidden');
-  aiLoadingText.textContent = "Searching the web for engineering tools...";
+  if (aiLoadingContainer) {
+    aiLoadingContainer.classList.remove('id-hidden');
+    aiLoadingText.textContent = "Grounding on Google Search & generating card...";
+  }
   
   const systemPrompt = `You are a professional Civil Engineering content writer. The user wants to generate an Instagram post for a shortcut related to: "${topic}".
   
   YOUR INSTRUCTIONS:
-  1. Use the googleSearch tool to perform search queries to find the exact software, official command name, and keyboard shortcut keys used for this topic.
+  1. Use the googleSearchRetrieval tool to perform search queries to find the exact software, official command name, and keyboard shortcut keys used for this topic.
   2. Identify the most popular and industry-standard software (AutoCAD, Revit, Civil 3D, ETABS, or SketchUp).
   3. Extract or deduce the primary keyboard shortcut (e.g. TR for Trim in AutoCAD, WA for Wall in Revit, F5 for Run Analysis in ETABS, or ALIGNMENT for Civil 3D alignments).
   4. Generate a detailed, engaging description of what the tool does.
@@ -1148,7 +1419,7 @@ btnAiGenerate.addEventListener('click', async () => {
           }]
         }],
         tools: [{
-          googleSearch: {}
+          googleSearchRetrieval: {} // Corrected tool name for Google Search Grounding
         }],
         generationConfig: {
           responseMimeType: "application/json"
@@ -1170,45 +1441,121 @@ btnAiGenerate.addEventListener('click', async () => {
     
     // Parse response JSON
     const data = JSON.parse(responseText);
+    latestGeneratedResearch = data; // Store in state variable
     
-    // Populate form fields
-    // A. Handle software selection option mapping
-    const softwareOptions = Array.from(contentSoftwareSelect.options).map(opt => opt.value);
-    let matchedSoftware = data.software;
+    // Display results in Research tab
+    if (resSoftware) resSoftware.textContent = data.software || 'AutoCAD';
+    if (resKeys) resKeys.textContent = data.keys || 'SHORTCUT';
+    if (resAction) resAction.textContent = data.action || 'Command';
+    if (resDesc) resDesc.textContent = data.desc || '';
+    if (resProTip) resProTip.textContent = data.proTip || 'Save this post!';
     
-    if (!softwareOptions.includes(matchedSoftware)) {
-      // Create new option dynamically if not present
-      const newOpt = new Option(matchedSoftware, matchedSoftware);
-      contentSoftwareSelect.add(newOpt);
-    }
-    contentSoftwareSelect.value = matchedSoftware;
-    
-    // B. Set input texts
-    contentKeysInput.value = data.keys || '';
-    contentActionInput.value = data.action || '';
-    contentDescInput.value = data.desc || '';
-    contentProTipInput.value = data.proTip || '';
-    
-    // C. Set steps
-    for (let i = 0; i < stepInputs.length; i++) {
-      stepInputs[i].value = data.steps?.[i] || '';
+    if (resSteps) {
+      resSteps.innerHTML = '';
+      const stepsList = data.steps || [];
+      stepsList.forEach(stepText => {
+        const li = document.createElement('li');
+        li.textContent = stepText;
+        resSteps.appendChild(li);
+      });
     }
     
-    // D. Trigger live update
-    updateCardPreview();
-    showToast(`AI successfully generated card details for ${data.software}!`);
-    aiPromptInput.value = ''; // clear prompt input
+    // Toggle displays
+    if (researchEmptyState) researchEmptyState.classList.add('id-hidden');
+    if (researchResultsDisplay) researchResultsDisplay.classList.remove('id-hidden');
+    
+    showToast("AI successfully researched details! Review on the right.");
+    aiPromptInput.value = '';
     
   } catch (error) {
     console.error("AI Generation Error: ", error);
     showToast(error.message || "Failed to generate shortcut. Check console.", "error");
   } finally {
-    // Restore button and hide loading status
     btnAiGenerate.disabled = false;
     btnAiGenerate.style.opacity = '1';
-    aiLoadingContainer.classList.add('id-hidden');
+    if (aiLoadingContainer) aiLoadingContainer.classList.add('id-hidden');
   }
 });
+
+// Import Researched Data to Creator Studio Editor
+if (btnImportResearchToStudio) {
+  btnImportResearchToStudio.addEventListener('click', () => {
+    if (!latestGeneratedResearch) {
+      showToast("No generated research found.", "warning");
+      return;
+    }
+    
+    const data = latestGeneratedResearch;
+    activeStudioShortcutId = null; // Reset edit ID since this is a new draft imported
+    
+    // Software
+    const softwareOptions = Array.from(contentSoftwareSelect.options).map(opt => opt.value);
+    if (!softwareOptions.includes(data.software)) {
+      const newOpt = new Option(data.software, data.software);
+      contentSoftwareSelect.add(newOpt);
+    }
+    contentSoftwareSelect.value = data.software || 'AutoCAD';
+    
+    // Fields
+    contentKeysInput.value = data.keys || '';
+    contentActionInput.value = data.action || '';
+    contentDescInput.value = data.desc || '';
+    contentProTipInput.value = data.proTip || '';
+    
+    // Steps
+    stepsContainer.innerHTML = '';
+    const steps = data.steps || [];
+    if (steps.length === 0) steps.push("Execute the command.");
+    steps.forEach((stepText, index) => {
+      const row = document.createElement('div');
+      row.className = 'step-input-row';
+      row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+      row.innerHTML = `
+        <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${index + 1}</span>
+        <input type="text" class="step-input" placeholder="Step ${index + 1}" value="${stepText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+        <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+      `;
+      stepsContainer.appendChild(row);
+      bindStepRowEvents(row);
+    });
+    
+    updateCardPreview();
+    
+    // Switch to studio tab
+    document.querySelector('.nav-btn[data-tab="studio"]').click();
+    showToast("Loaded AI researched draft into Creator Studio!");
+  });
+}
+
+// Save Researched Data directly to Hub Library
+if (btnSaveResearchToHub) {
+  btnSaveResearchToHub.addEventListener('click', () => {
+    if (!latestGeneratedResearch) {
+      showToast("No generated research found.", "warning");
+      return;
+    }
+    
+    const data = latestGeneratedResearch;
+    const id = `item-${Math.random().toString(36).substr(2, 9)}`;
+    
+    const newShortcut = {
+      id,
+      software: data.software || 'AutoCAD',
+      phase: 'basics',
+      keys: data.keys || 'SHORTCUT',
+      action: data.action || 'Command Action',
+      desc: data.desc || 'AI-researched tool details',
+      steps: data.steps || ['Execute the tool.'],
+      proTip: data.proTip || ''
+    };
+    
+    shortcutDb.unshift(newShortcut);
+    localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+    renderShortcutsHub();
+    saveAllDataToSyncFile();
+    showToast("Successfully saved researched shortcut directly to Hub Library!");
+  });
+}
 
 // ==========================================================================
 // 10.7 Content Calendar Manager Logic
@@ -1303,6 +1650,16 @@ function renderCalendarHub() {
       }
       localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
       updateCalendarProgress();
+      renderSidebarDaysList();
+      saveAllDataToSyncFile();
+      
+      // Sync editor state if active day changed
+      if (String(activeCalendarDayNum) === String(dayNum)) {
+        const activePost = calendarDb.find(p => String(p.day) === String(dayNum));
+        if (activePost) {
+          loadCalendarItemToEditor(activePost);
+        }
+      }
     });
     
     // Bind load into creator studio
@@ -1328,9 +1685,27 @@ function updateCalendarProgress() {
 }
 
 function loadCalendarItemToEditor(item) {
-  // Reset software and select AutoCAD since this is AutoCAD calendar
-  contentSoftwareSelect.value = 'AutoCAD';
+  // Set loaded calendar day number
+  activeCalendarDayNum = item.day;
   
+  // Update Mark Day Done button state
+  if (btnMarkDayDone) {
+    btnMarkDayDone.style.display = 'flex';
+    const isCompleted = completedCalendarDays.has(String(item.day));
+    if (isCompleted) {
+      btnMarkDayDone.querySelector('span').textContent = 'Posted ✓';
+      btnMarkDayDone.style.borderColor = 'var(--success)';
+      btnMarkDayDone.style.color = 'var(--success)';
+    } else {
+      btnMarkDayDone.querySelector('span').textContent = 'Mark Day Done';
+      btnMarkDayDone.style.borderColor = 'var(--border-color)';
+      btnMarkDayDone.style.color = 'var(--text-secondary)';
+    }
+  }
+
+  // Reset loaded library shortcut tracking since we are starting fresh with a calendar day
+  activeStudioShortcutId = null;
+
   // Clean titles to separate keys and action
   let keys = `DAY ${item.day}`;
   let action = item.title;
@@ -1340,6 +1715,15 @@ function loadCalendarItemToEditor(item) {
     keys = colonMatch[1].trim();
     action = colonMatch[2].trim();
   }
+
+  // Update Studio View Headers dynamically
+  const dayTitleEl = document.getElementById('day-title');
+  const daySubEl = document.getElementById('day-sub');
+  if (dayTitleEl) dayTitleEl.textContent = `Day ${item.day}: ${action}`;
+  if (daySubEl) daySubEl.textContent = (item.phase || '').toUpperCase();
+
+  // Reset software and select AutoCAD since this is AutoCAD calendar
+  contentSoftwareSelect.value = item.software || 'AutoCAD';
   
   // Set values in Creator Studio inputs
   contentKeysInput.value = keys;
@@ -1357,24 +1741,58 @@ function loadCalendarItemToEditor(item) {
   contentDescInput.value = descText;
   
   // Set pro-tip if any
-  contentProTipInput.value = (item.hashtags && item.hashtags.length > 0) ? `Tags: ${item.hashtags.join(' ')}` : 'Save this post for your next project!';
+  contentProTipInput.value = (item.proTip) ? item.proTip : (item.hashtags && item.hashtags.length > 0) ? `Tags: ${item.hashtags.join(' ')}` : 'Save this post for your next project!';
   
-  // Map steps
-  if (item.bullets && item.bullets.length > 0) {
-    // Bullets are steps
-    for (let i = 0; i < stepInputs.length; i++) {
-      stepInputs[i].value = item.bullets[i] || '';
-    }
-  } else if (item.script) {
-    // Reel script mapping
-    stepInputs[0].value = `Hook: ${action}`;
-    stepInputs[1].value = `Demo: ${item.script.substring(0, 70)}...`;
-    stepInputs[2].value = `Caption tip: ${item.caption ? item.caption.substring(0, 70) : 'Learn this!'}`;
+  // Set hashtags if any
+  if (contentHashtagsInput) {
+    contentHashtagsInput.value = item.hashtags ? (Array.isArray(item.hashtags) ? item.hashtags.join(' ') : item.hashtags) : '#autocad #civilengineering #drafting';
+  }
+
+  // Auto-detect command type (Single Command vs List)
+  const isList = item.type === 'list' || (item.bullets && item.bullets.length > 5);
+  setType(isList ? 'list' : 'command', false);
+
+  // Re-generate steps container inputs based on item content
+  stepsContainer.innerHTML = '';
+  const listItems = item.bullets || item.items || [];
+  if (listItems.length > 0) {
+    listItems.forEach((bulletText, index) => {
+      const row = document.createElement('div');
+      row.className = 'step-input-row';
+      row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+      row.innerHTML = `
+        <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${index + 1}</span>
+        <input type="text" class="step-input" placeholder="Step ${index + 1}" value="${bulletText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+        <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+      `;
+      stepsContainer.appendChild(row);
+      bindStepRowEvents(row);
+    });
   } else {
-    // General steps fallback
-    stepInputs[0].value = `Launch AutoCAD software.`;
-    stepInputs[1].value = `Type command: ${keys} and press Enter.`;
-    stepInputs[2].value = `Execute the drawing action on screen.`;
+    // Reel script mapping or fallback
+    const fallbackSteps = [];
+    if (item.script) {
+      fallbackSteps.push(`Hook: ${action}`);
+      fallbackSteps.push(`Demo: ${item.script.substring(0, 70)}...`);
+      fallbackSteps.push(`Caption tip: ${item.caption ? item.caption.substring(0, 70) : 'Learn this!'}`);
+    } else {
+      fallbackSteps.push(`Launch AutoCAD software.`);
+      fallbackSteps.push(`Type command: ${keys} and press Enter.`);
+      fallbackSteps.push(`Execute the drawing action on screen.`);
+    }
+    
+    fallbackSteps.forEach((stepText, index) => {
+      const row = document.createElement('div');
+      row.className = 'step-input-row';
+      row.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+      row.innerHTML = `
+        <span class="step-number" style="font-weight: 700; min-width: 15px; color: var(--accent-color);">${index + 1}</span>
+        <input type="text" class="step-input" placeholder="Step ${index + 1}" value="${stepText}" style="flex-grow: 1; padding: 8px 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: var(--font-ui); font-size: 0.85rem;">
+        <button type="button" class="btn-remove-step" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 4px;">&times;</button>
+      `;
+      stepsContainer.appendChild(row);
+      bindStepRowEvents(row);
+    });
   }
   
   // Sync view
@@ -1387,6 +1805,39 @@ function loadCalendarItemToEditor(item) {
 
 if (calendarPhaseSelect) {
   calendarPhaseSelect.addEventListener('change', renderCalendarHub);
+}
+
+if (btnMarkDayDone) {
+  btnMarkDayDone.addEventListener('click', () => {
+    if (!activeCalendarDayNum) return;
+    const dayStr = String(activeCalendarDayNum);
+    // Use mutable calendarDb (not static autocadCalendar)
+    const post = calendarDb.find(p => String(p.day) === dayStr);
+    
+    if (completedCalendarDays.has(dayStr)) {
+      completedCalendarDays.delete(dayStr);
+      showToast(`Day ${dayStr} marked as Pending.`);
+    } else {
+      completedCalendarDays.add(dayStr);
+      showToast(`✅ Day ${dayStr} marked as Done!`, 'success');
+    }
+    
+    localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
+    updateCalendarProgress();
+    renderCalendarHub();
+    renderSidebarDaysList();
+    saveAllDataToSyncFile();
+    
+    // Auto-advance to next day after marking done
+    const idx = calendarDb.findIndex(p => String(p.day) === dayStr);
+    if (idx !== -1 && idx < calendarDb.length - 1 && completedCalendarDays.has(dayStr)) {
+      const nextPost = calendarDb[idx + 1];
+      activeCalendarDayNum = nextPost.day;
+      setTimeout(() => loadCalendarItemToEditor(nextPost), 500);
+    } else if (post) {
+      loadCalendarItemToEditor(post);
+    }
+  });
 }
 
 
@@ -1691,6 +2142,7 @@ if (btnParsePaste) {
       if (importCount > 0) {
         localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
         renderShortcutsHub();
+        saveAllDataToSyncFile();
         aiPasteInput.value = '';
         showToast(`Successfully imported ${importCount} shortcuts to library! Go to Section 4 to export.`);
       } else {
@@ -1729,6 +2181,7 @@ if (btnParsePaste) {
         bindStepRowEvents(row);
       });
 
+      activeStudioShortcutId = null;
       updateCardPreview();
       aiPasteInput.value = '';
       showToast("Successfully parsed and populated card details!");
@@ -1738,15 +2191,411 @@ if (btnParsePaste) {
 
 
 // ==========================================================================
+// 10.9 File System Access API & IndexedDB Sync
+// ==========================================================================
+
+const typeCommandBtn = document.getElementById('type-command');
+const typeListBtn = document.getElementById('type-list');
+const keyField = document.getElementById('key-field');
+const stepsLabel = document.getElementById('steps-label');
+
+function setType(type, triggerSync = true) {
+  if (type === 'command') {
+    if (typeCommandBtn) typeCommandBtn.classList.add('active');
+    if (typeListBtn) typeListBtn.classList.remove('active');
+    if (keyField) keyField.style.display = 'block';
+    if (stepsLabel) stepsLabel.textContent = 'Steps';
+    const cardKeysWrapper = document.querySelector('.keycap-container');
+    if (cardKeysWrapper) cardKeysWrapper.style.display = 'block';
+  } else {
+    if (typeCommandBtn) typeCommandBtn.classList.remove('active');
+    if (typeListBtn) typeListBtn.classList.add('active');
+    if (keyField) keyField.style.display = 'none';
+    if (stepsLabel) stepsLabel.textContent = 'Shortcut List Items';
+    const cardKeysWrapper = document.querySelector('.keycap-container');
+    if (cardKeysWrapper) cardKeysWrapper.style.display = 'none';
+  }
+  if (triggerSync) {
+    saveCurrentDayData();
+    updateCardPreview();
+  }
+}
+
+if (typeCommandBtn && typeListBtn) {
+  typeCommandBtn.onclick = () => setType('command');
+  typeListBtn.onclick = () => setType('list');
+}
+
+// Arrow day selectors
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+
+if (btnPrev) {
+  btnPrev.addEventListener('click', () => {
+    if (!activeCalendarDayNum) activeCalendarDayNum = "1";
+    const idx = calendarDb.findIndex(d => String(d.day) === String(activeCalendarDayNum));
+    if (idx > 0) {
+      const prevPost = calendarDb[idx - 1];
+      activeCalendarDayNum = prevPost.day;
+      loadCalendarItemToEditor(prevPost);
+      renderSidebarDaysList();
+    }
+  });
+}
+
+if (btnNext) {
+  btnNext.addEventListener('click', () => {
+    if (!activeCalendarDayNum) activeCalendarDayNum = "1";
+    const idx = calendarDb.findIndex(d => String(d.day) === String(activeCalendarDayNum));
+    if (idx !== -1 && idx < calendarDb.length - 1) {
+      const nextPost = calendarDb[idx + 1];
+      activeCalendarDayNum = nextPost.day;
+      loadCalendarItemToEditor(nextPost);
+      renderSidebarDaysList();
+    }
+  });
+}
+
+// Auto-save form content back to calendarDb array and file handle if connected
+async function saveCurrentDayData() {
+  if (!activeCalendarDayNum) return;
+  const index = calendarDb.findIndex(d => String(d.day) === String(activeCalendarDayNum));
+  if (index === -1) return;
+  
+  const d = calendarDb[index];
+  d.software = contentSoftwareSelect.value;
+  d.title = contentActionInput.value.trim();
+  d.desc = contentDescInput.value.trim();
+  d.proTip = contentProTipInput.value.trim();
+  if (contentHashtagsInput) {
+    d.hashtags = contentHashtagsInput.value.trim().split(/\s+/).filter(t => t);
+  }
+  
+  // Format step inputs
+  const steps = [];
+  getStepInputs().forEach(input => {
+    const text = input.value.trim();
+    if (text) steps.push(text);
+  });
+  
+  const isCommand = typeCommandBtn && typeCommandBtn.classList.contains('active');
+  d.type = isCommand ? 'command' : 'list';
+  d.keys = contentKeysInput.value.trim();
+  
+  if (isCommand) {
+    d.bullets = steps;
+    d.items = [];
+  } else {
+    d.bullets = [];
+    d.items = steps;
+  }
+  
+  // Always cache back to browser storage
+  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+  
+  // Real-time synchronization to disk file
+  await saveAllDataToSyncFile();
+}
+
+const DB_NAME = 'LudarpCivilDB';
+const STORE_NAME = 'FileHandles';
+
+function getDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getStoredHandle() {
+  try {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get('data_json');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (e) {
+    console.error("IndexedDB load error:", e);
+    return null;
+  }
+}
+
+async function storeHandle(handle) {
+  try {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(handle, 'data_json');
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch (e) {
+    console.error("IndexedDB store error:", e);
+  }
+}
+
+// Request and verify file system permissions
+async function verifyPermission(handle, readWrite) {
+  const options = {};
+  if (readWrite) {
+    options.mode = 'readwrite';
+  }
+  if ((await handle.queryPermission(options)) === 'granted') {
+    return true;
+  }
+  if ((await handle.requestPermission(options)) === 'granted') {
+    return true;
+  }
+  return false;
+}
+
+// Update disk sync status description in sidebar
+function updateSyncStatus(connected, filename = '') {
+  if (!syncStatusText || !btnConnectFile) return;
+  if (connected) {
+    syncStatusText.innerHTML = `Connected:<br><span style="color: var(--success); font-family: var(--font-mono); font-weight: 700; font-size:0.7rem">${filename}</span>`;
+    btnConnectFile.textContent = "↩ Change File";
+    btnConnectFile.style.borderColor = "var(--success)";
+    btnConnectFile.style.color = "var(--success)";
+    // Update sync dot
+    const syncDot = document.getElementById('sync-dot');
+    if (syncDot) syncDot.classList.add('connected');
+  } else {
+    syncStatusText.innerHTML = `Local Sandbox`;
+    btnConnectFile.textContent = "Link JSON File";
+    btnConnectFile.style.borderColor = "";
+    btnConnectFile.style.color = "";
+  }
+}
+
+// Load sync data from disk file
+async function loadSyncDataFromFile(handle) {
+  try {
+    const file = await handle.getFile();
+    const contents = await file.text();
+    if (contents.trim()) {
+      const data = JSON.parse(contents);
+      if (data.shortcuts && Array.isArray(data.shortcuts)) {
+        shortcutDb = data.shortcuts;
+        localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+        renderShortcutsHub();
+      }
+      if (data.calendar && Array.isArray(data.calendar)) {
+        calendarDb = data.calendar;
+        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+      }
+      if (data.completed && Array.isArray(data.completed)) {
+        completedCalendarDays = new Set(data.completed.map(String));
+        localStorage.setItem('ludarp_completed_calendar', JSON.stringify([...completedCalendarDays]));
+        updateCalendarProgress();
+        renderCalendarHub();
+        renderSidebarDaysList();
+      }
+      showToast(`Loaded data from connected file: ${handle.name}`);
+    }
+  } catch (err) {
+    console.error("Failed to parse file data:", err);
+    showToast("Connected to empty or invalid file. Ready to sync.");
+  }
+}
+
+// Connect file system picker
+async function connectLocalFile() {
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      types: [{
+        description: 'JSON Files',
+        accept: {
+          'application/json': ['.json']
+        }
+      }],
+      excludeAcceptAllOption: true,
+      multiple: false
+    });
+    
+    const hasPerm = await verifyPermission(handle, true);
+    if (!hasPerm) {
+      showToast("Write permission denied. Sandbox mode active.", "warning");
+      return;
+    }
+    
+    fileHandle = handle;
+    await storeHandle(handle);
+    await loadSyncDataFromFile(handle);
+    updateSyncStatus(true, handle.name);
+    
+    saveAllDataToSyncFile(); // sync immediately to keep state
+  } catch (e) {
+    console.error(e);
+    if (e.name !== 'AbortError') {
+      showToast("Error connecting local file.", "error");
+    }
+  }
+}
+
+// Sync database and calendar checks back to file system
+async function saveAllDataToSyncFile() {
+  // Always update LocalStorage
+  localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+  localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
+  localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+  
+  if (fileHandle) {
+    try {
+      const writable = await fileHandle.createWritable();
+      const payload = {
+        shortcuts: shortcutDb,
+        calendar: calendarDb,
+        completed: Array.from(completedCalendarDays)
+      };
+      await writable.write(JSON.stringify(payload, null, 2));
+      await writable.close();
+    } catch (err) {
+      console.error("Auto-sync disk write failed:", err);
+    }
+  }
+}
+
+// Render dynamic day-by-day checklist in sidebar (Production Line)
+function renderSidebarDaysList() {
+  if (!sidebarDaysList) return;
+  sidebarDaysList.innerHTML = '';
+  
+  const phases = [...new Set(calendarDb.map(post => post.phase))];
+  
+  phases.forEach(phase => {
+    const label = document.createElement('div');
+    label.className = 'phase-label';
+    label.style.cssText = 'font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: 12px 0 6px 0; padding-bottom: 4px; border-bottom: 1px solid var(--border);';
+    label.textContent = phase;
+    sidebarDaysList.appendChild(label);
+    
+    calendarDb.forEach(post => {
+      if (post.phase !== phase) return;
+      
+      const isCompleted = completedCalendarDays.has(String(post.day));
+      const isActive = String(activeCalendarDayNum) === String(post.day);
+      const item = document.createElement('div');
+      item.className = `day-item${isCompleted ? ' done' : ''}${isActive ? ' active' : ''}`;
+      
+      item.innerHTML = `
+        <span class="dchk">${isCompleted ? '✓' : ''}</span>
+        <span class="dnum">D${post.day}</span>
+        <span class="dtitle">${post.title}</span>
+      `;
+      
+      item.addEventListener('click', () => {
+        activeCalendarDayNum = post.day;
+        loadCalendarItemToEditor(post);
+        renderSidebarDaysList();
+      });
+      
+      sidebarDaysList.appendChild(item);
+    });
+  });
+  
+  // Update sidebar progress count & bar
+  const total = calendarDb.length;
+  const done = calendarDb.filter(post => completedCalendarDays.has(String(post.day))).length;
+  if (sidebarProgressCount) sidebarProgressCount.textContent = `${done} / ${total}`;
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+  if (sidebarProgressBar) sidebarProgressBar.style.width = `${percent}%`;
+}
+
+// Auto-reconnect stored JSON file handle on page load
+async function initDiskSync() {
+  try {
+    const handle = await getStoredHandle();
+    if (handle) {
+      const options = { mode: 'readwrite' };
+      if (await handle.queryPermission(options) === 'granted') {
+        fileHandle = handle;
+        await loadSyncDataFromFile(handle);
+        updateSyncStatus(true, handle.name);
+        renderSidebarDaysList();
+      } else {
+        const statusEl = document.getElementById('sync-status');
+        const btnEl = document.getElementById('btn-connect-file');
+        if (statusEl && btnEl) {
+          statusEl.innerHTML = `Linked file:<br><span style="color: var(--accent-color); font-family: var(--font-mono); font-weight: 700;">${handle.name}</span><br><span style="font-size:0.7rem; color:var(--text-muted);">Permission needed.</span>`;
+          btnEl.textContent = "🔓 Authorize Sync & Connect";
+          btnEl.onclick = async () => {
+            const granted = await verifyPermission(handle, true);
+            if (granted) {
+              fileHandle = handle;
+              await loadSyncDataFromFile(handle);
+              updateSyncStatus(true, handle.name);
+              btnEl.onclick = connectLocalFile; // restore picker event
+              renderSidebarDaysList();
+            } else {
+              showToast("Authorization denied.", "warning");
+            }
+          };
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Failed to restore disk sync:", e);
+  }
+}
+
+// ==========================================================================
 // 11. Initializer Hook
 // ==========================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Sync live elements with inputs on page load
-  updateCardPreview();
+document.addEventListener('DOMContentLoaded', async () => {
   renderShortcutsHub();
   updateCalendarProgress(); // Fix Progress display showing 0/83 initially
+  renderSidebarDaysList();
   
   // Load saved API key
-  aiApiKeyInput.value = localStorage.getItem('ludarp_gemini_api_key') || '';
+  if (aiApiKeyInput) {
+    aiApiKeyInput.value = localStorage.getItem('ludarp_gemini_api_key') || '';
+  }
+  
+  // Load initial active day on startup (Day 1)
+  if (calendarDb.length > 0) {
+    const activeDay = calendarDb.find(d => String(d.day) === String(activeCalendarDayNum)) || calendarDb[0];
+    loadCalendarItemToEditor(activeDay);
+  } else {
+    updateCardPreview();
+  }
+  
+  // Wire real-time CAD crosshairs mouse tracking movement on preview canvas
+  const wrapper = document.getElementById('canvas-wrapper-square');
+  const crossH = document.getElementById('cad-crosshair-h');
+  const crossV = document.getElementById('cad-crosshair-v');
+  
+  if (wrapper && crossH && crossV) {
+    wrapper.addEventListener('mouseenter', () => {
+      crossH.style.display = 'block';
+      crossV.style.display = 'block';
+    });
+    wrapper.addEventListener('mouseleave', () => {
+      crossH.style.display = 'none';
+      crossV.style.display = 'none';
+    });
+    wrapper.addEventListener('mousemove', (e) => {
+      const rect = wrapper.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      crossH.style.top = `${y}px`;
+      crossV.style.left = `${x}px`;
+    });
+  }
+  
+  // Initialize File Sync
+  await initDiskSync();
 });

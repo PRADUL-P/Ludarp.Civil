@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivilCut Studio — Content Production Line</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --blue-deep:#0f2b46;
+    --blue-mid:#173d5e;
+    --grid-line:rgba(255,255,255,0.07);
+    --paper:#f0ede4;
+    --paper-dim:#c9c4b4;
+    --accent:#ff6b35;
+    --accent-dim:#c94f22;
+    --ok:#3ecf8e;
+    --danger:#e5484d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--blue-deep);
+    color:var(--paper);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:24px 24px;
+    min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0;}
+  .app{display:flex; min-height:100vh;}
+  .sidebar{
+    width:280px; flex-shrink:0;
+    background:rgba(15,43,70,0.9);
+    border-right:1px solid var(--grid-line);
+    padding:20px; overflow-y:auto; max-height:100vh;
+    position:sticky; top:0;
+  }
+  .brand{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .brand .tag{
+    width:34px;height:34px;border:2px solid var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono';font-weight:700;font-size:0.75rem;color:var(--accent);
+  }
+  .brand h1{font-size:1.15rem;}
+  .brand span{font-size:0.7rem; color:var(--paper-dim); display:block; letter-spacing:0.06em; text-transform:uppercase;}
+
+  .progress-block{margin:18px 0 22px; padding:12px; border:1px solid var(--grid-line); background:rgba(255,255,255,0.03);}
+  .progress-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;}
+  .progress-row .count{font-family:'JetBrains Mono'; font-weight:700; color:var(--ok);}
+  .progress-bar-track{height:6px; background:rgba(255,255,255,0.1);}
+  .progress-bar-fill{height:100%; background:var(--ok); transition:width 0.3s ease;}
+
+  .phase-group{margin-bottom:16px;}
+  .phase-label{
+    font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--paper-dim); margin-bottom:6px; padding-bottom:4px;
+    border-bottom:1px solid var(--grid-line);
+  }
+  .day-item{
+    display:flex; align-items:center; gap:8px;
+    padding:7px 8px; cursor:pointer; font-size:0.85rem;
+    border-left:2px solid transparent;
+  }
+  .day-item:hover{background:rgba(255,255,255,0.05);}
+  .day-item.active{background:rgba(255,107,53,0.12); border-left-color:var(--accent); color:#fff;}
+  .day-item .dchk{width:15px;height:15px;border:1px solid var(--paper-dim); flex-shrink:0; display:flex;align-items:center;justify-content:center; font-size:0.6rem;}
+  .day-item.done .dchk{background:var(--ok); border-color:var(--ok); color:#052;}
+  .day-item .dnum{font-family:'JetBrains Mono'; color:var(--paper-dim); width:26px; flex-shrink:0;}
+  .day-item.done{opacity:0.55;}
+
+  .main{flex:1; padding:26px 30px; overflow-y:auto;}
+  .topbar{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap; gap:12px;}
+  .topbar h2{font-size:1.3rem;}
+  .topbar p{color:var(--paper-dim); font-size:0.85rem; margin-top:4px;}
+  .nav-arrows{display:flex; gap:8px;}
+  button{font-family:'Inter',sans-serif; cursor:pointer;}
+  .btn{
+    padding:9px 16px; border:1px solid var(--paper-dim); background:transparent; color:var(--paper);
+    font-size:0.82rem; font-weight:600; display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:hover{border-color:var(--accent); color:var(--accent);}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#0f2b46;}
+  .btn.primary:hover{background:var(--accent-dim); color:#fff;}
+  .btn.ok{border-color:var(--ok); color:var(--ok);}
+  .btn.ok:hover{background:var(--ok); color:#052;}
+  .btn:disabled{opacity:0.35; cursor:not-allowed;}
+  .btn.active{border-color:var(--accent); color:var(--accent); background:rgba(255,107,53,0.12);}
+
+  .workspace{display:grid; grid-template-columns:380px 1fr; gap:26px;}
+  @media (max-width:900px){ .workspace{grid-template-columns:1fr;} .sidebar{position:relative; max-height:none; width:100%;} .app{flex-direction:column;} }
+
+  .form-card{background:rgba(255,255,255,0.04); border:1px solid var(--grid-line); padding:18px;}
+  .form-card h3{font-size:0.85rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); margin-bottom:14px;}
+  .fgroup{margin-bottom:12px;}
+  .fgroup label{display:block; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--paper-dim); margin-bottom:4px;}
+  .fgroup input, .fgroup select, .fgroup textarea{
+    width:100%; padding:8px 10px; background:rgba(0,0,0,0.25); border:1px solid var(--grid-line);
+    color:var(--paper); font-family:'Inter'; font-size:0.85rem;
+  }
+  .fgroup textarea{resize:vertical;}
+  .list-row{display:flex; gap:6px; margin-bottom:6px;}
+  .list-row input{flex:1;}
+  .list-row .rm{background:transparent;border:1px solid var(--danger); color:var(--danger); width:30px; flex-shrink:0;}
+  .add-row-btn{font-size:0.78rem; color:var(--accent); background:none; border:1px dashed var(--accent); width:100%; padding:6px; margin-top:4px;}
+
+  .preview-col{display:flex; flex-direction:column; gap:14px;}
+  .preview-frame{border:1px solid var(--grid-line); padding:14px; background:rgba(0,0,0,0.15);}
+  .preview-frame-label{font-size:0.7rem; color:var(--paper-dim); text-transform:uppercase; margin-bottom:10px; display:flex; justify-content:space-between;}
+  .canvas-scale-wrap{width:100%; display:flex; justify-content:center;}
+
+  /* ===== THE ACTUAL INSTAGRAM CARD (1080x1080 real, scaled via transform) ===== */
+  #card-outer{width:1080px; height:1080px; transform-origin:top left;}
+  #card{
+    width:1080px; height:1080px; background:var(--blue-deep);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:36px 36px;
+    position:relative; padding:70px; font-family:'Inter';
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .crop{position:absolute; width:34px; height:34px; border:2px solid var(--accent);}
+  .crop.tl{top:24px;left:24px;border-right:none;border-bottom:none;}
+  .crop.tr{top:24px;right:24px;border-left:none;border-bottom:none;}
+  .crop.bl{bottom:24px;left:24px;border-right:none;border-top:none;}
+  .crop.br{bottom:24px;right:24px;border-left:none;border-top:none;}
+  .titleblock{
+    position:absolute; top:24px; right:70px; display:flex; gap:0; font-family:'JetBrains Mono';
+    font-size:15px; border:1px solid var(--paper-dim);
+  }
+  .titleblock div{padding:6px 12px; border-left:1px solid var(--paper-dim);}
+  .titleblock div:first-child{border-left:none;}
+  .titleblock .tb-label{color:var(--paper-dim); font-size:10px; display:block;}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; margin-top:20px;}
+  .software-tag{font-family:'JetBrains Mono'; font-weight:700; font-size:22px; color:var(--accent); letter-spacing:0.08em;}
+  .handle-tag{font-family:'JetBrains Mono'; font-size:20px; color:var(--paper-dim);}
+  .keycap{
+    display:inline-block; font-family:'JetBrains Mono'; font-weight:700; font-size:54px;
+    background:var(--paper); color:var(--blue-deep); padding:14px 26px;
+    box-shadow:0 6px 0 var(--paper-dim); border-radius:6px; margin-bottom:22px;
+  }
+  .action-title{font-size:52px; font-weight:700; font-family:'Space Grotesk'; margin-bottom:14px; line-height:1.1;}
+  .card-desc{font-size:26px; color:var(--paper-dim); max-width:820px; line-height:1.4; margin-bottom:30px;}
+  .steps-wrap{display:flex; flex-direction:column; gap:18px;}
+  .step-row{display:flex; gap:18px; align-items:flex-start;}
+  .step-bubble{
+    width:44px; height:44px; border-radius:50%; border:2px solid var(--accent);
+    display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono';
+    font-weight:700; font-size:20px; color:var(--accent); flex-shrink:0;
+  }
+  .step-line{width:2px; background:var(--accent); opacity:0.35; flex:1; margin-left:21px;}
+  .step-text{font-size:24px; padding-top:8px; max-width:750px;}
+  .list-items{display:flex; flex-direction:column; gap:14px;}
+  .list-item-row{display:flex; gap:16px; align-items:baseline; font-size:26px;}
+  .list-item-row .li-key{font-family:'JetBrains Mono'; font-weight:700; color:var(--accent); min-width:90px;}
+  .protip-note{
+    background:var(--paper); color:#2a2a2a; padding:20px 26px; max-width:640px;
+    font-size:22px; line-height:1.4; transform:rotate(-1.2deg); box-shadow:4px 6px 14px rgba(0,0,0,0.35);
+    position:relative;
+  }
+  .protip-note .ptag{
+    position:absolute; top:-14px; left:20px; background:var(--danger); color:#fff;
+    font-family:'JetBrains Mono'; font-size:13px; font-weight:700; padding:3px 10px; letter-spacing:0.05em;
+  }
+  .card-footer{display:flex; justify-content:space-between; align-items:flex-end; margin-top:20px;}
+  .cta-save{font-family:'JetBrains Mono'; font-size:20px; color:var(--paper-dim); display:flex; gap:8px; align-items:center;}
+
+  .caption-box{background:rgba(0,0,0,0.25); border:1px solid var(--grid-line); padding:14px; font-size:0.85rem; white-space:pre-wrap; max-height:160px; overflow-y:auto; font-family:'JetBrains Mono';}
+  .toast{position:fixed; bottom:20px; right:20px; background:var(--ok); color:#052; padding:12px 20px; font-weight:700; font-size:0.85rem; z-index:99; box-shadow:0 4px 14px rgba(0,0,0,0.4);}
+  .paste-box textarea{width:100%; min-height:110px; background:rgba(0,0,0,0.25); border:1px solid var(--grid-line); color:var(--paper); font-family:'JetBrains Mono'; font-size:0.78rem; padding:10px;}
+  .type-toggle{display:flex; gap:8px; margin-bottom:12px;}
+  .type-toggle button{flex:1; padding:7px; font-size:0.78rem; border:1px solid var(--grid-line); background:transparent; color:var(--paper-dim);}
+  .type-toggle button.active{border-color:var(--accent); color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR: DAY PICKER + PROGRESS -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="tag">CC</div>
+      <div><h1>CivilCut</h1><span>Studio · Production Line</span></div>
+    </div>
+
+    <!-- Navigation Tab Buttons -->
+    <div class="tabs-nav" style="display: flex; gap: 8px; margin: 15px 0; border-bottom: 1px solid var(--grid-line); padding-bottom: 15px;">
+      <button class="btn active" id="tab-btn-studio" style="flex: 1; padding: 6px; font-size: 0.78rem; justify-content: center; font-weight: 700;">Studio</button>
+      <button class="btn" id="tab-btn-research" style="flex: 1; padding: 6px; font-size: 0.78rem; justify-content: center; font-weight: 700;">AI Research</button>
+    </div>
+
+    <!-- Studio Sidebar Panel Controls -->
+    <div id="sidebar-studio-controls">
+      <div class="progress-block">
+        <div class="progress-row">
+          <span>Posting progress</span>
+          <span class="count" id="progress-count">0 / 0</span>
+        </div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div id="sidebar-days"></div>
+
+      <!-- File System Sync Controls -->
+      <div class="progress-block" style="margin-top: 20px; border: 1px solid var(--accent); background: rgba(255,107,53,0.03); padding: 12px;">
+        <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 6px; letter-spacing: 0.05em;">Disk Sync Status</div>
+        <div id="sync-status" style="font-size: 0.78rem; color: var(--paper-dim); margin-bottom: 10px; line-height: 1.3;">Local Sandbox Mode</div>
+        <button class="btn" id="btn-connect-file" style="width:100%; justify-content:center; border-color: var(--accent); color: var(--accent); padding: 6px 12px; font-size: 0.78rem;">🔌 Connect local JSON File</button>
+      </div>
+
+      <div class="fgroup" style="margin-top:20px;">
+        <button class="btn" style="width:100%; justify-content:center;" id="btn-export-backup">⬇ Backup Library (JSON)</button>
+      </div>
+      <div class="fgroup">
+        <input type="file" id="import-file" accept=".json" style="display:none;">
+        <button class="btn" style="width:100%; justify-content:center;" id="btn-import-backup">⬆ Restore Backup</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN: EDIT FORM + LIVE PREVIEW -->
+  <main class="main">
+    <!-- Studio Workspace -->
+    <div id="studio-workspace">
+      <div class="topbar">
+        <div>
+          <h2 id="day-title">Loading...</h2>
+          <p id="day-sub">—</p>
+        </div>
+        <div class="nav-arrows">
+          <button class="btn" id="btn-prev">← Prev Day</button>
+          <button class="btn ok" id="btn-mark-done">✓ Mark Done</button>
+          <button class="btn" id="btn-next">Next Day →</button>
+        </div>
+      </div>
+
+      <div class="workspace">
+      <!-- EDIT FORM -->
+      <div class="form-card">
+        <h3>Edit Content</h3>
+
+        <div class="type-toggle">
+          <button data-type="command" id="type-command">Single Command</button>
+          <button data-type="list" id="type-list">Shortcut List</button>
+        </div>
+
+        <div class="fgroup">
+          <label>Software</label>
+          <select id="f-software">
+            <option>AutoCAD</option><option>Revit</option><option>Civil 3D</option><option>ETABS</option><option>SketchUp</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Instagram Handle</label>
+          <input id="f-handle" value="ludarp_civil">
+        </div>
+        <div class="fgroup" id="key-field">
+          <label>Shortcut Key</label>
+          <input id="f-key" placeholder="e.g. NCOPY">
+        </div>
+        <div class="fgroup">
+          <label>Title / Action</label>
+          <input id="f-title" placeholder="e.g. Copy Nested Objects">
+        </div>
+        <div class="fgroup">
+          <label>Description</label>
+          <textarea id="f-desc" rows="2"></textarea>
+        </div>
+
+        <div class="fgroup" id="steps-field">
+          <label id="steps-label">Steps</label>
+          <div id="steps-container"></div>
+          <button class="add-row-btn" id="btn-add-step">+ Add Row</button>
+        </div>
+
+        <div class="fgroup" id="protip-field">
+          <label>Pro Tip</label>
+          <textarea id="f-protip" rows="2"></textarea>
+        </div>
+        <div class="fgroup">
+          <label>Hashtags</label>
+          <textarea id="f-hashtags" rows="2" placeholder="#autocad #cadtips ..."></textarea>
+        </div>
+
+        <div class="fgroup" style="display:flex; gap:8px; margin-top:16px;">
+          <button class="btn primary" id="btn-export-single" style="flex:1; justify-content:center;">Export Image</button>
+          <button class="btn primary" id="btn-export-carousel" style="flex:1; justify-content:center;">Export Carousel (ZIP)</button>
+        </div>
+        <div class="fgroup">
+          <button class="btn" id="btn-copy-caption" style="width:100%; justify-content:center;">Copy Caption + Hashtags</button>
+        </div>
+
+        <h3 style="margin-top:22px;">Add More Days (Paste from Claude/ChatGPT)</h3>
+        <div class="paste-box fgroup">
+          <textarea id="ai-paste" placeholder="Software: AutoCAD&#10;Shortcut: NCOPY&#10;Action: Copy Nested Objects&#10;Description: ...&#10;Steps:&#10;1. ...&#10;2. ...&#10;Pro Tip: ...&#10;Hashtags: #autocad #cadtips&#10;---&#10;(separate multiple entries with ---)"></textarea>
+        </div>
+        <button class="btn" id="btn-parse-paste" style="width:100%; justify-content:center;">Parse & Add to Library</button>
+      </div>
+
+      <!-- LIVE PREVIEW -->
+      <div class="preview-col">
+        <div class="preview-frame">
+          <div class="preview-frame-label"><span>Live Preview</span><span>1080×1080</span></div>
+          <div class="canvas-scale-wrap">
+            <div id="card-outer">
+              <div id="card">
+                <div class="crop tl"></div><div class="crop tr"></div><div class="crop bl"></div><div class="crop br"></div>
+                <div class="titleblock" style="display:flex; border: 1.5px solid var(--paper-dim); font-family: 'JetBrains Mono'; font-size:12px; background: rgba(15,43,70,0.95); position: absolute; top: 24px; right: 70px; z-index:10;">
+                  <div style="padding: 4px 8px; border-right: 1.5px solid var(--paper-dim); display:flex; flex-direction:column;">
+                    <span class="tb-label" style="font-size: 8px; color: var(--paper-dim); text-transform:uppercase; display:block; line-height:1;">DRW BY</span>
+                    <span id="tb-drawn-by" style="font-weight:700;">ludarp</span>
+                  </div>
+                  <div style="padding: 4px 8px; border-right: 1.5px solid var(--paper-dim); display:flex; flex-direction:column; min-width: 45px;">
+                    <span class="tb-label" style="font-size: 8px; color: var(--paper-dim); text-transform:uppercase; display:block; line-height:1;">SHEET</span>
+                    <span id="tb-sheet" style="font-weight:700;">01</span>
+                  </div>
+                  <div style="padding: 4px 8px; border-right: 1.5px solid var(--paper-dim); display:flex; flex-direction:column; min-width: 45px;">
+                    <span class="tb-label" style="font-size: 8px; color: var(--paper-dim); text-transform:uppercase; display:block; line-height:1;">SCALE</span>
+                    <span id="tb-scale" style="font-weight:700;">1:1</span>
+                  </div>
+                  <div style="padding: 4px 8px; border-right: 1.5px solid var(--paper-dim); display:flex; flex-direction:column; min-width: 40px;">
+                    <span class="tb-label" style="font-size: 8px; color: var(--paper-dim); text-transform:uppercase; display:block; line-height:1;">REV</span>
+                    <span id="tb-rev" style="font-weight:700;">R0</span>
+                  </div>
+                  <div style="padding: 4px 8px; display:flex; flex-direction:column;">
+                    <span class="tb-label" style="font-size: 8px; color: var(--paper-dim); text-transform:uppercase; display:block; line-height:1;">DWG NO</span>
+                    <span id="tb-dwg-no" style="font-weight:700;">CAD-01</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="card-top">
+                    <div class="software-tag" id="c-software">AUTOCAD</div>
+                    <div class="handle-tag" id="c-handle">@ludarp_civil</div>
+                  </div>
+                  <div id="c-body" style="margin-top:40px;"></div>
+                </div>
+                <div class="card-footer">
+                  <div class="protip-note" id="c-protip-wrap">
+                    <div class="ptag">PRO TIP</div>
+                    <div id="c-protip"></div>
+                  </div>
+                  <div class="cta-save">Save for later ▸</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-frame">
+          <div class="preview-frame-label"><span>Caption Preview</span></div>
+          <div class="caption-box" id="caption-preview"></div>
+        </div>
+      </div>
+    </div> <!-- Close #studio-workspace -->
+
+    <!-- AI Research tab view workspace -->
+    <div id="research-workspace" style="display: none; grid-template-columns: 1fr 1.2fr; gap: 26px;" class="workspace">
+      <!-- Left: search controls -->
+      <div class="form-card">
+        <h3>1. Search Parameters</h3>
+        <div class="fgroup">
+          <label>Gemini API Key</label>
+          <input type="password" id="ai-api-key" placeholder="Enter Gemini API Key (stored locally)" style="width: 100%;">
+        </div>
+        <div class="fgroup">
+          <label>Topic / Search Query</label>
+          <textarea id="ai-prompt" rows="3" placeholder="e.g. How to draw a survey contour boundary in Civil 3D"></textarea>
+        </div>
+        <button class="btn primary" id="btn-ai-generate" style="width: 100%; justify-content: center;">
+          Research with Google & Generate
+        </button>
+        
+        <div id="ai-loading-container" style="display: none; margin-top: 14px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--grid-line); align-items: center; gap: 12px;">
+          <div class="spinner" style="width: 20px; height: 20px; border: 2px solid var(--grid-line); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <span id="ai-loading-text" style="font-size: 0.8rem; color: var(--paper-dim);">Researching shortcuts on Google...</span>
+        </div>
+      </div>
+      
+      <!-- Right: research results -->
+      <div class="form-card">
+        <h3>2. Research Results</h3>
+        <div id="research-empty-state" style="padding: 40px; text-align: center; color: var(--paper-dim); border: 1.5px dashed var(--grid-line); border-radius: 4px;">
+          <p>No query ran yet. Enter your API key and query on the left to start research.</p>
+        </div>
+        
+        <div id="research-results-display" style="display: none; flex-direction: column; gap: 16px;">
+          <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--grid-line); padding-bottom: 12px;">
+            <div style="flex: 1;">
+              <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--paper-dim);">Software</span>
+              <p id="res-software" style="font-size: 1.05rem; font-weight: 700; color: var(--accent); margin: 4px 0 0;"></p>
+            </div>
+            <div style="flex: 1;">
+              <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--paper-dim);">Shortcut Keys</span>
+              <p id="res-keys" style="font-size: 1.05rem; font-weight: 700; font-family: 'JetBrains Mono'; margin: 4px 0 0;"></p>
+            </div>
+          </div>
+          
+          <div>
+            <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--paper-dim);">Command / Action Title</span>
+            <h4 id="res-action" style="font-size: 1.15rem; font-weight: 700; margin: 4px 0 0;"></h4>
+          </div>
+          
+          <div>
+            <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--paper-dim);">Description</span>
+            <p id="res-desc" style="font-size: 0.88rem; line-height: 1.5; color: var(--paper-dim); margin: 4px 0 0;"></p>
+          </div>
+          
+          <div>
+            <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--paper-dim);">Steps</span>
+            <ol id="res-steps" style="margin: 6px 0 0; padding-left: 20px; font-size: 0.88rem; line-height: 1.6; display: flex; flex-direction: column; gap: 4px;">
+            </ol>
+          </div>
+          
+          <div>
+            <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--paper-dim);">Pro Tip</span>
+            <p id="res-protip" style="font-size: 0.88rem; font-style: italic; background-color: rgba(255, 107, 53, 0.08); border-left: 4px solid var(--accent); padding: 8px 12px; margin: 4px 0 0; color: var(--paper-dim);"></p>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 10px;">
+            <button class="btn primary" id="btn-import-research-to-studio" style="flex: 1; justify-content: center;">
+              Load to Editor
+            </button>
+            <button class="btn" id="btn-save-research-to-hub" style="flex: 1; justify-content: center; border-color: var(--accent); color: var(--accent); background: transparent;">
+              Save to Hub
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============ SEED DATA ============
+   A working sample spanning all phases. Add more anytime via the
+   "Paste from Claude/ChatGPT" box (bottom-left) using this format,
+   separating multiple entries with a line containing only ---
+*/
+let seedDays = [
+  {day:1, phase:"Phase 1: 2D", type:"list", software:"AutoCAD", title:"Top 10 Drawing Shortcuts",
+   desc:"Master these before anything else — they're used in almost every drawing.",
+   items:["L — Line","PL — Polyline","C — Circle","REC — Rectangle","ARC (A) — Arc","POL — Polygon","EL — Ellipse","SPL — Spline"],
+   protip:"Type the shortcut, hit Enter, and go — don't touch the ribbon.",
+   hashtags:"#autocad #autocadtips #civilengineering #cadtips #drafting"},
+
+  {day:6, phase:"Phase 1: 2D", type:"list", software:"AutoCAD", title:"Essential Editing Shortcuts",
+   desc:"Editing is where most of your drawing time actually goes.",
+   items:["TR — Trim","EX — Extend","CO/CP — Copy","MI — Mirror","O — Offset","F — Fillet","CHA — Chamfer","RO — Rotate"],
+   protip:"Press Enter right after TR with no selection — it trims using every visible object as a boundary.",
+   hashtags:"#autocadtips #cadediting #civil3d #drafting101"},
+
+  {day:61, phase:"Phase 3.5: Workflow Compression", type:"command", software:"AutoCAD",
+   key:"ALIGN (AL)", title:"Move + Rotate + Scale in One Command",
+   desc:"Stop doing move, rotate, and scale as three separate steps.",
+   steps:["Type ALIGN and hit Enter.","Pick 1-3 source points on your object.","Pick the matching destination points — AutoCAD moves, rotates, and scales all at once."],
+   protip:"Use 2 point pairs for move+rotate, 3 pairs to also match scale automatically.",
+   hashtags:"#autocad #align #cadhacks #drafting #workflowtips"},
+
+  {day:"69.5", phase:"Phase 3.5: Workflow Compression", type:"command", software:"AutoCAD",
+   key:"NCOPY", title:"Copy One Element Out of a Block or Xref",
+   desc:"You don't need to explode a block or xref to grab one piece of it.",
+   steps:["Type NCOPY and hit Enter.","Click the single nested object inside the block or xref.","Place it — it copies out as an independent object; the block/xref stays untouched."],
+   protip:"Works on blocks, xrefs, and even DGN underlays — one of the most underused commands in AutoCAD.",
+   hashtags:"#autocad #ncopy #cadhacks #blocks #xref #drafting"},
+
+  {day:72, phase:"Phase 3.5: Workflow Compression", type:"command", software:"AutoCAD",
+   key:"BURST", title:"Explode a Block Without Losing Attribute Values",
+   desc:"EXPLODE on an attributed block deletes the actual filled-in values.",
+   steps:["Select the attributed block (e.g. a tagged door or room symbol).","Type BURST and hit Enter.","The block explodes but keeps every attribute value as real text."],
+   protip:"Never use plain EXPLODE on a block with attributes — always BURST instead.",
+   hashtags:"#autocad #burst #cadhacks #blocks #drafting"},
+
+  {day:41, phase:"Phase 2: 3D", type:"list", software:"AutoCAD", title:"Basic 3D Solid Primitives",
+   desc:"The building blocks before any complex 3D modeling.",
+   items:["BOX — Solid box","CYLINDER (CYL) — Solid cylinder","SPHERE — Solid sphere","CONE — Solid cone","WEDGE (WE) — Solid wedge","TORUS (TOR) — Solid torus"],
+   protip:"Combine primitives with UNION, SUBTRACT, and INTERSECT to build anything complex.",
+   hashtags:"#autocad3d #cad3dmodeling #autocadtips #drafting"},
+
+  {day:46, phase:"Phase 3: Advanced", type:"list", software:"AutoCAD", title:"Custom Keyboard Shortcuts & Aliases",
+   desc:"Stop using default shortcuts if they don't fit how you actually work.",
+   items:["CUI — Customize User Interface","Edit the PGP file to add/change command aliases","REINIT — Reload aliases after editing the PGP file"],
+   protip:"Set your most-repeated 5-step command to a 2-letter alias — it adds up fast over a year.",
+   hashtags:"#autocadcustomization #cadhacks #powerusertips"},
+
+  {day:77, phase:"Phase 3.5: Workflow Compression", type:"command", software:"AutoCAD",
+   key:"DATAEXTRACTION", title:"Auto-Pull Block Data Into a Table",
+   desc:"Stop manually counting every door/window block for a schedule.",
+   steps:["Type DATAEXTRACTION and hit Enter.","Run the wizard and select which block properties to include.","Generate a schedule table directly in your drawing, or export straight to Excel."],
+   protip:"Re-run the same extraction later and it updates the table automatically as your drawing changes.",
+   hashtags:"#autocad #dataextraction #cadhacks #drafting #civilengineering"}
+];
+
+let DAYS = JSON.parse(localStorage.getItem('civilcut_days')) || seedDays;
+let completedDays = new Set(JSON.parse(localStorage.getItem('civilcut_done') || '[]'));
+let currentIndex = 0;
+let latestGeneratedResearch = null; // Store latest AI generated result object
+let fileHandle = null; // Stored FileSystemFileHandle for disk sync
+
+// IndexedDB persistence helper for FileSystemHandle
+const DB_NAME = 'CivilCutDB';
+const STORE_NAME = 'FileHandles';
+
+function getDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getStoredHandle() {
+  try {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get('data_json');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (e) {
+    console.error("IndexedDB load error:", e);
+    return null;
+  }
+}
+
+async function storeHandle(handle) {
+  try {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(handle, 'data_json');
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch (e) {
+    console.error("IndexedDB store error:", e);
+  }
+}
+
+async function removeStoredHandle() {
+  try {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete('data_json');
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch (e) {
+    console.error("IndexedDB delete error:", e);
+  }
+}
+
+// Request and verify file system permissions
+async function verifyPermission(handle, readWrite) {
+  const options = {};
+  if (readWrite) {
+    options.mode = 'readwrite';
+  }
+  if ((await handle.queryPermission(options)) === 'granted') {
+    return true;
+  }
+  if ((await handle.requestPermission(options)) === 'granted') {
+    return true;
+  }
+  return false;
+}
+
+// Update local sync status element
+function updateSyncStatus(connected, filename = '') {
+  const statusEl = document.getElementById('sync-status');
+  const btnEl = document.getElementById('btn-connect-file');
+  if (connected) {
+    statusEl.innerHTML = `Linked to disk file:<br><span style="color: var(--ok); font-family: 'JetBrains Mono'; font-weight: 700;">${escapeHtml(filename)}</span>`;
+    btnEl.textContent = "🔌 Change Connected File";
+    btnEl.style.borderColor = "var(--ok)";
+    btnEl.style.color = "var(--ok)";
+  } else {
+    statusEl.innerHTML = `Local Sandbox Mode<br><span style="color: var(--paper-dim); font-size: 0.72rem;">(Saves to browser storage)</span>`;
+    btnEl.textContent = "🔌 Connect local JSON File";
+    btnEl.style.borderColor = "var(--accent)";
+    btnEl.style.color = "var(--accent)";
+  }
+}
+
+// Load sync data from disk file
+async function loadSyncDataFromFile(handle) {
+  try {
+    const file = await handle.getFile();
+    const contents = await file.text();
+    if (contents.trim()) {
+      const data = JSON.parse(contents);
+      if (data.days && Array.isArray(data.days)) {
+        DAYS = data.days;
+        localStorage.setItem('civilcut_days', JSON.stringify(DAYS));
+      }
+      if (data.completed && Array.isArray(data.completed)) {
+        completedDays = new Set(data.completed);
+        localStorage.setItem('civilcut_done', JSON.stringify([...completedDays]));
+      }
+      toast(`Loaded ${DAYS.length} days from ${handle.name}`);
+    }
+  } catch (err) {
+    console.error("Failed to parse file data:", err);
+    toast("Connected to empty or invalid file. Ready to sync.");
+  }
+}
+
+// Connect file system trigger
+async function connectLocalFile() {
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      types: [{
+        description: 'JSON Files',
+        accept: {
+          'application/json': ['.json']
+        }
+      }],
+      excludeAcceptAllOption: true,
+      multiple: false
+    });
+    
+    const hasPerm = await verifyPermission(handle, true);
+    if (!hasPerm) {
+      toast("Write permission denied. Sandbox mode active.");
+      return;
+    }
+    
+    fileHandle = handle;
+    await storeHandle(handle);
+    await loadSyncDataFromFile(handle);
+    updateSyncStatus(true, handle.name);
+    
+    currentIndex = 0;
+    loadDay();
+    saveCurrentDayData(); // sync immediately to keep state
+  } catch (e) {
+    console.error(e);
+    if (e.name !== 'AbortError') {
+      toast("Error connecting local file.");
+    }
+  }
+}
+
+// Auto-save form content back to DAYS array and file handle if connected
+async function saveCurrentDayData() {
+  if (currentIndex < 0 || currentIndex >= DAYS.length) return;
+  const d = DAYS[currentIndex];
+  d.software = document.getElementById('f-software').value;
+  d.title = document.getElementById('f-title').value;
+  d.desc = document.getElementById('f-desc').value;
+  d.protip = document.getElementById('f-protip').value;
+  d.hashtags = document.getElementById('f-hashtags').value;
+  d.key = document.getElementById('f-key').value;
+  
+  const rows = getStepValues();
+  if (d.type === 'command') {
+    d.steps = rows;
+  } else {
+    d.items = rows;
+  }
+  
+  // Always cache back to browser storage
+  localStorage.setItem('civilcut_days', JSON.stringify(DAYS));
+  localStorage.setItem('civilcut_done', JSON.stringify([...completedDays]));
+  
+  // Real-time synchronization to disk file
+  if (fileHandle) {
+    try {
+      const writable = await fileHandle.createWritable();
+      const payload = {
+        days: DAYS,
+        completed: Array.from(completedDays)
+      };
+      await writable.write(JSON.stringify(payload, null, 2));
+      await writable.close();
+    } catch (err) {
+      console.error("Auto-sync disk write failed:", err);
+    }
+  }
+}
+
+// Tab Toggling Controls
+const tabBtnStudio = document.getElementById('tab-btn-studio');
+const tabBtnResearch = document.getElementById('tab-btn-research');
+const studioWorkspace = document.getElementById('studio-workspace');
+const researchWorkspace = document.getElementById('research-workspace');
+const sidebarStudioControls = document.getElementById('sidebar-studio-controls');
+
+if (tabBtnStudio && tabBtnResearch) {
+  tabBtnStudio.addEventListener('click', () => {
+    tabBtnStudio.classList.add('active');
+    tabBtnResearch.classList.remove('active');
+    studioWorkspace.style.display = 'block';
+    sidebarStudioControls.style.display = 'block';
+    researchWorkspace.style.display = 'none';
+  });
+  
+  tabBtnResearch.addEventListener('click', () => {
+    tabBtnResearch.classList.add('active');
+    tabBtnStudio.classList.remove('active');
+    studioWorkspace.style.display = 'none';
+    sidebarStudioControls.style.display = 'none';
+    researchWorkspace.style.display = 'grid';
+  });
+}
+
+/* ============ RENDER: SIDEBAR ============ */
+function renderSidebar(){
+  const wrap = document.getElementById('sidebar-days');
+  wrap.innerHTML = '';
+  const phases = [...new Set(DAYS.map(d=>d.phase))];
+  phases.forEach(phase=>{
+    const group = document.createElement('div');
+    group.className = 'phase-group';
+    const label = document.createElement('div');
+    label.className = 'phase-label';
+    label.textContent = phase;
+    group.appendChild(label);
+    DAYS.forEach((d, i)=>{
+      if(d.phase !== phase) return;
+      const item = document.createElement('div');
+      item.className = 'day-item' + (i===currentIndex ? ' active':'') + (completedDays.has(String(d.day)) ? ' done':'');
+      item.innerHTML = `<span class="dchk">${completedDays.has(String(d.day))?'✓':''}</span><span class="dnum">D${d.day}</span><span>${d.title}</span>`;
+      item.onclick = ()=>{ currentIndex = i; loadDay(); };
+      group.appendChild(item);
+    });
+    wrap.appendChild(group);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = DAYS.length;
+  const done = DAYS.filter(d=>completedDays.has(String(d.day))).length;
+  document.getElementById('progress-count').textContent = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width = total ? (done/total*100)+'%' : '0%';
+}
+
+/* ============ LOAD DAY INTO FORM ============ */
+function loadDay(){
+  const d = DAYS[currentIndex];
+  document.getElementById('day-title').textContent = `Day ${d.day} — ${d.title}`;
+  document.getElementById('day-sub').textContent = d.phase;
+  document.getElementById('f-software').value = d.software;
+  document.getElementById('f-title').value = d.title;
+  document.getElementById('f-desc').value = d.desc;
+  document.getElementById('f-protip').value = d.protip || '';
+  document.getElementById('f-hashtags').value = d.hashtags || '';
+  document.getElementById('f-key').value = d.key || '';
+
+  setType(d.type, false);
+  const container = document.getElementById('steps-container');
+  container.innerHTML = '';
+  const arr = d.type === 'command' ? (d.steps||[]) : (d.items||[]);
+  arr.forEach(val => addStepRow(val));
+
+  renderSidebar();
+  renderCaption();
+  renderCardPreview();
+}
+
+/* ============ TYPE TOGGLE (command vs list) ============ */
+function setType(type, resetRows=true){
+  document.getElementById('type-command').classList.toggle('active', type==='command');
+  document.getElementById('type-list').classList.toggle('active', type==='list');
+  document.getElementById('key-field').style.display = type==='command' ? 'block':'none';
+  document.getElementById('steps-label').textContent = type==='command' ? 'Steps' : 'Shortcut List Items';
+  DAYS[currentIndex] = DAYS[currentIndex] || {};
+  DAYS[currentIndex].type = type;
+  if(resetRows){
+    document.getElementById('steps-container').innerHTML = '';
+    addStepRow('');
+  }
+  saveCurrentDayData();
+}
+document.getElementById('type-command').onclick = ()=>setType('command');
+document.getElementById('type-list').onclick = ()=>setType('list');
+
+/* ============ DYNAMIC STEP/LIST ROWS ============ */
+function addStepRow(value=''){
+  const container = document.getElementById('steps-container');
+  const row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = `<input type="text" value="${escapeHtml(value)}"><button class="rm">×</button>`;
+  row.querySelector('input').oninput = ()=>{ renderCaption(); renderCardPreview(); saveCurrentDayData(); };
+  row.querySelector('.rm').onclick = ()=>{
+    if(container.children.length <= 1) return; // keep at least 1 row
+    row.remove(); renderCaption(); renderCardPreview(); saveCurrentDayData();
+  };
+  container.appendChild(row);
+}
+document.getElementById('btn-add-step').onclick = ()=>{ addStepRow(''); saveCurrentDayData(); };
+
+function getStepValues(){
+  return [...document.querySelectorAll('#steps-container input')].map(i=>i.value).filter(v=>v.trim()!=='');
+}
+
+/* live-update on any field change */
+['f-software','f-title','f-desc','f-protip','f-hashtags','f-key','f-handle'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{ renderCaption(); renderCardPreview(); saveCurrentDayData(); });
+});
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+/* ============ RENDER: CARD PREVIEW ============ */
+function renderCardPreview(){
+  const type = document.getElementById('type-command').classList.contains('active') ? 'command' : 'list';
+  document.getElementById('c-software').textContent = document.getElementById('f-software').value.toUpperCase();
+  document.getElementById('c-handle').textContent = '@' + document.getElementById('f-handle').value.replace('@','');
+  document.getElementById('c-protip').textContent = document.getElementById('f-protip').value;
+  
+  if (document.getElementById('tb-drawn-by')) {
+    document.getElementById('tb-drawn-by').textContent = document.getElementById('f-handle').value.replace('@','').toLowerCase();
+  }
+  if (document.getElementById('tb-sheet')) {
+    document.getElementById('tb-sheet').textContent = String(DAYS[currentIndex]?.day ?? '01').padStart(2,'0');
+  }
+  if (document.getElementById('tb-scale')) {
+    document.getElementById('tb-scale').textContent = "1:1";
+  }
+  if (document.getElementById('tb-rev')) {
+    document.getElementById('tb-rev').textContent = "R0";
+  }
+  if (document.getElementById('tb-dwg-no')) {
+    const sw = document.getElementById('f-software').value.substring(0,3).toUpperCase();
+    const key = (document.getElementById('f-key').value || 'DWG').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    document.getElementById('tb-dwg-no').textContent = `${sw}-${key}`;
+  }
+
+  const body = document.getElementById('c-body');
+  const title = document.getElementById('f-title').value;
+  const desc = document.getElementById('f-desc').value;
+  const rows = getStepValues();
+
+  if(type === 'command'){
+    const key = document.getElementById('f-key').value;
+    body.innerHTML = `
+      <div class="keycap">${escapeHtml(key)}</div>
+      <div class="action-title">${escapeHtml(title)}</div>
+      <div class="card-desc">${escapeHtml(desc)}</div>
+      <div class="steps-wrap">
+        ${rows.map((s,i)=>`<div class="step-row"><div class="step-bubble">${String(i+1).padStart(2,'0')}</div><div class="step-text">${escapeHtml(s)}</div></div>`).join('')}
+      </div>`;
+  } else {
+    body.innerHTML = `
+      <div class="action-title">${escapeHtml(title)}</div>
+      <div class="card-desc">${escapeHtml(desc)}</div>
+      <div class="list-items">
+        ${rows.map(s=>{
+          const parts = s.split('—');
+          const k = parts.length>1 ? parts[0].trim() : '';
+          const rest = parts.length>1 ? parts.slice(1).join('—').trim() : s;
+          return `<div class="list-item-row">${k?`<span class="li-key">${escapeHtml(k)}</span>`:''}<span>${escapeHtml(rest)}</span></div>`;
+        }).join('')}
+      </div>`;
+  }
+}
+
+/* ============ CAPTION BUILD + COPY ============ */
+function buildCaption(){
+  const title = document.getElementById('f-title').value;
+  const desc = document.getElementById('f-desc').value;
+  const protip = document.getElementById('f-protip').value;
+  const hashtags = document.getElementById('f-hashtags').value;
+  const rows = getStepValues();
+  let body = `${title}\n\n${desc}\n\n`;
+  rows.forEach((r,i)=>{ body += `${i+1}. ${r}\n`; });
+  if(protip) body += `\n💡 Pro tip: ${protip}\n`;
+  body += `\n${hashtags}`;
+  return body;
+}
+function renderCaption(){ document.getElementById('caption-preview').textContent = buildCaption(); }
+
+document.getElementById('btn-copy-caption').onclick = ()=>{
+  navigator.clipboard.writeText(buildCaption());
+  toast('Caption + hashtags copied');
+};
+
+/* ============ EXPORT: SINGLE IMAGE ============ */
+async function captureCard(){
+  const el = document.getElementById('card');
+  return await html2canvas(el, {backgroundColor:null, scale:1});
+}
+document.getElementById('btn-export-single').onclick = async ()=>{
+  const canvas = await captureCard();
+  const link = document.createElement('a');
+  link.download = `Day${DAYS[currentIndex].day}_${document.getElementById('f-title').value.replace(/\s+/g,'_')}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  toast('Image exported');
+};
+
+/* ============ EXPORT: CAROUSEL (multi-slide ZIP) ============ */
+/* ============ EXPORT: CAROUSEL (multi-slide ZIP offscreen) ============ */
+async function exportCarousel(){
+  const type = document.getElementById('type-command').classList.contains('active') ? 'command' : 'list';
+  const title = document.getElementById('f-title').value;
+  const desc = document.getElementById('f-desc').value;
+  const protip = document.getElementById('f-protip').value;
+  const rows = getStepValues();
+  
+  if (rows.length === 0) {
+    toast('Add at least one step or list item to export a carousel');
+    return;
+  }
+
+  const zip = new JSZip();
+  
+  // Clone card offscreen
+  const originNode = document.getElementById('card');
+  const clone = originNode.cloneNode(true);
+  clone.style.transform = 'none';
+  clone.style.position = 'fixed';
+  clone.style.top = '-9999px';
+  clone.style.left = '-9999px';
+  document.body.appendChild(clone);
+  
+  const cloneBody = clone.querySelector('#c-body');
+  const cloneProtipWrap = clone.querySelector('#c-protip-wrap');
+  
+  let slideIdx = 1;
+
+  // Slide 1: Hook/title only
+  cloneBody.innerHTML = `
+    <div class="action-title" style="font-size:64px; text-align:center; margin-top:60px;">${escapeHtml(title)}</div>
+    <div class="card-desc" style="font-size:30px; text-align:center; max-width:90%; margin:30px auto 0;">${escapeHtml(desc)}</div>
+  `;
+  if (cloneProtipWrap) cloneProtipWrap.style.display = 'none';
+  await sleep(100);
+  zip.file(`slide_${String(slideIdx).padStart(2,'0')}.png`, await cloneCanvasBlob(clone));
+  slideIdx++;
+
+  // Middle slides: one step per slide
+  for(let i=0; i<rows.length; i++){
+    if(type === 'command'){
+      cloneBody.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:40px;">
+          <div class="step-bubble" style="width:80px;height:80px;font-size:34px;margin-bottom:26px;">${String(i+1).padStart(2,'0')}</div>
+          <div class="step-text" style="font-size:38px; max-width:900px; text-align:center;">${escapeHtml(rows[i])}</div>
+        </div>`;
+    } else {
+      const parts = rows[i].split('—');
+      const k = parts.length>1 ? parts[0].trim() : '';
+      const rest = parts.length>1 ? parts.slice(1).join('—').trim() : rows[i];
+      cloneBody.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:40px;">
+          ${k?`<div class="keycap" style="margin-bottom:26px; font-size:44px;">${escapeHtml(k)}</div>`:''}
+          <div class="step-text" style="font-size:38px; max-width:900px; text-align:center;">${escapeHtml(rest)}</div>
+        </div>`;
+    }
+    await sleep(100);
+    zip.file(`slide_${String(slideIdx).padStart(2,'0')}.png`, await cloneCanvasBlob(clone));
+    slideIdx++;
+  }
+
+  // Final slide: pro tip + CTA
+  cloneBody.innerHTML = `<div class="action-title" style="font-size:48px; text-align:center; margin-top:60px;">That's the trick.</div>`;
+  if (cloneProtipWrap) {
+    cloneProtipWrap.style.display = protip ? 'block' : 'none';
+    const cloneProtipText = cloneProtipWrap.querySelector('#c-protip');
+    if (cloneProtipText) cloneProtipText.textContent = protip;
+  }
+  await sleep(100);
+  zip.file(`slide_${String(slideIdx).padStart(2,'0')}.png`, await cloneCanvasBlob(clone));
+
+  // Clean up
+  document.body.removeChild(clone);
+
+  const blob = await zip.generateAsync({type:'blob'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `Day${DAYS[currentIndex].day}_Carousel.zip`;
+  link.click();
+  toast('Carousel ZIP exported');
+}
+
+async function cloneCanvasBlob(el){
+  const canvas = await html2canvas(el, {backgroundColor:null, scale:1});
+  return await new Promise(res => canvas.toBlob(res, 'image/png'));
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+document.getElementById('btn-export-carousel').onclick = exportCarousel;
+
+/* ============ MARK DONE / NAV ============ */
+document.getElementById('btn-mark-done').onclick = ()=>{
+  const key = String(DAYS[currentIndex].day);
+  if(completedDays.has(key)) completedDays.delete(key); else completedDays.add(key);
+  localStorage.setItem('civilcut_done', JSON.stringify([...completedDays]));
+  renderSidebar();
+};
+document.getElementById('btn-next').onclick = ()=>{
+  if(currentIndex < DAYS.length-1){ currentIndex++; loadDay(); }
+};
+document.getElementById('btn-prev').onclick = ()=>{
+  if(currentIndex > 0){ currentIndex--; loadDay(); }
+};
+
+/* ============ BACKUP / RESTORE ============ */
+document.getElementById('btn-export-backup').onclick = ()=>{
+  const data = {days:DAYS, completed:[...completedDays]};
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'civilcut_backup.json';
+  link.click();
+  toast('Backup downloaded');
+};
+document.getElementById('btn-import-backup').onclick = ()=> document.getElementById('import-file').click();
+document.getElementById('import-file').onchange = (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(data.days) {
+        DAYS = data.days;
+        localStorage.setItem('civilcut_days', JSON.stringify(DAYS));
+      }
+      if(data.completed) {
+        completedDays = new Set(data.completed);
+        localStorage.setItem('civilcut_done', JSON.stringify([...completedDays]));
+      }
+      currentIndex = 0;
+      loadDay();
+      toast('Backup restored');
+    }catch(err){ toast('Invalid backup file'); }
+  };
+  reader.readAsText(file);
+};
+
+/* ============ AI PASTE PARSER (batch, split by ---) ============ */
+document.getElementById('btn-parse-paste').onclick = ()=>{
+  const raw = document.getElementById('ai-paste').value;
+  if(!raw.trim()) return;
+  const chunks = raw.split(/^---$/m).map(c=>c.trim()).filter(c=>c);
+  let added = 0;
+  chunks.forEach(chunk=>{
+    const get = (label) => {
+      const m = chunk.match(new RegExp(label + ':\\s*(.+)', 'i'));
+      return m ? m[1].trim() : '';
+    };
+    const stepsMatch = chunk.match(/Steps:\s*([\s\S]*?)(?:Pro Tip:|Hashtags:|$)/i);
+    const steps = stepsMatch ? stepsMatch[1].split(/\n/).map(s=>s.replace(/^\d+\.\s*/,'').trim()).filter(s=>s) : [];
+    const software = get('Software') || 'AutoCAD';
+    const key = get('Shortcut');
+    const action = get('Action') || 'Untitled';
+    const desc = get('Description');
+    const protip = get('Pro Tip');
+    const hashtags = get('Hashtags');
+    const nextDay = (DAYS.length ? Math.max(...DAYS.map(d=>parseFloat(d.day)||0)) : 0) + 1;
+    DAYS.push({
+      day: nextDay, phase:"Custom Added", type: key ? 'command' : 'list',
+      software, key, title:action, desc, steps, items:steps, protip, hashtags
+    });
+    added++;
+  });
+  localStorage.setItem('civilcut_days', JSON.stringify(DAYS));
+  document.getElementById('ai-paste').value = '';
+  renderSidebar();
+  toast(`${added} card(s) added to library`);
+};
+
+/* ============ AI RESEARCH GROUNDING HUB ============ */
+const aiApiKeyInput = document.getElementById('ai-api-key');
+const aiPromptInput = document.getElementById('ai-prompt');
+const btnAiGenerate = document.getElementById('btn-ai-generate');
+const aiLoadingContainer = document.getElementById('ai-loading-container');
+const aiLoadingText = document.getElementById('ai-loading-text');
+
+const researchEmptyState = document.getElementById('research-empty-state');
+const researchResultsDisplay = document.getElementById('research-results-display');
+const resSoftware = document.getElementById('res-software');
+const resKeys = document.getElementById('res-keys');
+const resAction = document.getElementById('res-action');
+const resDesc = document.getElementById('res-desc');
+const resSteps = document.getElementById('res-steps');
+const resProTip = document.getElementById('res-protip');
+const btnImportResearchToStudio = document.getElementById('btn-import-research-to-studio');
+const btnSaveResearchToHub = document.getElementById('btn-save-research-to-hub');
+
+if (aiApiKeyInput) {
+  aiApiKeyInput.value = localStorage.getItem('civilcut_gemini_key') || '';
+  aiApiKeyInput.addEventListener('input', () => {
+    localStorage.setItem('civilcut_gemini_key', aiApiKeyInput.value.trim());
+  });
+}
+
+if (btnAiGenerate) {
+  btnAiGenerate.addEventListener('click', async () => {
+    const apiKey = aiApiKeyInput.value.trim();
+    const topic = aiPromptInput.value.trim();
+    
+    if (!apiKey) {
+      toast("Please enter a valid Gemini API Key.");
+      return;
+    }
+    
+    if (!topic) {
+      toast("Please enter a query or topic.");
+      return;
+    }
+    
+    btnAiGenerate.disabled = true;
+    btnAiGenerate.style.opacity = '0.5';
+    aiLoadingContainer.style.display = 'flex';
+    aiLoadingText.textContent = "Grounding on Google Search & generating card...";
+    
+    const systemPrompt = `You are a professional Civil Engineering content writer. The user wants to generate an Instagram post for a shortcut related to: "${topic}".
+    
+    YOUR INSTRUCTIONS:
+    1. Use the googleSearchRetrieval tool to perform search queries to find the exact software, official command name, and keyboard shortcut keys used for this topic.
+    2. Identify the most popular and industry-standard software (AutoCAD, Revit, Civil 3D, ETABS, or SketchUp).
+    3. Extract or deduce the primary keyboard shortcut (e.g. TR for Trim in AutoCAD, WA for Wall in Revit, F5 for Run Analysis in ETABS, or ALIGNMENT for Civil 3D alignments).
+    4. Generate a detailed, engaging description of what the tool does.
+    5. Provide 3 simple, sequential steps to use this shortcut.
+    6. Include a high-value "Pro Tip" related to this shortcut.
+    7. You MUST return ONLY a JSON object that matches the following schema. Do not wrap in markdown tags or include any trailing text:
+    {
+      "software": "AutoCAD | Revit | Civil 3D | ETABS | SketchUp",
+      "keys": "keyboard shortcut keys (capitalized, e.g. TR or F5)",
+      "action": "action name (e.g., Trim Lines)",
+      "desc": "brief description of what it does",
+      "steps": [
+        "Step 1 text",
+        "Step 2 text",
+        "Step 3 text"
+      ],
+      "proTip": "expert tip or value addition"
+    }`;
+    
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: systemPrompt
+            }]
+          }],
+          tools: [{
+            googleSearchRetrieval: {}
+          }],
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error?.message || "Gemini API Request failed");
+      }
+      
+      const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!responseText) {
+        throw new Error("No response content returned from Gemini. Please verify your query.");
+      }
+      
+      const data = JSON.parse(responseText);
+      latestGeneratedResearch = data;
+      
+      // Update results UI
+      resSoftware.textContent = data.software || 'AutoCAD';
+      resKeys.textContent = data.keys || '';
+      resAction.textContent = data.action || '';
+      resDesc.textContent = data.desc || '';
+      resProTip.textContent = data.proTip || '';
+      
+      resSteps.innerHTML = '';
+      const stepList = data.steps || [];
+      stepList.forEach(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        resSteps.appendChild(li);
+      });
+      
+      researchEmptyState.style.display = 'none';
+      researchResultsDisplay.style.display = 'flex';
+      
+      toast("Research finished! Review and load/save on the right.");
+      aiPromptInput.value = '';
+      
+    } catch (e) {
+      console.error(e);
+      toast(e.message || "Failed to generate shortcut.");
+    } finally {
+      btnAiGenerate.disabled = false;
+      btnAiGenerate.style.opacity = '1';
+      aiLoadingContainer.style.display = 'none';
+    }
+  });
+}
+
+if (btnImportResearchToStudio) {
+  btnImportResearchToStudio.addEventListener('click', () => {
+    if (!latestGeneratedResearch) {
+      toast("No research data found.");
+      return;
+    }
+    
+    const d = latestGeneratedResearch;
+    
+    // software
+    document.getElementById('f-software').value = d.software || 'AutoCAD';
+    document.getElementById('f-title').value = d.action || '';
+    document.getElementById('f-desc').value = d.desc || '';
+    document.getElementById('f-protip').value = d.proTip || '';
+    document.getElementById('f-key').value = d.keys || '';
+    
+    setType(d.keys ? 'command' : 'list', false);
+    const container = document.getElementById('steps-container');
+    container.innerHTML = '';
+    const arr = d.steps || [];
+    arr.forEach(val => addStepRow(val));
+    
+    saveCurrentDayData();
+    renderCaption();
+    renderCardPreview();
+    
+    // Switch to studio tab
+    document.getElementById('tab-btn-studio').click();
+    toast("Loaded research results into Studio editor!");
+  });
+}
+
+if (btnSaveResearchToHub) {
+  btnSaveResearchToHub.addEventListener('click', () => {
+    if (!latestGeneratedResearch) {
+      toast("No research data found.");
+      return;
+    }
+    
+    const d = latestGeneratedResearch;
+    const nextDay = (DAYS.length ? Math.max(...DAYS.map(x=>parseFloat(x.day)||0)) : 0) + 1;
+    
+    DAYS.push({
+      day: nextDay,
+      phase: "Research Added",
+      type: d.keys ? 'command' : 'list',
+      software: d.software || 'AutoCAD',
+      key: d.keys || '',
+      title: d.action || 'Untitled',
+      desc: d.desc || '',
+      steps: d.steps || [],
+      items: d.steps || [],
+      protip: d.proTip || '',
+      hashtags: "#autocad #civilengineering"
+    });
+    
+    localStorage.setItem('civilcut_days', JSON.stringify(DAYS));
+    renderSidebar();
+    toast(`Successfully saved researched shortcut to Production Line Day ${nextDay}!`);
+  });
+}
+
+/* ============ TOAST ============ */
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2400);
+}
+
+// Wire file connect button click listener
+if (document.getElementById('btn-connect-file')) {
+  document.getElementById('btn-connect-file').onclick = connectLocalFile;
+}
+
+// Auto-reconnect stored JSON file handle if present in IndexedDB on page load
+async function initDiskSync() {
+  try {
+    const handle = await getStoredHandle();
+    if (handle) {
+      // Browser safety requires user action or verification check
+      const options = { mode: 'readwrite' };
+      if (await handle.queryPermission(options) === 'granted') {
+        fileHandle = handle;
+        await loadSyncDataFromFile(handle);
+        updateSyncStatus(true, handle.name);
+        currentIndex = 0;
+        loadDay();
+      } else {
+        // Show status that we found a file but need permission re-grant
+        const statusEl = document.getElementById('sync-status');
+        const btnEl = document.getElementById('btn-connect-file');
+        statusEl.innerHTML = `Found linked file:<br><span style="color: var(--accent); font-family: 'JetBrains Mono'; font-weight: 700;">${escapeHtml(handle.name)}</span><br><span style="font-size:0.75rem; color:var(--paper-dim);">Click button below to authorize.</span>`;
+        btnEl.textContent = "🔓 Authorize Sync & Connect";
+        btnEl.onclick = async () => {
+          const granted = await verifyPermission(handle, true);
+          if (granted) {
+            fileHandle = handle;
+            await loadSyncDataFromFile(handle);
+            updateSyncStatus(true, handle.name);
+            btnEl.onclick = connectLocalFile; // restore picker event
+            currentIndex = 0;
+            loadDay();
+            saveCurrentDayData();
+          } else {
+            toast("Authorization denied. Staying in sandbox mode.");
+          }
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Failed to restore file sync handle:", e);
+  }
+}
+
+/* ============ INIT ============ */
+async function initApp() {
+  loadDay();
+  await initDiskSync();
+}
+initApp();
+</script>
+</body>
+</html>

@@ -1,1466 +1,881 @@
-// Automatically generated from markdown files
+// 30-Day Feed-Only Schedule — All 82 pieces across 30 days (~3 posts/day)
+// Each object is one post. Day numbering uses "1a", "1b", "1c" for multi-post days.
+// "slot" indicates posting order within the day (morning / afternoon / evening).
 const autocadCalendar = [
+
+  // ─────────────────────────────────────────────
+  // DAY 1  —  3 posts
+  // ─────────────────────────────────────────────
   {
-    "day": "1",
-    "format": "carousel",
+    "day": "1a", "slot": "Morning", "format": "carousel",
     "title": "Top 10 Drawing Shortcuts",
-    "bullets": [
-      "L \u2013 Line",
-      "PL \u2013 Polyline",
-      "C \u2013 Circle",
-      "REC \u2013 Rectangle",
-      "ARC (A) \u2013 Arc",
-      "POL \u2013 Polygon",
-      "EL \u2013 Ellipse",
-      "DO \u2013 Donut",
-      "PO \u2013 Point",
-      "SPL \u2013 Spline"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad",
-      "#autocadtips",
-      "#civilengineering",
-      "#cadtips",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "desc": "The 10 essential drawing shortcuts every AutoCAD user needs memorized.",
+    "bullets": ["L – Line", "PL – Polyline", "C – Circle", "REC – Rectangle", "ARC (A) – Arc", "POL – Polygon", "EL – Ellipse", "DO – Donut", "PO – Point", "SPL – Spline"],
+    "proTip": "Type just the alias and press Enter — never touch the ribbon.",
+    "hashtags": ["#autocad", "#autocadtips", "#civilengineering", "#cadtips", "#drafting"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "2",
-    "format": "reel",
-    "title": "\"You're drawing lines the slow way\"",
-    "bullets": [],
-    "script": "Clicking ribbon (slow) vs typing \"L\"+Enter (fast). Text overlay on time saved.",
-    "caption": "The ribbon is not your friend. Learn your commands.",
-    "hashtags": [
-      "#autocad",
-      "#cadhacks",
-      "#engineeringtips",
-      "#productivityhacks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "day": "1b", "slot": "Afternoon", "format": "carousel",
+    "title": "Line Command: Ribbon vs Shortcut",
+    "desc": "Clicking the ribbon vs typing 'L' and pressing Enter — the difference in speed is massive.",
+    "bullets": ["Ribbon click = 2-3 seconds per command", "Type L + Enter = instant", "Build muscle memory from Day 1", "Never click the ribbon for commands you use daily"],
+    "proTip": "Time yourself for one week — you'll never go back to ribbon clicking.",
+    "hashtags": ["#autocad", "#cadhacks", "#engineeringtips", "#productivityhacks"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "3",
-    "format": "carousel",
-    "title": "More Drawing Tools",
-    "bullets": [
-      "XL \u2013 Construction Line (infinite line)",
-      "RAY \u2013 Ray (one-directional infinite line)",
-      "REG \u2013 Region (2D closed area object)",
-      "BOUNDARY (BO) \u2013 Create polyline/region from enclosed area",
-      "DIV \u2013 Divide an object into equal segments",
-      "MEA \u2013 Measure an object at fixed intervals"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad",
-      "#drafting",
-      "#cadtips",
-      "#civilengineering"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "4",
-    "format": "image",
+    "day": "1c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: BOUNDARY",
+    "desc": "Need a closed polyline from overlapping lines without redrawing? BOUNDARY auto-traces a clean closed shape.",
     "bullets": [],
-    "script": "",
-    "caption": "Need a closed polyline from overlapping lines without redrawing? Type **BOUNDARY**, click inside the area, and AutoCAD auto-traces a clean closed shape.",
-    "hashtags": [
-      "#autocadhiddenfeatures",
-      "#cadtricks",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "proTip": "Use BO (short alias) to launch it even faster.",
+    "hashtags": ["#autocadhiddenfeatures", "#cadtricks", "#drafting"],
+    "phase": "Week 1 — 2D Drawing Basics"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 2  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "2a", "slot": "Morning", "format": "carousel",
+    "title": "More Drawing Tools",
+    "desc": "Beyond Line and Circle — the drawing tools that handle complex geometry.",
+    "bullets": ["XL – Construction Line (infinite)", "RAY – Ray (one-directional)", "REG – Region (2D closed area)", "BOUNDARY (BO) – Closed polyline from area", "DIV – Divide into equal segments", "MEA – Measure at fixed intervals"],
+    "proTip": "XL is invaluable for setting up reference geometry before you start detailing.",
+    "hashtags": ["#autocad", "#drafting", "#cadtips", "#civilengineering"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "5",
-    "format": "carousel",
-    "title": "Polyline Editing",
-    "bullets": [
-      "PE \u2013 Polyline Edit (join, width, curve fit)",
-      "JOIN (J) \u2013 Join lines/arcs/polylines into one object",
-      "SPLINEDIT \u2013 Edit spline objects",
-      "CLOSE \u2013 Close an open polyline"
-    ],
-    "script": "",
-    "caption": "## Week 2 (Days 6-10): Editing Commands",
-    "hashtags": [
-      "#autocad",
-      "#polylines",
-      "#drafting",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "day": "2b", "slot": "Afternoon", "format": "carousel",
+    "title": "Trim Command Trick Nobody Teaches You",
+    "desc": "Press Enter immediately after TR — no cutting edge selection needed. AutoCAD uses ALL visible objects as cutting edges.",
+    "bullets": ["Type TR → Enter", "Press Enter again (skip edge selection)", "Click anything to trim — it just works", "Saves 10+ minutes on complex drawings"],
+    "proTip": "Hold Shift while trimming to switch to Extend mode instantly.",
+    "hashtags": ["#autocadtrim", "#cadhacks", "#drafting"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "6",
-    "format": "carousel",
-    "title": "Essential Editing Shortcuts",
-    "bullets": [
-      "TR \u2013 Trim",
-      "EX \u2013 Extend",
-      "CO / CP \u2013 Copy",
-      "MI \u2013 Mirror",
-      "O \u2013 Offset",
-      "F \u2013 Fillet",
-      "CHA \u2013 Chamfer",
-      "S \u2013 Stretch",
-      "RO \u2013 Rotate",
-      "SC \u2013 Scale"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadtips",
-      "#cadediting",
-      "#civil3d",
-      "#drafting101"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "7",
-    "format": "reel",
-    "title": "\"The Trim command trick nobody teaches you\"",
-    "bullets": [],
-    "script": "Press Enter immediately after TR (no cutting edge selection) \u2014 trims using all visible objects.",
-    "caption": "This saves 10+ minutes on complex drawings.",
-    "hashtags": [
-      "#autocadtrim",
-      "#cadhacks",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "8",
-    "format": "carousel",
-    "title": "Array & Duplication Commands",
-    "bullets": [
-      "AR \u2013 Array (rectangular/polar/path)",
-      "ARRAYRECT \u2013 Rectangular array directly",
-      "ARRAYPOLAR \u2013 Polar array directly",
-      "ARRAYPATH \u2013 Array along a path",
-      "ARRAYEDIT \u2013 Edit an existing array"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad",
-      "#arraycommand",
-      "#drafting",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "9",
-    "format": "image",
+    "day": "2c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: OVERKILL",
+    "desc": "Duplicate overlapping lines causing plot issues? OVERKILL auto-deletes exact duplicates and overlapping geometry in one command.",
     "bullets": [],
-    "script": "",
-    "caption": "Duplicate overlapping lines slowing down your file and causing plot issues? Type **OVERKILL**, select all, and it auto-deletes exact duplicates and overlapping geometry.",
-    "hashtags": [
-      "#autocad",
-      "#cadcleanup",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "proTip": "Run OVERKILL before every file submission — keeps your drawings clean.",
+    "hashtags": ["#autocad", "#cadcleanup", "#drafting"],
+    "phase": "Week 1 — 2D Drawing Basics"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 3  —  2 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "3a", "slot": "Morning", "format": "carousel",
+    "title": "Polyline Editing",
+    "desc": "Everything you can do with polylines that most people don't know about.",
+    "bullets": ["PE – Polyline Edit (join, width, curve fit)", "JOIN (J) – Join lines/arcs/polylines into one", "SPLINEDIT – Edit spline objects", "CLOSE – Close an open polyline"],
+    "proTip": "Use PE → J to join multiple separate lines into a single clean polyline.",
+    "hashtags": ["#autocad", "#polylines", "#drafting", "#cadtips"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "10",
-    "format": "carousel",
-    "title": "More Editing Tools",
-    "bullets": [
-      "BR \u2013 Break",
-      "BREAKATPOINT \u2013 Break without gap",
-      "JOIN \u2013 Join objects",
-      "LEN \u2013 Lengthen",
-      "ALIGN (AL) \u2013 Align objects to another reference",
-      "REVERSE \u2013 Reverse polyline direction"
-    ],
-    "script": "",
-    "caption": "## Week 3 (Days 11-15): Layers & Object Properties",
-    "hashtags": [
-      "#autocad",
-      "#cadediting",
-      "#drafting",
-      "#civilengineering"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "11",
-    "format": "carousel",
-    "title": "Layer Management Shortcuts",
-    "bullets": [
-      "LA \u2013 Layer Manager",
-      "LAYISO \u2013 Isolate Layer",
-      "LAYUNISO \u2013 Restore all layers",
-      "LAYFRZ \u2013 Freeze layer by clicking object",
-      "LAYOFF \u2013 Turn off layer by clicking object",
-      "LAYMCUR \u2013 Set current layer by selecting object",
-      "LAYDEL \u2013 Delete a layer entirely"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadlayers",
-      "#cadorganization",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "12",
-    "format": "image",
+    "day": "3b", "slot": "Afternoon", "format": "image",
     "title": "Hidden Feature: MATCHPROP",
+    "desc": "Stop manually resetting layer, color, and linetype. MATCHPROP copies all formatting from one object to another in one click.",
     "bullets": [],
-    "script": "",
-    "caption": "Stop manually resetting layer, color, and linetype every time. **MATCHPROP** copies all formatting from one object to another in one click.",
-    "hashtags": [
-      "#autocadtips",
-      "#cadefficiency",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "proTip": "Use the 'Settings' option in MATCHPROP to control which properties get copied.",
+    "hashtags": ["#autocadtips", "#cadefficiency", "#drafting"],
+    "phase": "Week 1 — 2D Drawing Basics"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 4  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "4a", "slot": "Morning", "format": "carousel",
+    "title": "Essential Editing Shortcuts",
+    "desc": "The 10 editing commands you'll use every single day.",
+    "bullets": ["TR – Trim", "EX – Extend", "CO / CP – Copy", "MI – Mirror", "O – Offset", "F – Fillet", "CHA – Chamfer", "S – Stretch", "RO – Rotate", "SC – Scale"],
+    "proTip": "Learn these 10 before anything else — they cover 90% of your editing workflow.",
+    "hashtags": ["#autocadtips", "#cadediting", "#civil3d", "#drafting101"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "13",
-    "format": "carousel",
-    "title": "Object Properties Deep Dive",
-    "bullets": [
-      "MO / PR \u2013 Properties Palette",
-      "CH \u2013 Change properties",
-      "CHPROP \u2013 Change specific object properties via command line",
-      "LT \u2013 Linetype Manager",
-      "LTS \u2013 Linetype Scale",
-      "LW \u2013 Lineweight settings"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad",
-      "#objectproperties",
-      "#drafting",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "day": "4b", "slot": "Afternoon", "format": "carousel",
+    "title": "Layer Walk: The Tool That Finds Hidden Junk",
+    "desc": "LAYWALK cycles through every layer interactively — perfect for spotting forgotten or empty layers before a deadline handoff.",
+    "bullets": ["Type LAYWALK", "Click each layer in the list", "Drawing updates in real time showing only that layer", "Find forgotten geometry before submitting"],
+    "proTip": "Run LAYWALK before every handoff — you'll catch hidden objects every time.",
+    "hashtags": ["#autocad", "#layermanagement", "#cadhacks"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "14",
-    "format": "carousel",
-    "title": "More Layer Tools",
-    "bullets": [
-      "LAYWALK \u2013 Preview each layer's content interactively",
-      "LAYMRG \u2013 Merge two layers into one",
-      "LAYCUR \u2013 Change objects to the current layer",
-      "LAYLCK / LAYULK \u2013 Lock/unlock a layer",
-      "LAYVPI \u2013 Isolate layer in current viewport only"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadlayers",
-      "#cadtips",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "15",
-    "format": "reel",
-    "title": "\"Layer Walk: the tool that finds hidden junk\"",
-    "bullets": [],
-    "script": "Demo LAYWALK cycling through layers to spot forgotten/empty layers before a deadline handoff.",
-    "caption": "Never submit a messy layer list again. ## Week 4 (Days 16-20): Dimensioning & Annotation",
-    "hashtags": [
-      "#autocad",
-      "#layermanagement",
-      "#cadhacks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "16",
-    "format": "carousel",
-    "title": "Dimensioning Shortcuts",
-    "bullets": [
-      "DLI \u2013 Linear Dimension",
-      "DAL \u2013 Aligned Dimension",
-      "DAN \u2013 Angular Dimension",
-      "DRA \u2013 Radius Dimension",
-      "DDI \u2013 Diameter Dimension",
-      "DCO \u2013 Continue Dimension",
-      "DBA \u2013 Baseline Dimension"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocaddimensions",
-      "#drafting",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "17",
-    "format": "carousel",
-    "title": "Text & Leader Shortcuts",
-    "bullets": [
-      "MT / T \u2013 Multiline Text",
-      "DT \u2013 Single Line Text",
-      "ED \u2013 Edit Text",
-      "ST \u2013 Text Style Manager",
-      "LE \u2013 Quick Leader",
-      "MLEADER (MLD) \u2013 Multileader",
-      "MLEADERSTYLE \u2013 Multileader style manager"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadtext",
-      "#drafting",
-      "#cadannotations"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "18",
-    "format": "carousel",
-    "title": "Dimension Style & Management",
-    "bullets": [
-      "D \u2013 Dimension Style Manager",
-      "DIMSTYLE \u2013 Same as above, full command",
-      "DIMEDIT (DED) \u2013 Edit dimension text/position",
-      "DIMTEDIT \u2013 Edit dimension text location",
-      "DIMOVERRIDE (DOV) \u2013 Override a single dimension's style"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad",
-      "#dimensionstyles",
-      "#drafting",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "19",
-    "format": "image",
+    "day": "4c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: QDIM",
+    "desc": "Need to dimension 10 points at once? QDIM auto-generates continuous or baseline dimensions instantly — no clicking one at a time.",
     "bullets": [],
-    "script": "",
-    "caption": "Need to dimension 10 points at once instead of one at a time? Type **QDIM**, select all your objects, and it auto-generates continuous or baseline dimensions instantly.",
-    "hashtags": [
-      "#autocad",
-      "#quickdim",
-      "#drafting",
-      "#cadtricks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "proTip": "Select your entire geometry, then run QDIM — works on complex profiles in seconds.",
+    "hashtags": ["#autocad", "#quickdim", "#drafting", "#cadtricks"],
+    "phase": "Week 1 — 2D Drawing Basics"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 5  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "5a", "slot": "Morning", "format": "carousel",
+    "title": "Array & Duplication Commands",
+    "desc": "Stop copying objects one at a time — use arrays for any repeating pattern.",
+    "bullets": ["AR – Array (rectangular/polar/path)", "ARRAYRECT – Rectangular array directly", "ARRAYPOLAR – Polar array directly", "ARRAYPATH – Array along a path", "ARRAYEDIT – Edit an existing array"],
+    "proTip": "Associative arrays let you edit the count and spacing live via grip points after creation.",
+    "hashtags": ["#autocad", "#arraycommand", "#drafting", "#cadtips"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "20",
-    "format": "reel",
-    "title": "\"Multileaders vs old leaders \u2014 use this instead\"",
-    "bullets": [],
-    "script": "Show old LEADER command limitations vs MLEADER's styles, multiple leader lines to one note, and auto-formatting.",
-    "caption": "If you're still using old leaders, it's time to upgrade. ## Week 5 (Days 21-25): Blocks, Attributes & Reusable Content",
-    "hashtags": [
-      "#autocad",
-      "#mleader",
-      "#drafting",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "day": "5b", "slot": "Afternoon", "format": "carousel",
+    "title": "Multileaders vs Old Leaders — Use This Instead",
+    "desc": "The old LEADER command is limited. MLEADER gives you styles, multiple leader lines to one note, and auto-formatting.",
+    "bullets": ["LE – old Quick Leader (limited)", "MLD – Multileader (modern, flexible)", "MLEADERSTYLE – create your own leader styles", "Attach multiple arrowheads to a single note"],
+    "proTip": "Set up an MLEADERSTYLE matching your project standard once — reuse it across all drawings.",
+    "hashtags": ["#autocad", "#mleader", "#drafting", "#cadtips"],
+    "phase": "Week 1 — 2D Drawing Basics"
   },
   {
-    "day": "21",
-    "format": "carousel",
-    "title": "Block Basics",
-    "bullets": [
-      "B \u2013 Block (create a block definition)",
-      "I \u2013 Insert (place a block)",
-      "BEDIT \u2013 Block Editor",
-      "W \u2013 Wblock (write block out as separate file)",
-      "EXPLODE (X) \u2013 Break a block into individual objects"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadblocks",
-      "#cadtips",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "22",
-    "format": "carousel",
-    "title": "Attributes & Dynamic Blocks",
-    "bullets": [
-      "ATTDEF \u2013 Define an attribute",
-      "ATTEDIT (ATE) \u2013 Edit block attribute values",
-      "BATTMAN \u2013 Block Attribute Manager",
-      "Dynamic Block parameters (via BEDIT) \u2013 stretch, rotate, visibility states"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadblocks",
-      "#dynamicblocks",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "23",
-    "format": "image",
+    "day": "5c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: DESIGNCENTER",
+    "desc": "Stop rebuilding blocks and styles from scratch. ADCENTER lets you drag-and-drop content from any other drawing directly into your current one.",
     "bullets": [],
-    "script": "",
-    "caption": "Stop rebuilding the same blocks and styles from scratch. **ADCENTER** (DesignCenter) lets you drag-and-drop content from any other drawing directly into your current one.",
-    "hashtags": [
-      "#autocad",
-      "#designcenter",
-      "#cadefficiency"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "proTip": "Pin your company standards drawing in DesignCenter for instant access to all blocks and layers.",
+    "hashtags": ["#autocad", "#designcenter", "#cadefficiency"],
+    "phase": "Week 1 — 2D Drawing Basics"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 6  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "6a", "slot": "Morning", "format": "carousel",
+    "title": "More Editing Tools",
+    "desc": "The editing commands that fill the gaps in your workflow.",
+    "bullets": ["BR – Break", "BREAKATPOINT – Break without gap", "JOIN – Join objects", "LEN – Lengthen", "ALIGN (AL) – Align to reference", "REVERSE – Reverse polyline direction"],
+    "proTip": "BREAKATPOINT splits a line at an exact point without creating a visible gap — useful for managing overlapping objects.",
+    "hashtags": ["#autocad", "#cadediting", "#drafting", "#civilengineering"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "24",
-    "format": "carousel",
-    "title": "Block Utilities",
-    "bullets": [
-      "PURGE (PU) \u2013 Remove unused blocks/layers/styles",
-      "RENAME (REN) \u2013 Rename a block or other named object",
-      "INSERTOBJ \u2013 Insert OLE object",
-      "MINSERT \u2013 Insert a rectangular array of a block in one step"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadblocks",
-      "#cadcleanup",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "day": "6b", "slot": "Afternoon", "format": "carousel",
+    "title": "Dynamic Blocks: One Block, Endless Variations",
+    "desc": "A single door block that can stretch width, flip orientation, and change swing angle — all from one block definition.",
+    "bullets": ["Open BEDIT (Block Editor)", "Add a Stretch parameter + action", "Add Flip parameter for mirroring", "Add Visibility states for different types"],
+    "proTip": "Replace 5 separate door size blocks with 1 dynamic block — cuts your block library significantly.",
+    "hashtags": ["#autocad", "#dynamicblocks", "#drafting", "#cadhacks"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "25",
-    "format": "reel",
-    "title": "\"Dynamic blocks: one block, endless variations\"",
-    "bullets": [],
-    "script": "Show a single door block that can stretch width, flip orientation, and change swing angle \u2014 all from one block definition.",
-    "caption": "Stop making 5 separate blocks for 5 door sizes. ## Week 6 (Days 26-30): External References & Data",
-    "hashtags": [
-      "#autocad",
-      "#dynamicblocks",
-      "#drafting",
-      "#cadhacks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "26",
-    "format": "carousel",
-    "title": "External References (Xrefs)",
-    "bullets": [
-      "XREF (XR) \u2013 Manage external references",
-      "XATTACH (XA) \u2013 Attach an external drawing",
-      "XCLIP \u2013 Clip an xref to show only part of it",
-      "XBIND \u2013 Bind specific xref elements into your drawing",
-      "BIND \u2013 Bind an entire xref permanently"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadxref",
-      "#cadcollaboration",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "27",
-    "format": "carousel",
-    "title": "Tables & Data Links",
-    "bullets": [
-      "TABLE \u2013 Insert a table object",
-      "TABLEDIT \u2013 Edit table cell content",
-      "DATALINK \u2013 Link an Excel spreadsheet into your drawing",
-      "DATALINKUPDATE \u2013 Refresh linked data from Excel"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadtables",
-      "#datalinks",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "28",
-    "format": "reel",
-    "title": "\"Link Excel data straight into AutoCAD\"",
-    "bullets": [],
-    "script": "Show DATALINK connecting an Excel schedule to an AutoCAD table, then refreshing after an Excel edit.",
-    "caption": "Never manually retype a schedule again.",
-    "hashtags": [
-      "#autocad",
-      "#exceltoautocad",
-      "#datalink",
-      "#cadautomation"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "29",
-    "format": "image",
+    "day": "6c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: FIELD",
+    "desc": "Want your title block to auto-update the date or sheet number? Use FIELD to insert live data instead of static text that goes out of date.",
     "bullets": [],
-    "script": "",
-    "caption": "Want your title block to auto-update the date or sheet number? Use **FIELD** to insert live data instead of static text that goes out of date.",
-    "hashtags": [
-      "#autocad",
-      "#titleblocks",
-      "#cadautomation"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "proTip": "Use FIELD for drawing scale, plot date, file path — anything that changes per sheet.",
+    "hashtags": ["#autocad", "#titleblocks", "#cadautomation"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 7  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "7a", "slot": "Morning", "format": "carousel",
+    "title": "Layer Management Shortcuts",
+    "desc": "The layer commands that save hours on complex multi-discipline drawings.",
+    "bullets": ["LA – Layer Manager", "LAYISO – Isolate Layer", "LAYUNISO – Restore all layers", "LAYFRZ – Freeze layer by clicking object", "LAYOFF – Turn off layer by clicking", "LAYMCUR – Set current layer from object", "LAYDEL – Delete a layer entirely"],
+    "proTip": "LAYISO is the fastest way to focus on one discipline's content — one click isolates everything.",
+    "hashtags": ["#autocadlayers", "#cadorganization", "#drafting"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "30",
-    "format": "reel",
-    "title": "\"Why your file is 200MB and how to fix it\"",
-    "bullets": [],
-    "script": "Show file size before/after PURGE, AUDIT, and detaching unused Xrefs.",
-    "caption": "Bloated files slow you down. Here's the cleanup routine. ## Week 7 (Days 31-35): Parametric & Constraint Tools (2D)",
-    "hashtags": [
-      "#autocad",
-      "#cadfilesize",
-      "#cadcleanup"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "day": "7b", "slot": "Afternoon", "format": "carousel",
+    "title": "Link Excel Data Into AutoCAD",
+    "desc": "Connect a live Excel schedule to an AutoCAD table — update Excel, and the drawing table refreshes automatically.",
+    "bullets": ["DATALINK – Create a link to an Excel file", "TABLE → insert with data link active", "DATALINKUPDATE – Refresh from Excel", "Never manually retype a schedule again"],
+    "proTip": "Link your door/window schedule in Excel so the architect and drafter always have the same numbers.",
+    "hashtags": ["#autocad", "#exceltoautocad", "#datalink", "#cadautomation"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "31",
-    "format": "carousel",
-    "title": "Geometric Constraints",
-    "bullets": [
-      "GEOMCONSTRAINT \u2013 Apply constraints (parallel, perpendicular, tangent, etc.)",
-      "AUTOCONSTRAIN \u2013 Auto-detect and apply constraints",
-      "CONSTRAINTBAR \u2013 Show/hide constraint icons",
-      "DELCONSTRAINT \u2013 Remove constraints"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadparametric",
-      "#geometricconstraints",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "32",
-    "format": "carousel",
-    "title": "Dimensional Constraints",
-    "bullets": [
-      "DIMCONSTRAINT (DCON) \u2013 Apply a dimensional constraint",
-      "PARAMETERS \u2013 Open the Parameters Manager",
-      "Link constraints to formulas (e.g., width = 2 \u00d7 height)"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadparametric",
-      "#dimensionalconstraints",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "33",
-    "format": "image",
+    "day": "7c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: QUICKCALC",
+    "desc": "Need a quick calculation without leaving AutoCAD? QUICKCALC (Ctrl+8) opens a built-in calculator that can grab measurements directly from your drawing.",
     "bullets": [],
-    "script": "",
-    "caption": "Need a quick calculation without leaving AutoCAD? **QUICKCALC** (Ctrl+8) opens a built-in calculator that can grab measurements directly from your drawing.",
-    "hashtags": [
-      "#autocad",
-      "#quickcalc",
-      "#cadtricks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "proTip": "Use the GetDist() function in QuickCalc to snap a real distance from the drawing into your formula.",
+    "hashtags": ["#autocad", "#quickcalc", "#cadtricks"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 8  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "8a", "slot": "Morning", "format": "carousel",
+    "title": "Object Properties Deep Dive",
+    "desc": "Controlling object properties the right way — ByLayer discipline and fast property editing.",
+    "bullets": ["MO / PR – Properties Palette", "CH – Change properties", "CHPROP – Change via command line", "LT – Linetype Manager", "LTS – Linetype Scale", "LW – Lineweight settings"],
+    "proTip": "Always keep color, linetype, and lineweight set to ByLayer — this is non-negotiable for professional drawings.",
+    "hashtags": ["#autocad", "#objectproperties", "#drafting", "#cadtips"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "34",
-    "format": "carousel",
-    "title": "Selection & Query Tools",
-    "bullets": [
-      "QSELECT \u2013 Select all objects by type/property",
-      "FILTER \u2013 Advanced selection filter",
-      "LIST \u2013 List detailed object data",
-      "DIST (DI) \u2013 Measure distance between points",
-      "AREA \u2013 Calculate area of a region",
-      "ID \u2013 Get coordinates of a point"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad",
-      "#cadselection",
-      "#drafting",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
+    "day": "8b", "slot": "Afternoon", "format": "carousel",
+    "title": "Why Your File Is 200MB (And How to Fix It)",
+    "desc": "The cleanup routine that cuts bloated AutoCAD files down to size in under 2 minutes.",
+    "bullets": ["PURGE (PU) – Remove unused blocks, layers, styles", "AUDIT – Find and fix drawing errors", "Detach unused Xrefs (XREF manager)", "Run OVERKILL to eliminate duplicate geometry"],
+    "proTip": "Do this cleanup routine before every file submission and before archiving projects.",
+    "hashtags": ["#autocad", "#cadfilesize", "#cadcleanup"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "35",
-    "format": "reel",
-    "title": "\"QSELECT: select 500 objects in one click\"",
-    "bullets": [],
-    "script": "Demo selecting every instance of a specific block or text style instantly using QSELECT filters.",
-    "caption": "Bulk editing made easy. ## Week 8 (Days 36-40): Plotting, Layouts & Sheet Sets (2D Output)",
-    "hashtags": [
-      "#autocad",
-      "#qselect",
-      "#cadhacks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "36",
-    "format": "carousel",
-    "title": "Plotting Essentials",
-    "bullets": [
-      "PLOT (Ctrl+P) \u2013 Open the plot dialog",
-      "PAGESETUP \u2013 Configure page/plot settings",
-      "PLOTSTYLE \u2013 Manage plot style tables",
-      "PREVIEW \u2013 Preview before printing",
-      "EXPORTPDF \u2013 Export directly to PDF"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadplotting",
-      "#cadoutput",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "37",
-    "format": "carousel",
-    "title": "Layouts & Viewports",
-    "bullets": [
-      "LAYOUT \u2013 Create/manage layout tabs",
-      "MVIEW (MV) \u2013 Create a viewport in a layout",
-      "VPORTS \u2013 Manage multiple viewports",
-      "VPLAYER \u2013 Control layer visibility per viewport",
-      "MSPACE / PSPACE \u2013 Switch between model/paper space"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadlayouts",
-      "#paperspace",
-      "#modelspace"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "38",
-    "format": "carousel",
-    "title": "Sheet Sets for Multi-Drawing Projects",
-    "bullets": [
-      "SHEETSET (SSM) \u2013 Open Sheet Set Manager",
-      "NEWSHEETSET \u2013 Create a new sheet set",
-      "Publish entire sheet sets to PDF/DWF in one click",
-      "Auto-updating title block fields across all sheets"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocadsheetsets",
-      "#civilengineering",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "39",
-    "format": "reel",
-    "title": "\"Publishing 50 sheets in one click\"",
-    "bullets": [],
-    "script": "Show PUBLISH command batch-printing an entire sheet set to PDF automatically.",
-    "caption": "Manually plotting sheet by sheet? Stop. This is the way.",
-    "hashtags": [
-      "#autocad",
-      "#publish",
-      "#cadefficiency"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "40",
-    "format": "carousel",
-    "title": "AutoCAD 2D Complete Cheat Sheet (Full Recap)",
-    "bullets": [],
-    "script": "",
-    "caption": "Every 2D command from Day 1 to Day 39, compiled in one master graphic. Screenshot and save this \u2014 this is the full 2D toolkit. \ud83d\udcf8 *(Include a compiled grid graphic of all ~90+ 2D commands covered)* # PHASE 2: AUTOCAD 3D \u2014 COMPLETE COVERAGE (After 2D is finished) ## Week 9 (Days 41-45): 3D Modeling",
-    "hashtags": [
-      "#autocadcheatsheet",
-      "#cadtips",
-      "#drafting",
-      "#savethispost"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "41",
-    "format": "carousel",
-    "title": "Basic 3D Solid Primitives",
-    "bullets": [
-      "BOX, CYLINDER (CYL), SPHERE, CONE, WEDGE (WE), PYRAMID (PYR), TORUS (TOR)"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad3d",
-      "#cad3dmodeling",
-      "#drafting"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "42",
-    "format": "carousel",
-    "title": "Creating Complex 3D Shapes",
-    "bullets": [
-      "EXTRUDE (EXT), REVOLVE (REV), LOFT, SWEEP, PRESSPULL"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad3d",
-      "#cadmodeling",
-      "#extrude",
-      "#revolve"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "43",
-    "format": "carousel",
-    "title": "Boolean Operations",
-    "bullets": [
-      "UNION (UNI), SUBTRACT (SU), INTERSECT (IN), SLICE (SL)"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad3d",
-      "#booleanoperations",
-      "#cadtips"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "44",
-    "format": "reel",
-    "title": "\"3D Editing Commands You're Missing\"",
-    "bullets": [
-      "3DROTATE, 3DMOVE, 3DALIGN, FILLETEDGE, CHAMFEREDGE"
-    ],
-    "script": "",
-    "caption": "",
-    "hashtags": [
-      "#autocad3d",
-      "#3dediting",
-      "#cadhacks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "45",
-    "format": "image",
-    "title": "Hidden Feature: SECTIONPLANE",
-    "bullets": [
-      "4-5 posts/week \u2192 Phase 1 (2D) takes ~8-10 weeks",
-      "Phase 2 (3D) begins only after Phase 1 wraps, per your instruction",
-      "Revit series can follow as its own complete phase after AutoCAD 3D, using this same 2D-first-then-3D structure (Revit 2D drafting/annotation \u2192 Revit 3D modeling/families) ## Automation Notes",
-      "Use Meta Business Suite (free) or Later/Buffer to schedule posts in advance",
-      "Batch-record reel screen captures in one sitting",
-      "Reuse Canva carousel templates \u2014 just swap command lists per post"
-    ],
-    "script": "",
-    "caption": "Need a quick section cut through a 3D model? **SECTIONPLANE** slices through a solid and generates a live 2D section view instantly. ## Coverage Summary | Phase | Focus | Days | Commands Covered | |---|---|---|---| | Phase 1 | Complete 2D (drawing, editing, layers, dimensions, blocks, xrefs, data, parametric, output) | 1-40 | ~95 | | Phase 2 | 3D modeling | 41-45 | ~20 | **2D is now fully covered (~95 commands, an estimated 90%+ of practically-used 2D commands)** before any 3D content begins, exactly as requested. ## Posting Cadence",
-    "hashtags": [
-      "#autocad3d",
-      "#sectionplane",
-      "#cadtricks"
-    ],
-    "phase": "Phase 1 & 2: 2D & 3D Basics"
-  },
-  {
-    "day": "46",
-    "format": "carousel",
-    "title": "Custom Keyboard Shortcuts & Aliases",
-    "bullets": [
-      "CUI \u2013 Customize User Interface",
-      "PGP file editing \u2013 add/edit command aliases (e.g., make \"WD\" = Wipeout)",
-      "Reload aliases with REINIT after editing the PGP file"
-    ],
-    "script": "",
-    "caption": "Stop using default shortcuts if they don't fit your workflow \u2014 build your own.",
-    "hashtags": [
-      "#autocadcustomization",
-      "#cadhacks",
-      "#powerusertips"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "47",
-    "format": "carousel",
-    "title": "Tool Palettes & Workspaces",
-    "bullets": [
-      "TOOLPALETTES (Ctrl+3) \u2013 Create custom tool palettes with your most-used blocks/hatches",
-      "WORKSPACE \u2013 Save custom ribbon/toolbar layouts",
-      "CUIEXPORT / CUIIMPORT \u2013 Share your custom setup across computers"
-    ],
-    "script": "",
-    "caption": "Build a workspace that matches how YOU actually work:",
-    "hashtags": [
-      "#autocad",
-      "#workspaces",
-      "#cadefficiency",
-      "#powerusertips"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "48",
-    "format": "reel",
-    "title": "\"Building a custom tool palette in 60 seconds\"",
-    "bullets": [],
-    "script": "Drag frequently-used blocks and hatches into a new tool palette, rename it, and show one-click insertion afterward.",
-    "caption": "Set this up once, save hours every week after.",
-    "hashtags": [
-      "#autocad",
-      "#toolpalettes",
-      "#cadhacks",
-      "#productivitytips"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "49",
-    "format": "image",
+    "day": "8c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: Action Recorder",
+    "desc": "Repeating the same 10-step process on every drawing? ACTRECORD records a macro once and ACTPLAY replays it — no scripting needed.",
     "bullets": [],
-    "script": "",
-    "caption": "Repeating the same 10-step process on every drawing? **ACTRECORD** (Action Recorder) lets you record a macro once and replay it with **ACTPLAY** \u2014 no scripting knowledge required.",
-    "hashtags": [
-      "#autocad",
-      "#actionrecorder",
-      "#cadautomation",
-      "#powerusertips"
-    ],
-    "phase": "Phase 3: Advanced Tips"
+    "proTip": "Record your standard layer setup sequence once — replay it on every new drawing with one command.",
+    "hashtags": ["#autocad", "#actionrecorder", "#cadautomation", "#powerusertips"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 9  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "9a", "slot": "Morning", "format": "carousel",
+    "title": "More Layer Tools",
+    "desc": "Advanced layer management — the tools that handle complex multi-layer drawings.",
+    "bullets": ["LAYWALK – Preview each layer interactively", "LAYMRG – Merge two layers into one", "LAYCUR – Move objects to current layer", "LAYLCK / LAYULK – Lock/unlock a layer", "LAYVPI – Isolate layer per viewport only"],
+    "proTip": "LAYVPI is critical for paper space workflows — hide a layer in one viewport without affecting others.",
+    "hashtags": ["#autocadlayers", "#cadtips", "#drafting"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "50",
-    "format": "carousel",
-    "title": "Intro to AutoLISP (No-Code-Experience Version)",
-    "bullets": [
-      "APPLOAD \u2013 Load a .lsp routine into AutoCAD",
-      "Free/community LISP routines exist for things like auto-numbering, batch attribute editing, and area labeling",
-      "VLIDE \u2013 Visual LISP Editor, for viewing/tweaking existing routines"
-    ],
-    "script": "",
-    "caption": "You don't need to be a programmer to use basic LISP routines: ## Week 11 (Days 51-55): Advanced Drafting Efficiency",
-    "hashtags": [
-      "#autocad",
-      "#autolisp",
-      "#cadautomation",
-      "#advancedcad"
-    ],
-    "phase": "Phase 3: Advanced Tips"
+    "day": "9b", "slot": "Afternoon", "format": "carousel",
+    "title": "QSELECT: Select 500 Objects in One Click",
+    "desc": "Demo selecting every instance of a specific block or text style instantly using QSELECT's property filters.",
+    "bullets": ["Open QSELECT from right-click menu", "Choose object type (e.g., Block Reference)", "Filter by a property (e.g., Name = DOOR)", "All matching objects selected instantly"],
+    "proTip": "Combine QSELECT with CHPROP to change properties of hundreds of objects in seconds.",
+    "hashtags": ["#autocad", "#qselect", "#cadhacks"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "51",
-    "format": "carousel",
-    "title": "Advanced Object Snap & Tracking",
-    "bullets": [
-      "OSNAP (OS) \u2013 Configure running object snaps",
-      "Polar Tracking (F10) \u2013 Snap to precise angles automatically",
-      "Object Snap Tracking (F11) \u2013 Track alignment from multiple reference points",
-      "OTRACK \u2013 Toggle object snap tracking"
-    ],
-    "script": "",
-    "caption": "Precision drafting relies on these:",
-    "hashtags": [
-      "#autocad",
-      "#precisiondrafting",
-      "#cadtips",
-      "#advancedcad"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "52",
-    "format": "carousel",
-    "title": "Groups & Advanced Selection",
-    "bullets": [
-      "GROUP (G) \u2013 Create a named group of objects",
-      "UNGROUP \u2013 Break a group apart",
-      "PICKSTYLE \u2013 Toggle group selection behavior",
-      "Selection Cycling (Ctrl while clicking overlapping objects)"
-    ],
-    "script": "",
-    "caption": "Group repeated object sets so you never lose track of them:",
-    "hashtags": [
-      "#autocad",
-      "#cadgroups",
-      "#drafting",
-      "#advancedcad"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "53",
-    "format": "image",
+    "day": "9c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: Superhatch (Express Tools)",
+    "desc": "Need to hatch with an image, block, or external drawing? Express Tools' Superhatch lets you use anything as a hatch pattern — great for material call-outs.",
     "bullets": [],
-    "script": "",
-    "caption": "Need to hatch with an image, block, or external drawing instead of a standard pattern? Express Tools' **Superhatch** lets you do exactly that \u2014 great for material call-outs and site plans.",
-    "hashtags": [
-      "#autocad",
-      "#expresstools",
-      "#hatching",
-      "#advancedcad"
-    ],
-    "phase": "Phase 3: Advanced Tips"
+    "proTip": "Enable Express Tools via the Add/Remove Programs if you don't see them — they're free with every AutoCAD install.",
+    "hashtags": ["#autocad", "#expresstools", "#hatching", "#advancedcad"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 10  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "10a", "slot": "Morning", "format": "carousel",
+    "title": "Dimensioning Shortcuts",
+    "desc": "All the dimension commands you need — typed fast, no ribbon required.",
+    "bullets": ["DLI – Linear Dimension", "DAL – Aligned Dimension", "DAN – Angular Dimension", "DRA – Radius Dimension", "DDI – Diameter Dimension", "DCO – Continue Dimension", "DBA – Baseline Dimension"],
+    "proTip": "Use DCO (Continue) immediately after placing one dimension to chain the next — massively faster.",
+    "hashtags": ["#autocaddimensions", "#drafting", "#cadtips"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "54",
-    "format": "reel",
-    "title": "\"5 Express Tools you're not using\"",
-    "bullets": [],
-    "script": "Quick demo of: 1. TCOUNT \u2013 Auto-number text objects sequentially 2. TXTEXP \u2013 Convert text to polylines/outlines 3. EXTRIM \u2013 Trim multiple objects to a cutting boundary at once 4. MPEDIT \u2013 Edit multiple polylines simultaneously 5. LSPINCLUDE \u2013 Load Express Tools automatically at startup",
-    "caption": "Turn on Express Tools if you haven't already \u2014 free with every install.",
-    "hashtags": [
-      "#autocad",
-      "#expresstools",
-      "#cadhacks",
-      "#advancedcad"
-    ],
-    "phase": "Phase 3: Advanced Tips"
+    "day": "10b", "slot": "Afternoon", "format": "carousel",
+    "title": "Publishing 50 Sheets in One Click",
+    "desc": "The PUBLISH command batch-prints an entire sheet set to PDF automatically — no more plotting sheet by sheet.",
+    "bullets": ["Set up Sheet Set (SSM)", "PUBLISH → select sheet set", "Choose PDF output settings", "Hit Publish — all sheets export automatically"],
+    "proTip": "Schedule PUBLISH as a batch job overnight — come in to find 200 sheets already exported.",
+    "hashtags": ["#autocad", "#publish", "#cadefficiency"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
   },
   {
-    "day": "55",
-    "format": "carousel",
-    "title": "Advanced Array & Pattern Techniques",
-    "bullets": [
-      "Associative Arrays \u2013 edit one item, updates the whole array automatically",
-      "Array along a 3D path (for structural/civil layouts)",
-      "Editing array item count/spacing live via grip points",
-      "Converting an array to independent objects (ARRAYEDIT > Explode)"
-    ],
-    "script": "",
-    "caption": "Beyond the basics: ## Week 12 (Days 56-60): Collaboration & Workflow Mastery",
-    "hashtags": [
-      "#autocad",
-      "#advancedarrays",
-      "#cadtips",
-      "#civilengineering"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "56",
-    "format": "carousel",
-    "title": "Advanced Xref & Collaboration Workflow",
-    "bullets": [
-      "Overlay vs Attach xref types \u2014 know the difference before nesting drawings",
-      "XREF notification/reload workflow when a linked file updates",
-      "Using layer states (LAYERSTATE) to save/restore layer configs per discipline"
-    ],
-    "script": "",
-    "caption": "Working across a full engineering team:",
-    "hashtags": [
-      "#autocad",
-      "#cadcollaboration",
-      "#advancedcad",
-      "#civilengineering"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "57",
-    "format": "carousel",
-    "title": "Sheet Set Advanced Techniques",
-    "bullets": [
-      "Custom sheet set templates with pre-filled title block fields",
-      "Sheet set Fields linking directly to project data (project name, number, client)",
-      "Batch-renumbering sheets across an entire set",
-      "eTransmit \u2013 package a full project (drawings + xrefs + fonts) for sending to consultants"
-    ],
-    "script": "",
-    "caption": "Beyond basic sheet sets:",
-    "hashtags": [
-      "#autocad",
-      "#sheetsets",
-      "#advancedcad",
-      "#civilengineering"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "58",
-    "format": "image",
+    "day": "10c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: CAD Standards Checker",
+    "desc": "STANDARDS checks your drawing against a standards file (.dws) and flags any layer/style naming violations automatically.",
     "bullets": [],
-    "script": "",
-    "caption": "Managing a big team with layer/style naming rules? **STANDARDS** (CAD Standards Manager) checks your drawing against a standards file (.dws) and flags any violations automatically.",
-    "hashtags": [
-      "#autocad",
-      "#cadstandards",
-      "#advancedcad",
-      "#qualitycontrol"
-    ],
-    "phase": "Phase 3: Advanced Tips"
+    "proTip": "Share the .dws standards file with your whole team so every drawing passes the same check.",
+    "hashtags": ["#autocad", "#cadstandards", "#advancedcad", "#qualitycontrol"],
+    "phase": "Week 2 — Layers, Properties & Annotation"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 11  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "11a", "slot": "Morning", "format": "carousel",
+    "title": "Text & Leader Shortcuts",
+    "desc": "The text and annotation commands every drafter needs to know.",
+    "bullets": ["MT / T – Multiline Text", "DT – Single Line Text", "ED – Edit Text", "ST – Text Style Manager", "LE – Quick Leader", "MLD – Multileader", "MLEADERSTYLE – Multileader style manager"],
+    "proTip": "Use MT for any text that needs formatting — DT is only for single-line labels that never need to wrap.",
+    "hashtags": ["#autocadtext", "#drafting", "#cadannotations"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
   },
   {
-    "day": "59",
-    "format": "reel",
-    "title": "\"eTransmit: sending a complete project package in one click\"",
-    "bullets": [],
-    "script": "Show ETRANSMIT bundling a drawing with all its xrefs, fonts, and plot styles into a single zip \u2014 no more \"missing xref\" emails from consultants.",
-    "caption": "Never forget an xref again when sending files out.",
-    "hashtags": [
-      "#autocad",
-      "#etransmit",
-      "#cadcollaboration",
-      "#advancedcad"
-    ],
-    "phase": "Phase 3: Advanced Tips"
+    "day": "11b", "slot": "Afternoon", "format": "carousel",
+    "title": "3D Editing Commands You're Missing",
+    "desc": "The 3D editing commands that most users don't realize exist — powerful once you know them.",
+    "bullets": ["3DROTATE – Rotate around a 3D axis", "3DMOVE – Move along a 3D axis", "3DALIGN – Align in 3D space", "FILLETEDGE – Fillet a 3D solid edge", "CHAMFEREDGE – Chamfer a 3D solid edge"],
+    "proTip": "Use 3DALIGN to precisely position 3D models from point cloud scans against reference geometry.",
+    "hashtags": ["#autocad3d", "#3dediting", "#cadhacks"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
   },
   {
-    "day": "60",
-    "format": "carousel",
-    "title": "AutoCAD Advanced/Power-User Complete Cheat Sheet",
-    "bullets": [],
-    "script": "",
-    "caption": "Every advanced tip from Days 46-59, compiled into one master reference. This completes the full AutoCAD journey: 2D \u2192 3D \u2192 Advanced. Screenshot and save. \ud83d\udcf8 ## Updated Full Series Overview | Phase | Focus | Days | Content | |---|---|---|---| | 1 | Complete 2D | 1-40 | ~95 commands (drawing, editing, layers, dimensions, blocks, xrefs, data, parametric, output) | | 2 | Complete 3D | 41-45 | ~20 commands (solids, editing, booleans, sectioning) | | 3 | Advanced / Power-user | 46-60 | Customization, automation, LISP intro, Express Tools, collaboration, standards, sheet set mastery | **Total: 60 days, ~130+ distinct commands/features/workflows \u2014 a full beginner-to-power-user AutoCAD journey in the correct order: 2D first, then 3D, then advanced.** After Day 60, the account has a complete AutoCAD foundation to point back to (via \"save this post\" cheat sheets), and can transition into the Revit series using the same structure (2D drafting \u2192 3D modeling/families \u2192 advanced/collaboration).",
-    "hashtags": [
-      "#autocad",
-      "#advancedcad",
-      "#cadmastery",
-      "#savethispost"
-    ],
-    "phase": "Phase 3: Advanced Tips"
-  },
-  {
-    "day": "61",
-    "format": "reel",
-    "title": "ALIGN: Move + Rotate + Scale in One Command",
-    "bullets": [],
-    "script": "Show manually moving an object, then rotating it, then scaling it to fit a reference \u2014 3 separate commands. Cut to: ALIGN, pick source/destination points, done in one action.",
-    "caption": "Stop doing move \u2192 rotate \u2192 scale separately. ALIGN (AL) does all three in one command.",
-    "hashtags": [
-      "#autocad",
-      "#align",
-      "#cadhacks",
-      "#drafting",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "62",
-    "format": "reel",
-    "title": "REFEDIT: Edit a Block Without Exploding It",
-    "bullets": [],
-    "script": "Show the old way \u2014 EXPLODE \u2192 edit geometry \u2192 re-BLOCK \u2192 re-insert everywhere. Cut to: REFEDIT, double-click the block, edit in place, save back \u2014 done.",
-    "caption": "Never explode a block just to fix one line again.",
-    "hashtags": [
-      "#autocad",
-      "#refedit",
-      "#cadhacks",
-      "#blocks",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "63",
-    "format": "carousel",
-    "title": "MEASUREGEOM: One Command, All Measurements",
-    "bullets": [],
-    "script": "",
-    "caption": "Stop switching between DIST, AREA, and separate radius checks. **MEASUREGEOM** gives you distance, radius, angle, area, AND volume \u2014 all from one command with sub-options.",
-    "hashtags": [
-      "#autocad",
-      "#measuregeom",
-      "#cadtips",
-      "#drafting",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "64",
-    "format": "reel",
-    "title": "SCALE & ROTATE: The \"Reference\" Option Nobody Uses",
-    "bullets": [],
-    "script": "Show manually calculating a scale ratio or rotation angle with a calculator first. Cut to: SCALE/ROTATE \u2192 Reference option \u2192 pick two points \u2192 AutoCAD calculates the ratio/angle for you automatically.",
-    "caption": "Stop doing math before you scale or rotate. Let AutoCAD do it.",
-    "hashtags": [
-      "#autocad",
-      "#scalecommand",
-      "#rotatecommand",
-      "#cadhacks",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "65",
-    "format": "image",
+    "day": "11c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: BLOCKREPLACE",
+    "desc": "Need to swap every instance of an outdated block with a new one? BLOCKREPLACE does it project-wide in one command — no manual delete and reinsert.",
     "bullets": [],
-    "script": "",
-    "caption": "Need to swap every instance of an old block (like an outdated symbol) with a new one? **BLOCKREPLACE** does it project-wide in one command \u2014 no manual delete-and-reinsert for every instance. ## Week 14 (Days 66-70)",
-    "hashtags": [
-      "#autocad",
-      "#blockreplace",
-      "#cadefficiency",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
+    "proTip": "Use BLOCKREPLACE when updating a standard symbol across a 50-sheet set — takes seconds instead of hours.",
+    "hashtags": ["#autocad", "#blockreplace", "#cadefficiency", "#drafting"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 12  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "12a", "slot": "Morning", "format": "carousel",
+    "title": "Dimension Style & Management",
+    "desc": "Setting up professional dimension styles — the foundation of a clean, consistent drawing set.",
+    "bullets": ["D – Dimension Style Manager", "DIMSTYLE – Full command alias", "DED – Edit dimension text/position", "DIMTEDIT – Edit dimension text location", "DOV – Override a single dimension's style"],
+    "proTip": "Always create a project-specific dim style — never use the AutoCAD Standard default for submitted drawings.",
+    "hashtags": ["#autocad", "#dimensionstyles", "#drafting", "#cadtips"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
   },
   {
-    "day": "66",
-    "format": "reel",
-    "title": "FILLET/CHAMFER at Radius 0: Instant Clean Corners",
-    "bullets": [],
-    "script": "Show trimming and extending two lines manually to form a corner. Cut to: FILLET with radius set to 0, click both lines, instant clean corner in one click.",
-    "caption": "Stop trim-and-extending corners. Set fillet radius to 0 and just click both lines.",
-    "hashtags": [
-      "#autocad",
-      "#fillet",
-      "#cadhacks",
-      "#drafting",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
+    "day": "12b", "slot": "Afternoon", "format": "carousel",
+    "title": "5 Express Tools You're Not Using",
+    "desc": "The Express Tools hidden gems that save serious time on repetitive annotation and editing tasks.",
+    "bullets": ["TCOUNT – Auto-number text objects sequentially", "TXTEXP – Convert text to polylines/outlines", "EXTRIM – Trim multiple objects to one boundary", "MPEDIT – Edit multiple polylines simultaneously", "LSPINCLUDE – Load Express Tools automatically at startup"],
+    "proTip": "TCOUNT is a game-changer for numbering door tags, parking spaces, or room labels.",
+    "hashtags": ["#autocad", "#expresstools", "#cadhacks", "#advancedcad"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
   },
   {
-    "day": "67",
-    "format": "carousel",
-    "title": "MULTIPLE: Repeat Any Command Without Re-Pressing Enter",
-    "bullets": [],
-    "script": "",
-    "caption": "Placing 20 circles or blocks one at a time? Type **MULTIPLE** before your command (e.g., \"MULTIPLE CIRCLE\") and it repeats automatically after each placement \u2014 no need to hit Enter or retype the command every time.",
-    "hashtags": [
-      "#autocad",
-      "#multiplecommand",
-      "#cadtips",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "68",
-    "format": "reel",
-    "title": "Copy/Paste with Base Point: One Action, Not Three",
-    "bullets": [],
-    "script": "Show the old way \u2014 set a base point, copy, switch drawings, paste, manually reposition. Cut to: Ctrl+Shift+C (copy with base point) \u2192 Ctrl+Shift+V (paste at correct point) \u2014 perfectly placed in one motion across drawings.",
-    "caption": "Copying between drawings? This shortcut saves the repositioning step entirely.",
-    "hashtags": [
-      "#autocad",
-      "#copypaste",
-      "#cadhacks",
-      "#drafting",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "69",
-    "format": "carousel",
-    "title": "More Workflow-Compression Commands",
-    "bullets": [
-      "**PEDIT with Multiple option** \u2013 join AND smooth multiple polylines in one command, instead of joining then curve-fitting separately",
-      "**OFFSET with Multiple option** \u2013 offset the same object several times at once instead of repeating the command",
-      "**MATCHPROP with settings toggles** \u2013 copy only specific properties (like just layer, not linetype) instead of resetting each manually",
-      "**STRETCH with crossing window** \u2013 moves and resizes in one action depending on what's captured, instead of separate move + resize steps"
-    ],
-    "script": "",
-    "caption": "A few more \"does 2-3 things at once\" commands to add to your list:",
-    "hashtags": [
-      "#autocad",
-      "#cadworkflow",
-      "#drafting",
-      "#cadhacks",
-      "#productivitytips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "69.5",
-    "format": "reel",
-    "title": "NCOPY: Copy One Element Straight Out of a Block or Xref",
-    "bullets": [],
-    "script": "Show the old way \u2014 explode the entire block/xref just to grab one line or symbol, then rebuild everything afterward. Cut to: type **NCOPY**, click the single nested object inside the block/xref, place it \u2014 it copies out as an independent object, while the block and xref stay fully intact.",
-    "caption": "You don't need to explode a block or xref to steal one piece of it. NCOPY grabs a nested object directly \u2014 done in one command.",
-    "hashtags": [
-      "#autocad",
-      "#ncopy",
-      "#cadhacks",
-      "#blocks",
-      "#xref",
-      "#drafting",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "70",
-    "format": "carousel",
-    "title": "\"One Command Instead of Three\" \u2014 Full Recap",
-    "bullets": [],
-    "script": "",
-    "caption": "Every workflow-compression tip from this module, compiled in one graphic. These are the tips that separate a fast drafter from a slow one. Save this. \ud83d\udcf8 *(Include a compiled grid graphic of all commands from Days 61-69.5)* ## Week 15 (Days 71-75): More \"Nobody Told Me This Existed\" Commands",
-    "hashtags": [
-      "#autocad",
-      "#cadmastery",
-      "#drafting",
-      "#savethispost",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "71",
-    "format": "reel",
-    "title": "CHSPACE: Move Objects Between Model Space & Paper Space Instantly",
-    "bullets": [],
-    "script": "Show the old way \u2014 manually redrawing or copy-pasting an object from model space into a layout, then recalculating scale by hand. Cut to: select the object, type **CHSPACE**, and it moves between model/paper space with the scale automatically corrected.",
-    "caption": "Stop manually recalculating scale when moving objects between model space and a layout. CHSPACE does it in one command.",
-    "hashtags": [
-      "#autocad",
-      "#chspace",
-      "#cadhacks",
-      "#drafting",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "72",
-    "format": "reel",
-    "title": "BURST: Explode a Block Without Losing Attribute Values",
-    "bullets": [],
-    "script": "Show the old way \u2014 EXPLODE on a block with attributes, and the actual filled-in values (like a door tag number) disappear, leaving only the tag prompt. Cut to: **BURST**, same block, but the attribute values convert into real text and survive.",
-    "caption": "Never use EXPLODE on an attributed block again. BURST keeps the actual values intact.",
-    "hashtags": [
-      "#autocad",
-      "#burst",
-      "#cadhacks",
-      "#blocks",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "73",
-    "format": "carousel",
-    "title": "SCALETEXT & JUSTIFYTEXT: Resize/Realign Text Without Moving It",
-    "bullets": [
-      "**SCALETEXT** \u2013 resize multiple text objects to a new height without manually repositioning each one",
-      "**JUSTIFYTEXT** \u2013 change text justification (left/center/right/etc.) without the text jumping to a new location"
-    ],
-    "script": "",
-    "caption": "Two commands that fix a text formatting headache in one step:",
-    "hashtags": [
-      "#autocad",
-      "#scaletext",
-      "#justifytext",
-      "#cadtips",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "74",
-    "format": "carousel",
-    "title": "MLEADERALIGN & DIMBREAK: Auto-Clean Your Annotations",
-    "bullets": [
-      "**MLEADERALIGN** \u2013 select multiple leaders and align them all in one command, instead of dragging each one individually",
-      "**DIMBREAK** \u2013 automatically adds a gap where a dimension line crosses another object or dimension, instead of manually trimming it"
-    ],
-    "script": "",
-    "caption": "Stop manually nudging things into place:",
-    "hashtags": [
-      "#autocad",
-      "#mleaderalign",
-      "#dimbreak",
-      "#cadhacks",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "75",
-    "format": "carousel",
-    "title": "OOPS, SETBYLAYER & FIND: Quiet Time-Savers",
-    "bullets": [
-      "**OOPS** \u2013 restores your last erased object, even after running other commands in between (unlike UNDO, which reverses everything since)",
-      "**SETBYLAYER** \u2013 forces all selected objects' color/linetype/lineweight to ByLayer in one command, instead of fixing each property manually",
-      "**FIND** \u2013 find and replace text across an entire drawing, including text buried inside blocks"
-    ],
-    "script": "",
-    "caption": "Three more one-command fixes worth knowing:",
-    "hashtags": [
-      "#autocad",
-      "#oops",
-      "#setbylayer",
-      "#find",
-      "#cadhacks",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "76",
-    "format": "carousel",
-    "title": "\"Nobody Told Me This Existed\" \u2014 Full Recap",
-    "bullets": [],
-    "script": "",
-    "caption": "Every hidden-gem command from Days 71-75, compiled in one graphic. These are the commands almost nobody gets taught in school. Save this. \ud83d\udcf8 ## Week 16 (Days 77-81): Data Extraction & 3D-to-2D Shortcuts",
-    "hashtags": [
-      "#autocad",
-      "#cadmastery",
-      "#drafting",
-      "#savethispost",
-      "#workflowtips"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "77",
-    "format": "reel",
-    "title": "DATAEXTRACTION: Auto-Pull Block Data Into a Table",
-    "bullets": [],
-    "script": "Show the old way \u2014 manually counting every door/window block instance and typing counts into a schedule by hand. Cut to: **DATAEXTRACTION**, run the wizard, select block properties, and it generates a complete schedule (or exports to Excel) automatically.",
-    "caption": "Stop manually counting blocks for schedules. DATAEXTRACTION builds the table for you.",
-    "hashtags": [
-      "#autocad",
-      "#dataextraction",
-      "#cadhacks",
-      "#drafting",
-      "#civilengineering"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "78",
-    "format": "carousel",
-    "title": "SOLPROF & FLATSHOT: Auto-Generate 2D Lines From a 3D Model",
-    "bullets": [
-      "**SOLPROF** \u2013 generates clean 2D profile lines of a 3D solid for the current view automatically",
-      "**FLATSHOT** \u2013 flattens an entire 3D model into a 2D line drawing based on the current viewpoint, in one command"
-    ],
-    "script": "",
-    "caption": "Stop manually tracing outlines from a 3D view:",
-    "hashtags": [
-      "#autocad",
-      "#solprof",
-      "#flatshot",
-      "#3dto2d",
-      "#cadhacks"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
-  },
-  {
-    "day": "79",
-    "format": "image",
+    "day": "12c", "slot": "Evening", "format": "image",
     "title": "Hidden Feature: MASSPROP",
+    "desc": "Need area, volume, centroid, or moment of inertia? MASSPROP calculates all of it instantly for any solid or region — no manual formulas.",
     "bullets": [],
-    "script": "",
-    "caption": "Need area, volume, centroid, or moment of inertia for a solid or region? **MASSPROP** calculates all of it instantly \u2014 no manual formulas or exporting to a spreadsheet.",
-    "hashtags": [
-      "#autocad",
-      "#massprop",
-      "#cadtips",
-      "#structuralengineering"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
+    "proTip": "Use MASSPROP on closed polyline regions for quick area and centroid checks in 2D too.",
+    "hashtags": ["#autocad", "#massprop", "#cadtips", "#structuralengineering"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 13  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "13a", "slot": "Morning", "format": "carousel",
+    "title": "Block Basics",
+    "desc": "Creating, inserting, and managing blocks — the foundation of reusable CAD content.",
+    "bullets": ["B – Create a block definition", "I – Insert a block", "BEDIT – Block Editor", "W – Wblock (export block as separate file)", "X – Explode (break block into objects)"],
+    "proTip": "Always set the insertion point carefully when creating blocks — it determines where the block snaps on insert.",
+    "hashtags": ["#autocadblocks", "#cadtips", "#drafting"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
   },
   {
-    "day": "80",
-    "format": "carousel",
-    "title": "SELECTSIMILAR & ISOLATEOBJECTS: Smarter Selection in One Click",
-    "bullets": [
-      "**SELECTSIMILAR** \u2013 right-click an object and instantly select every other object in the drawing with matching properties (same layer, type, etc.)",
-      "**ISOLATEOBJECTS** \u2013 isolate specific objects on screen regardless of what layer they're on, without touching layer settings at all (pairs with UNISOLATEOBJECTS to restore)"
-    ],
-    "script": "",
-    "caption": "Two commands that replace manual multi-object selection:",
-    "hashtags": [
-      "#autocad",
-      "#selectsimilar",
-      "#isolateobjects",
-      "#cadhacks",
-      "#drafting"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
+    "day": "13b", "slot": "Afternoon", "format": "carousel",
+    "title": "eTransmit: Sending a Complete Project Package",
+    "desc": "ETRANSMIT bundles a drawing with all its xrefs, fonts, and plot styles into a single zip — no more 'missing xref' emails.",
+    "bullets": ["ETRANSMIT opens the package wizard", "Select drawings to include", "AutoCAD finds and packs all referenced files", "Deliver one clean zip to consultants"],
+    "proTip": "Always use eTransmit instead of just emailing the .dwg — it catches every missing dependency automatically.",
+    "hashtags": ["#autocad", "#etransmit", "#cadcollaboration", "#advancedcad"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
   },
   {
-    "day": "81",
-    "format": "carousel",
+    "day": "13c", "slot": "Evening", "format": "carousel",
+    "title": "Week 1-2 Recap: Top 5 Tips So Far",
+    "desc": "The 5 most impactful tips from the first two weeks — save these if you haven't already.",
+    "bullets": ["TR → Enter (trim with all visible edges)", "MATCHPROP (copy formatting in one click)", "LAYISO (isolate any layer instantly)", "QSELECT (select by property)", "OVERKILL (auto-clean duplicate geometry)"],
+    "proTip": "Master these 5 before moving on — they'll save you time on every drawing from here.",
+    "hashtags": ["#autocad", "#cadtips", "#drafting", "#savethispost"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 14  —  2 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "14a", "slot": "Morning", "format": "carousel",
+    "title": "Block Utilities",
+    "desc": "The utilities that keep your block library clean, organized and maintainable.",
+    "bullets": ["PURGE (PU) – Remove unused blocks/layers/styles", "RENAME (REN) – Rename a block or named object", "INSERTOBJ – Insert OLE object", "MINSERT – Insert a rectangular array of a block in one step"],
+    "proTip": "Run PURGE with 'Purge nested items' checked to get rid of all orphaned block definitions.",
+    "hashtags": ["#autocadblocks", "#cadcleanup", "#drafting"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
+  },
+  {
+    "day": "14b", "slot": "Afternoon", "format": "carousel",
+    "title": "ALIGN: Move + Rotate + Scale in One Command",
+    "desc": "Stop doing Move → Rotate → Scale as three separate commands. ALIGN (AL) does all three in one action with reference points.",
+    "bullets": ["Type AL (ALIGN)", "Pick 1, 2, or 3 source points on the object", "Pick matching destination points", "AutoCAD moves, rotates, and scales to fit"],
+    "proTip": "Use 2-point ALIGN for most tasks — it moves and rotates without affecting scale.",
+    "hashtags": ["#autocad", "#align", "#cadhacks", "#drafting", "#workflowtips"],
+    "phase": "Week 3 — Blocks, Xrefs & Data"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 15  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "15a", "slot": "Morning", "format": "carousel",
+    "title": "External References (Xrefs)",
+    "desc": "Working with external drawings — the foundation of collaborative CAD on any large project.",
+    "bullets": ["XREF (XR) – Manage external references", "XATTACH (XA) – Attach an external drawing", "XCLIP – Clip an xref to show only part", "XBIND – Bind specific xref elements", "BIND – Bind an entire xref permanently"],
+    "proTip": "Use Overlay (not Attach) for xrefs when working in a team — prevents accidental circular references.",
+    "hashtags": ["#autocadxref", "#cadcollaboration", "#drafting"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+  {
+    "day": "15b", "slot": "Afternoon", "format": "carousel",
+    "title": "REFEDIT: Edit a Block Without Exploding It",
+    "desc": "Never explode a block just to fix one line again. REFEDIT lets you edit in place and save back while keeping all instances updated.",
+    "bullets": ["Double-click a block (or type REFEDIT)", "Edit geometry directly in context", "REFCLOSE → Save reference edits", "All instances of the block update automatically"],
+    "proTip": "REFEDIT works on Xrefs too — make changes to a referenced file without opening it separately.",
+    "hashtags": ["#autocad", "#refedit", "#cadhacks", "#blocks", "#drafting"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+  {
+    "day": "15c", "slot": "Evening", "format": "carousel",
+    "title": "MEASUREGEOM: One Command, All Measurements",
+    "desc": "Stop switching between DIST, AREA, and separate radius checks. MEASUREGEOM gives you distance, radius, angle, area, AND volume from one command.",
+    "bullets": ["Type MEASUREGEOM (or MEA)", "Choose sub-option: Distance / Radius / Angle / Area / Volume", "All in one command — no switching", "Replaces DIST, AREA, and separate radius checks"],
+    "proTip": "Use the Area option with the Object sub-option to measure any closed polyline area instantly.",
+    "hashtags": ["#autocad", "#measuregeom", "#cadtips", "#drafting", "#workflowtips"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 16  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "16a", "slot": "Morning", "format": "carousel",
+    "title": "Tables & Data Links",
+    "desc": "AutoCAD tables connected to live Excel data — the right way to manage schedules on engineering drawings.",
+    "bullets": ["TABLE – Insert a table object", "TABLEDIT – Edit table cell content", "DATALINK – Link an Excel spreadsheet", "DATALINKUPDATE – Refresh linked data from Excel"],
+    "proTip": "Right-click a linked table and choose 'Update Data Links' after any Excel change — takes 2 seconds.",
+    "hashtags": ["#autocadtables", "#datalinks", "#drafting"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+  {
+    "day": "16b", "slot": "Afternoon", "format": "carousel",
+    "title": "SCALE & ROTATE: The Reference Option Nobody Uses",
+    "desc": "Stop calculating scale ratios and rotation angles manually. Let AutoCAD do the math using the Reference option.",
+    "bullets": ["Type SCALE (or SC)", "Select objects → pick base point", "Type R for Reference", "Pick two reference points — AutoCAD calculates the ratio"],
+    "proTip": "Same trick works with ROTATE → R (Reference) — pick two points to define the target angle automatically.",
+    "hashtags": ["#autocad", "#scalecommand", "#rotatecommand", "#cadhacks", "#drafting"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+  {
+    "day": "16c", "slot": "Evening", "format": "image",
+    "title": "Hidden Feature: SECTIONPLANE",
+    "desc": "SECTIONPLANE slices through a 3D model and generates a live 2D section view instantly — no manual tracing.",
+    "bullets": [],
+    "proTip": "Use Live Section mode to drag the plane through the model in real time before generating the output.",
+    "hashtags": ["#autocad3d", "#sectionplane", "#cadtricks"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 17  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "17a", "slot": "Morning", "format": "carousel",
+    "title": "Geometric Constraints",
+    "desc": "Parametric drawing — define geometric relationships that AutoCAD enforces automatically.",
+    "bullets": ["GEOMCONSTRAINT – Apply constraints (parallel, perpendicular, tangent)", "AUTOCONSTRAIN – Auto-detect and apply constraints", "CONSTRAINTBAR – Show/hide constraint icons", "DELCONSTRAINT – Remove constraints"],
+    "proTip": "Use AUTOCONSTRAIN on existing geometry first — it finds and applies most constraints automatically.",
+    "hashtags": ["#autocadparametric", "#geometricconstraints", "#cadtips"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+  {
+    "day": "17b", "slot": "Afternoon", "format": "carousel",
+    "title": "Copy/Paste With Base Point: One Action, Not Three",
+    "desc": "Ctrl+Shift+C copies with a base point. Ctrl+Shift+V pastes at exactly the right location — perfectly aligned across drawings.",
+    "bullets": ["Ctrl+Shift+C – Copy with base point", "Switch to target drawing", "Ctrl+Shift+V – Paste to original coordinates", "Object lands in the exact correct position"],
+    "proTip": "Use 0,0 as your base point across all project drawings — everything aligns perfectly on paste.",
+    "hashtags": ["#autocad", "#copypaste", "#cadhacks", "#drafting", "#workflowtips"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+  {
+    "day": "17c", "slot": "Evening", "format": "image",
+    "title": "Hidden Feature: BLOCKREPLACE (Revisited)",
+    "desc": "BLOCKREPLACE is the most underused productivity command in AutoCAD — swap every instance of a block project-wide in one step.",
+    "bullets": [],
+    "proTip": "Works across all open drawings when using Sheet Sets — true project-wide replacement.",
+    "hashtags": ["#autocad", "#cadefficiency", "#drafting", "#workflowtips"],
+    "phase": "Week 4 — Advanced Tools & Output"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 18  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "18a", "slot": "Morning", "format": "carousel",
+    "title": "Dimensional Constraints",
+    "desc": "Drive geometry with numbers — parametric dimensions that update the drawing when you change values.",
+    "bullets": ["DCON – Apply a dimensional constraint", "PARAMETERS – Open Parameters Manager", "Link constraints to formulas (width = 2 × height)", "Changing one value updates all linked geometry"],
+    "proTip": "Name your parameters clearly (e.g., 'wall_thickness') — you'll thank yourself when editing later.",
+    "hashtags": ["#autocadparametric", "#dimensionalconstraints", "#cadtips"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "18b", "slot": "Afternoon", "format": "carousel",
+    "title": "NCOPY: Copy One Element Straight Out of a Block or Xref",
+    "desc": "You don't need to explode a block or xref to steal one piece of it. NCOPY grabs a nested object directly — done in one command.",
+    "bullets": ["Type NCOPY", "Click the nested object inside the block or xref", "Place the copy — it lands as an independent object", "The block/xref stays completely intact"],
+    "proTip": "NCOPY is indispensable when you need just one line or symbol from an xref without binding the whole thing.",
+    "hashtags": ["#autocad", "#ncopy", "#cadhacks", "#blocks", "#xref", "#workflowtips"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "18c", "slot": "Evening", "format": "carousel",
+    "title": "More Workflow-Compression Commands",
+    "desc": "Commands that replace 2-3 steps with one — the hallmark of a fast, efficient drafter.",
+    "bullets": ["PEDIT → Multiple – join + smooth polylines at once", "OFFSET → Multiple – offset same object several times", "MATCHPROP → Settings – copy only specific properties", "STRETCH → Crossing window – move AND resize in one action"],
+    "proTip": "OFFSET → Multiple is one of the most underused options — keeps the source object active for rapid multi-offset.",
+    "hashtags": ["#autocad", "#cadworkflow", "#drafting", "#cadhacks", "#productivitytips"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 19  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "19a", "slot": "Morning", "format": "carousel",
+    "title": "Selection & Query Tools",
+    "desc": "Select smarter, query faster — the tools that turn 10-minute selection tasks into seconds.",
+    "bullets": ["QSELECT – Select by object type/property", "FILTER – Advanced selection filter", "LIST – Detailed object data", "DIST (DI) – Measure distance", "AREA – Calculate area of a region", "ID – Get coordinates of a point"],
+    "proTip": "FILTER is more powerful than QSELECT for complex multi-criteria selection — worth learning both.",
+    "hashtags": ["#autocad", "#cadselection", "#drafting", "#cadtips"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "19b", "slot": "Afternoon", "format": "carousel",
+    "title": "Workflow Compression Bonus List",
+    "desc": "A curated list of 'does two things at once' commands that separate fast drafters from slow ones.",
+    "bullets": ["BURST – Explode block, keep attribute values", "CHSPACE – Move between model/paper space with auto-scale", "MULTIPLE – Repeat any command automatically", "SCALETEXT – Resize text height without repositioning", "JUSTIFYTEXT – Change alignment without moving text"],
+    "proTip": "Print this list and stick it next to your monitor — you'll find yourself using these daily within a week.",
+    "hashtags": ["#autocad", "#cadhacks", "#cadworkflow", "#drafting"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "19c", "slot": "Evening", "format": "carousel",
+    "title": "CHSPACE: Move Objects Between Model & Paper Space",
+    "desc": "Stop manually recalculating scale when moving objects between model space and a layout. CHSPACE does it with auto-scale correction.",
+    "bullets": ["Select the object in model space", "Type CHSPACE", "Object moves to paper space at the correct scale", "Works in reverse too — paper to model"],
+    "proTip": "CHSPACE is essential for moving annotation notes between layouts and model space correctly.",
+    "hashtags": ["#autocad", "#chspace", "#cadhacks", "#drafting", "#workflowtips"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 20  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "20a", "slot": "Morning", "format": "carousel",
+    "title": "Plotting Essentials",
+    "desc": "Everything you need to know to plot correctly — page setups, plot styles, and PDF export.",
+    "bullets": ["PLOT (Ctrl+P) – Open plot dialog", "PAGESETUP – Configure page/plot settings", "PLOTSTYLE – Manage plot style tables", "PREVIEW – Preview before printing", "EXPORTPDF – Export directly to PDF"],
+    "proTip": "Save a named Page Setup for each common output (A1 PDF, A3 PDF) — reuse in seconds.",
+    "hashtags": ["#autocadplotting", "#cadoutput", "#drafting"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "20b", "slot": "Afternoon", "format": "carousel",
+    "title": "DATAEXTRACTION: Auto-Pull Block Data Into a Table",
+    "desc": "Stop manually counting block instances for schedules. DATAEXTRACTION builds a complete schedule table — or exports to Excel — automatically.",
+    "bullets": ["Type DATAEXTRACTION → follow the wizard", "Select which drawings/blocks to scan", "Choose which attribute properties to extract", "Output as an AutoCAD table or export to Excel"],
+    "proTip": "Link the extracted table back as a DATALINK so the schedule auto-updates when blocks change.",
+    "hashtags": ["#autocad", "#dataextraction", "#cadhacks", "#drafting", "#civilengineering"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "20c", "slot": "Evening", "format": "carousel",
+    "title": "BURST: Explode a Block Without Losing Attribute Values",
+    "desc": "Never use EXPLODE on an attributed block again. BURST keeps the actual filled-in values intact as real text.",
+    "bullets": ["EXPLODE on attributed block → values disappear", "BURST on same block → values convert to text", "The block explodes to geometry + real text", "Nothing is lost"],
+    "proTip": "BURST is an Express Tool — make sure Express Tools are enabled in your installation.",
+    "hashtags": ["#autocad", "#burst", "#cadhacks", "#blocks", "#drafting"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 21  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "21a", "slot": "Morning", "format": "carousel",
+    "title": "Layouts & Viewports",
+    "desc": "Paper space, layouts, and viewports — the setup that every professional drawing uses.",
+    "bullets": ["LAYOUT – Create/manage layout tabs", "MVIEW (MV) – Create a viewport in a layout", "VPORTS – Manage multiple viewports", "VPLAYER – Control layer visibility per viewport", "MSPACE / PSPACE – Switch model/paper space"],
+    "proTip": "Lock viewport scale (double-click the viewport border → Properties → Lock Display) to prevent accidental zooming.",
+    "hashtags": ["#autocadlayouts", "#paperspace", "#modelspace"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "21b", "slot": "Afternoon", "format": "carousel",
+    "title": "SCALETEXT & JUSTIFYTEXT: Fix Text Without Moving It",
+    "desc": "Two commands that solve text formatting problems in one step — no repositioning afterward.",
+    "bullets": ["SCALETEXT – Resize multiple text objects to a new height in place", "JUSTIFYTEXT – Change text justification without the text jumping", "Select all affected text at once", "Works on MText, DText, and Attribute text"],
+    "proTip": "SCALETEXT is perfect when a client asks you to change all annotation from 2.5mm to 3mm height project-wide.",
+    "hashtags": ["#autocad", "#scaletext", "#justifytext", "#cadtips", "#drafting"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+  {
+    "day": "21c", "slot": "Evening", "format": "carousel",
+    "title": "DATAEXTRACTION: Build Your Door Schedule in 2 Minutes",
+    "desc": "A practical walkthrough of using DATAEXTRACTION to auto-generate a door schedule from block attributes.",
+    "bullets": ["Tag all door blocks with number attributes", "Run DATAEXTRACTION → select the drawing", "Map 'DoorNumber' and 'DoorType' attributes", "AutoCAD builds the complete schedule table"],
+    "proTip": "Run the extraction again after any door additions — the schedule updates in under 30 seconds.",
+    "hashtags": ["#autocad", "#schedules", "#cadautomation", "#civilengineering"],
+    "phase": "Week 5 — Workflow Compression"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 22  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "22a", "slot": "Morning", "format": "carousel",
+    "title": "Layouts & Viewports (Deep Dive)",
+    "desc": "Advanced viewport control — the techniques that make your sheet layouts professional.",
+    "bullets": ["VPLAYER – Hide layers in specific viewports only", "MS / PS – Toggle in/out of viewport quickly", "Set viewport scale via Properties palette", "CHSPACE – Move objects between spaces with scale correction"],
+    "proTip": "Never set viewport scale by zooming manually — always use the Properties palette for exact 1:100, 1:200 scale.",
+    "hashtags": ["#autocadlayouts", "#paperspace", "#cadtips"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+  {
+    "day": "22b", "slot": "Afternoon", "format": "carousel",
+    "title": "SOLPROF & FLATSHOT: Auto-Generate 2D Lines From a 3D Model",
+    "desc": "Stop manually tracing 3D views to create 2D drawings. SOLPROF and FLATSHOT do it automatically.",
+    "bullets": ["SOLPROF – 2D profile of a 3D solid for current view", "FLATSHOT – Flatten entire 3D model to 2D lines", "Both generate clean linework from viewpoint", "Export to paper space layouts for elevation drawings"],
+    "proTip": "Use FLATSHOT for quick elevation extractions from 3D models — delivers clean 2D geometry in seconds.",
+    "hashtags": ["#autocad", "#solprof", "#flatshot", "#3dto2d", "#cadhacks"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+  {
+    "day": "22c", "slot": "Evening", "format": "carousel",
+    "title": "OOPS, SETBYLAYER & FIND: Quiet Time-Savers",
+    "desc": "Three commands that fix common headaches in one step each — most people don't know they exist.",
+    "bullets": ["OOPS – Restores last erased object, even after other commands (unlike UNDO)", "SETBYLAYER – Forces all object properties to ByLayer in one step", "FIND – Find and replace text across entire drawing including inside blocks"],
+    "proTip": "FIND works inside blocks — the only way to bulk-update block text without exploding everything.",
+    "hashtags": ["#autocad", "#oops", "#setbylayer", "#find", "#cadhacks", "#drafting"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 23  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "23a", "slot": "Morning", "format": "carousel",
+    "title": "Sheet Sets for Multi-Drawing Projects",
+    "desc": "The professional workflow for managing large drawing sets — Sheet Set Manager explained.",
+    "bullets": ["SHEETSET (SSM) – Open Sheet Set Manager", "NEWSHEETSET – Create a new sheet set", "Publish entire sheet sets to PDF in one click", "Auto-updating title block fields across all sheets"],
+    "proTip": "Sheet Sets are essential for any project over 10 drawings — the time investment pays back immediately.",
+    "hashtags": ["#autocadsheetsets", "#civilengineering", "#drafting"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+  {
+    "day": "23b", "slot": "Afternoon", "format": "carousel",
+    "title": "Basic 3D Solid Primitives",
+    "desc": "The building blocks of 3D modeling in AutoCAD — every primitive command you need.",
+    "bullets": ["BOX – Rectangular solid", "CYL – Cylinder", "SPHERE – Sphere", "CONE – Cone", "WEDGE (WE) – Wedge", "PYRAMID (PYR) – Pyramid", "TORUS (TOR) – Torus (donut)"],
+    "proTip": "Switch to '3D Modeling' workspace before starting 3D — gives you all the right tools upfront.",
+    "hashtags": ["#autocad3d", "#cad3dmodeling", "#drafting"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+  {
+    "day": "23c", "slot": "Evening", "format": "carousel",
+    "title": "SELECTSIMILAR & ISOLATEOBJECTS: Smarter Selection",
+    "desc": "Two commands that replace manual multi-object selection — instant isolation and bulk selection by property.",
+    "bullets": ["SELECTSIMILAR – Right-click → select all matching objects instantly", "ISOLATEOBJECTS – Isolate selected objects regardless of layer", "UNISOLATEOBJECTS – Restore everything after isolation", "Works independently of layer settings"],
+    "proTip": "ISOLATEOBJECTS is perfect for focusing on one detail area without touching layer visibility at all.",
+    "hashtags": ["#autocad", "#selectsimilar", "#isolateobjects", "#cadhacks", "#drafting"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 24  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "24a", "slot": "Morning", "format": "carousel",
+    "title": "Complex 3D Shapes",
+    "desc": "Beyond primitives — the commands that create any complex 3D form from 2D geometry.",
+    "bullets": ["EXTRUDE (EXT) – Push a 2D profile into 3D", "REVOLVE (REV) – Spin a profile around an axis", "LOFT – Blend between multiple cross-sections", "SWEEP – Follow a path curve", "PRESSPULL – Push/pull faces interactively"],
+    "proTip": "PRESSPULL on a closed region is the fastest way to create a simple solid — just drag and type a height.",
+    "hashtags": ["#autocad3d", "#cadmodeling", "#extrude", "#revolve"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+  {
+    "day": "24b", "slot": "Afternoon", "format": "carousel",
+    "title": "Boolean Operations",
+    "desc": "Combine, subtract, and intersect 3D solids — the core logic of solid modeling.",
+    "bullets": ["UNION (UNI) – Combine two solids into one", "SUBTRACT (SU) – Cut one solid with another", "INTERSECT (IN) – Keep only the overlapping volume", "SLICE (SL) – Cut a solid with a plane"],
+    "proTip": "SUBTRACT is how you create holes, notches, and cut-outs in 3D — model the cutter separately then subtract it.",
+    "hashtags": ["#autocad3d", "#booleanoperations", "#cadtips"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+  {
+    "day": "24c", "slot": "Evening", "format": "carousel",
     "title": "THICKEN & CONVTOSOLID: Instant Solid Conversion",
-    "bullets": [
-      "**THICKEN** \u2013 turns a flat surface into a 3D solid with a set thickness, in one command",
-      "**CONVTOSOLID** \u2013 converts eligible meshes or surfaces directly into solids, instead of manually remodeling them"
-    ],
-    "script": "",
-    "caption": "Stop rebuilding geometry from scratch:",
-    "hashtags": [
-      "#autocad3d",
-      "#thicken",
-      "#convtosolid",
-      "#cadhacks",
-      "#advancedcad"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
+    "desc": "Stop rebuilding 3D geometry from scratch — convert existing surfaces directly into solids.",
+    "bullets": ["THICKEN – Turn a flat surface into a solid with set thickness", "CONVTOSOLID – Convert meshes/surfaces to solids directly", "THICKEN works on any AutoCAD surface", "CONVTOSOLID handles imported mesh geometry"],
+    "proTip": "Use THICKEN on surfaces imported from Rhino or SketchUp to make them solid for Boolean operations.",
+    "hashtags": ["#autocad3d", "#thicken", "#convtosolid", "#cadhacks", "#advancedcad"],
+    "phase": "Week 6 — Output, 3D & Advanced"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 25  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "25a", "slot": "Morning", "format": "carousel",
+    "title": "Custom Keyboard Shortcuts & Aliases",
+    "desc": "Build your own shortcuts — stop using defaults that don't match your workflow.",
+    "bullets": ["CUI – Customize User Interface", "Edit acad.pgp file to add/change aliases", "Example: make 'WD' = Wipeout command", "REINIT – Reload aliases after editing the PGP file"],
+    "proTip": "Remap the 5 commands you use most to single-letter aliases — you'll feel the speed difference within an hour.",
+    "hashtags": ["#autocadcustomization", "#cadhacks", "#powerusertips"],
+    "phase": "Week 7 — Advanced & Power-User"
   },
   {
-    "day": "82",
-    "format": "carousel",
-    "title": "Full Series Master Recap",
-    "bullets": [],
-    "script": "",
-    "caption": "From Day 1 to Day 81 \u2014 every command, shortcut, and workflow trick covered across 2D, 3D, Advanced, and Workflow Compression. This is the complete AutoCAD reference. Save this post. \ud83d\udcf8 ## Updated Full Series Overview | Phase | Focus | Days | Content | |---|---|---|---| | 1 | Complete 2D | 1-40 | ~95 commands (drawing, editing, layers, dimensions, blocks, xrefs, data, parametric, output) | | 2 | Complete 3D | 41-45 | ~20 commands (solids, editing, booleans, sectioning) | | 3 | Advanced / Power-user | 46-60 | Customization, automation, LISP intro, Express Tools, collaboration, standards, sheet set mastery | | 3.5 | Workflow Compression (\"1 command instead of 3\") | 61-82 | ALIGN, REFEDIT, MEASUREGEOM, Reference option, BLOCKREPLACE, Fillet-0, MULTIPLE, Copy/Paste base point, NCOPY, PEDIT/OFFSET/MATCHPROP/STRETCH options, CHSPACE, BURST, SCALETEXT, JUSTIFYTEXT, MLEADERALIGN, DIMBREAK, OOPS, SETBYLAYER, FIND, DATAEXTRACTION, SOLPROF, FLATSHOT, MASSPROP, SELECTSIMILAR, ISOLATEOBJECTS, THICKEN, CONVTOSOLID | **Total: 82 days, ~163+ distinct commands/features/workflows.** This module (3.5) is a strong recurring content type even beyond Day 70 \u2014 every time you learn or notice a \"combo\" command while drafting, it can become a one-off post between other series. Worth keeping as an ongoing content bucket, not just a one-time module. After Day 70, the account has a complete AutoCAD foundation (2D \u2192 3D \u2192 Advanced \u2192 Workflow Compression) and is ready to start the same structure for Revit.",
-    "hashtags": [
-      "#autocad",
-      "#cadmastery",
-      "#drafting",
-      "#savethispost"
-    ],
-    "phase": "Phase 3.5: Workflow Compression"
+    "day": "25b", "slot": "Afternoon", "format": "carousel",
+    "title": "Tool Palettes & Workspaces",
+    "desc": "A workspace that fits how you actually work — custom palettes and saved ribbon layouts.",
+    "bullets": ["TOOLPALETTES (Ctrl+3) – Custom palettes with your blocks/hatches", "WORKSPACE – Save custom ribbon/toolbar layouts", "CUIEXPORT – Export your setup for use on another PC", "CUIIMPORT – Import another user's setup"],
+    "proTip": "Build one Tool Palette per project discipline (Structural, Civil, MEP) — one click to switch contexts.",
+    "hashtags": ["#autocad", "#workspaces", "#cadefficiency", "#powerusertips"],
+    "phase": "Week 7 — Advanced & Power-User"
+  },
+  {
+    "day": "25c", "slot": "Evening", "format": "carousel",
+    "title": "Intro to AutoLISP (No Coding Experience Required)",
+    "desc": "You don't need to write code to use AutoLISP routines — just load and run them.",
+    "bullets": ["APPLOAD – Load a .lsp routine into AutoCAD", "Free community LISP routines exist for auto-numbering, batch attribute editing, area labeling", "VLIDE – Visual LISP Editor for viewing/editing routines"],
+    "proTip": "Search 'AutoCAD LISP routines free download' — thousands exist for common civil/architectural tasks.",
+    "hashtags": ["#autocad", "#autolisp", "#cadautomation", "#advancedcad"],
+    "phase": "Week 7 — Advanced & Power-User"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 26  —  3 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "26a", "slot": "Morning", "format": "carousel",
+    "title": "Advanced Object Snap & Tracking",
+    "desc": "Precision drafting depends on these — beyond basic endpoint/midpoint snaps.",
+    "bullets": ["OSNAP (OS) – Configure running object snaps", "Polar Tracking (F10) – Snap to precise angles", "Object Snap Tracking (F11) – Track from multiple reference points", "OTRACK – Toggle object snap tracking"],
+    "proTip": "Enable only the snaps you actively use — too many running snaps causes snap conflicts on complex drawings.",
+    "hashtags": ["#autocad", "#precisiondrafting", "#cadtips", "#advancedcad"],
+    "phase": "Week 7 — Advanced & Power-User"
+  },
+  {
+    "day": "26b", "slot": "Afternoon", "format": "carousel",
+    "title": "Groups & Advanced Selection",
+    "desc": "Group related objects so you never lose track of them — and selection cycling for overlapping geometry.",
+    "bullets": ["GROUP (G) – Create a named group", "UNGROUP – Break a group apart", "PICKSTYLE – Toggle group selection behavior", "Selection Cycling – Ctrl+click overlapping objects"],
+    "proTip": "Named groups are searchable — GROUP → Name gives you click-to-select across complex drawings.",
+    "hashtags": ["#autocad", "#cadgroups", "#drafting", "#advancedcad"],
+    "phase": "Week 7 — Advanced & Power-User"
+  },
+  {
+    "day": "26c", "slot": "Evening", "format": "carousel",
+    "title": "Advanced Array Techniques",
+    "desc": "Beyond basic arrays — the array features that handle real civil and structural patterns.",
+    "bullets": ["Associative Arrays – edit one item, whole array updates", "Array along a 3D path (for structural/civil layouts)", "Edit count/spacing live via grip points", "Convert array to independent objects: ARRAYEDIT → Explode"],
+    "proTip": "Associative arrays are the key feature — always leave them associative until you're 100% done editing.",
+    "hashtags": ["#autocad", "#advancedarrays", "#cadtips", "#civilengineering"],
+    "phase": "Week 7 — Advanced & Power-User"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 27  —  2 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "27a", "slot": "Morning", "format": "carousel",
+    "title": "Advanced Xref & Collaboration Workflow",
+    "desc": "Working across a full engineering team — the xref discipline that prevents file corruption and circular references.",
+    "bullets": ["Overlay vs Attach – know the difference before nesting drawings", "XREF notification/reload workflow for team file updates", "LAYERSTATE – Save and restore layer configs per discipline", "XCLIP for showing only the relevant project area"],
+    "proTip": "Overlay xrefs are always safer in team environments — they don't nest and can't cause circular references.",
+    "hashtags": ["#autocad", "#cadcollaboration", "#advancedcad", "#civilengineering"],
+    "phase": "Week 7 — Advanced & Power-User"
+  },
+  {
+    "day": "27b", "slot": "Afternoon", "format": "carousel",
+    "title": "Sheet Set Advanced Techniques",
+    "desc": "Taking Sheet Sets beyond the basics — professional multi-project workflows.",
+    "bullets": ["Custom sheet set templates with pre-filled title block fields", "Sheet set Fields linked to project data (name, number, client)", "Batch-renumber sheets across an entire set", "eTransmit to package a full project for consultants"],
+    "proTip": "Sheet set Field values update on all sheets simultaneously — change the project number once, updates everywhere.",
+    "hashtags": ["#autocad", "#sheetsets", "#advancedcad", "#civilengineering"],
+    "phase": "Week 7 — Advanced & Power-User"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 28  —  2 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "28a", "slot": "Morning", "format": "carousel",
+    "title": "AutoCAD 2D Complete Cheat Sheet (Full Recap)",
+    "desc": "Every 2D command from Day 1 — compiled in one master reference. Screenshot and save this.",
+    "bullets": ["Drawing: L, PL, C, REC, ARC, POL, EL, XL, DIV, MEA", "Editing: TR, EX, CO, MI, O, F, CHA, S, RO, SC, BR, LEN, AL", "Layers: LA, LAYISO, LAYUNISO, LAYFRZ, LAYOFF, LAYWALK", "Dimensions: DLI, DAL, DAN, DRA, DDI, DCO, DBA, QDIM", "Blocks: B, I, BEDIT, W, X, REFEDIT, BURST, BLOCKREPLACE", "Data: DATALINK, FIELD, DATAEXTRACTION, QSELECT, FILTER"],
+    "proTip": "Pin this to your workspace — it's the reference you'll come back to for years.",
+    "hashtags": ["#autocadcheatsheet", "#cadtips", "#drafting", "#savethispost"],
+    "phase": "Week 8 — Recaps & Finales"
+  },
+  {
+    "day": "28b", "slot": "Afternoon", "format": "carousel",
+    "title": "AutoCAD Advanced Cheat Sheet (Full Recap)",
+    "desc": "Every advanced tip from the series — power-user commands compiled in one graphic.",
+    "bullets": ["Customization: CUI, PGP aliases, REINIT, TOOLPALETTES, WORKSPACE", "Automation: ACTRECORD, ACTPLAY, APPLOAD, AUTOLISP", "Collaboration: XREF, XCLIP, ETRANSMIT, LAYERSTATE, STANDARDS", "Express Tools: TCOUNT, TXTEXP, EXTRIM, MPEDIT, SUPERHATCH"],
+    "proTip": "Share both cheat sheets with your team — a shared vocabulary makes collaboration significantly faster.",
+    "hashtags": ["#autocad", "#advancedcad", "#cadmastery", "#savethispost"],
+    "phase": "Week 8 — Recaps & Finales"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 29  —  2 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "29a", "slot": "Morning", "format": "carousel",
+    "title": "Workflow Compression Recap #1",
+    "desc": "The first half of the 'One Command Instead of Three' series — every time-saving shortcut compiled.",
+    "bullets": ["ALIGN – Move + Rotate + Scale in one", "REFEDIT – Edit a block in place", "MEASUREGEOM – All measurements in one command", "SCALE/ROTATE Reference – no math needed", "BLOCKREPLACE – Swap block project-wide", "FILLET radius 0 – instant clean corners"],
+    "proTip": "These commands don't just save time — they reduce errors by eliminating manual intermediate steps.",
+    "hashtags": ["#autocad", "#cadmastery", "#drafting", "#savethispost", "#workflowtips"],
+    "phase": "Week 8 — Recaps & Finales"
+  },
+  {
+    "day": "29b", "slot": "Afternoon", "format": "carousel",
+    "title": "Workflow Compression Recap #2",
+    "desc": "The second half of the compression series — more commands that eliminate unnecessary steps.",
+    "bullets": ["MULTIPLE – Repeat any command automatically", "Ctrl+Shift+C/V – Copy/paste with base point", "NCOPY – Extract from block/xref without exploding", "CHSPACE – Move between spaces with auto-scale", "BURST – Explode block keeping attribute values", "SCALETEXT / JUSTIFYTEXT – format text without moving it"],
+    "proTip": "Combine NCOPY with CHSPACE for a powerful pattern: extract content from xrefs and position in layouts.",
+    "hashtags": ["#autocad", "#cadmastery", "#cadhacks", "#savethispost", "#workflowtips"],
+    "phase": "Week 8 — Recaps & Finales"
+  },
+
+  // ─────────────────────────────────────────────
+  // DAY 30  —  2 posts
+  // ─────────────────────────────────────────────
+  {
+    "day": "30a", "slot": "Morning", "format": "carousel",
+    "title": "Full Series Master Recap — The Complete AutoCAD Reference",
+    "desc": "From Day 1 to Day 29 — every command, shortcut, and workflow trick in one final master graphic. Save this post.",
+    "bullets": ["Phase 1 (2D): ~95 commands — drawing, editing, layers, dims, blocks, xrefs, data, output", "Phase 2 (3D): ~20 commands — solids, editing, booleans, sectioning", "Phase 3 (Advanced): Customization, automation, LISP, Express Tools, collaboration", "Phase 3.5 (Workflow): ALIGN, REFEDIT, MEASUREGEOM, NCOPY, BURST, CHSPACE + more"],
+    "proTip": "Bookmark this. Share it. Come back to it when you're stuck — this is the complete AutoCAD toolkit.",
+    "hashtags": ["#autocad", "#cadmastery", "#drafting", "#savethispost"],
+    "phase": "Week 8 — Recaps & Finales"
+  },
+  {
+    "day": "30b", "slot": "Evening", "format": "carousel",
+    "title": "What's Coming Next Month? (Revit Series Teaser)",
+    "desc": "AutoCAD month is done. Next up: Revit — the same structure, applied to BIM. Here's what's coming.",
+    "bullets": ["Revit 2D: Drafting, annotation, sheets, detail views", "Revit 3D: Families, modeling, levels and grids", "Revit Advanced: Schedules, parameters, collaboration, Dynamo intro", "Starting in 7 days — follow now to catch every post from Day 1"],
+    "proTip": "Everything you learned in AutoCAD translates to Revit — the muscle memory transfers, the concepts scale up.",
+    "hashtags": ["#revit", "#bim", "#autocad", "#civilengineering", "#comingsoon"],
+    "phase": "Week 8 — Recaps & Finales"
   }
 ];
