@@ -575,6 +575,8 @@ sidebarButtons.forEach(btn => {
       renderCheatSheet();
     } else if (targetTab === 'quiz') {
       initQuizAndFlashcards();
+    } else if (targetTab === 'cloudviewer') {
+      initCloudViewer();
     }
   });
 });
@@ -3930,4 +3932,241 @@ if (btnGsheetPush) {
       showToast('❌ Push failed: ' + err.message, 'error');
     }
   };
+}
+
+// ==========================================================================
+// 20. Cloud Sheet Viewer Engine
+// ==========================================================================
+let cloudViewerData = [];
+
+const PRIORITY_COLS = ['id', 'day', 'software', 'keys', 'shortcut', 'action', 'title', 'category', 'difficulty', 'desc', 'description', 'proTip', 'commonMistake', 'hashtags'];
+const DIFFICULTY_COLORS = { 'Beginner': '#10b981', 'Intermediate': '#f59e0b', 'Advanced': '#ef4444', 'Expert': '#a855f7' };
+
+function initCloudViewer() {
+  const btnRefresh = document.getElementById('btn-cloudviewer-refresh');
+  const btnLoadAll = document.getElementById('btn-cloudviewer-load-all');
+  const searchInput = document.getElementById('cloudviewer-search');
+  const filterSoftware = document.getElementById('cloudviewer-filter-software');
+  const filterDifficulty = document.getElementById('cloudviewer-filter-difficulty');
+  const viewModeSelect = document.getElementById('cloudviewer-view-mode');
+
+  if (btnRefresh) btnRefresh.onclick = fetchCloudViewerData;
+  if (searchInput) searchInput.addEventListener('input', renderCloudViewerContent);
+  if (filterSoftware) filterSoftware.addEventListener('change', renderCloudViewerContent);
+  if (filterDifficulty) filterDifficulty.addEventListener('change', renderCloudViewerContent);
+  if (viewModeSelect) viewModeSelect.addEventListener('change', renderCloudViewerContent);
+
+  if (btnLoadAll) {
+    btnLoadAll.onclick = () => {
+      if (cloudViewerData.length === 0) {
+        showToast('⚠️ No cloud data loaded yet. Click Refresh from Cloud first.', 'error');
+        return;
+      }
+      const sanitized = cloudViewerData.map((item, i) => ({
+        ...item,
+        day: Number(item.day) || i + 1,
+        bullets: typeof item.bullets === 'string' ? tryParse(item.bullets, []) : (item.bullets || []),
+        hashtags: typeof item.hashtags === 'string' ? tryParse(item.hashtags, []) : (item.hashtags || [])
+      }));
+      calendarDb = sanitized;
+      localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+      updateCalendarProgress();
+      renderSidebarDaysList();
+      renderDatabaseManagerTable();
+      saveAllDataToSyncFile();
+      showToast(`✅ Loaded ${calendarDb.length} posts from Cloud Sheet into App Database!`, 'success');
+    };
+  }
+
+  // Auto-fetch on first open if no data yet
+  if (cloudViewerData.length === 0) {
+    fetchCloudViewerData();
+  } else {
+    renderCloudViewerContent();
+  }
+}
+
+function tryParse(str, fallback) {
+  try { return JSON.parse(str); } catch { return fallback; }
+}
+
+async function fetchCloudViewerData() {
+  const url = (typeof LUDARP_GSHEET_DEFAULT_URL !== 'undefined') ? LUDARP_GSHEET_DEFAULT_URL : '';
+  const savedUrl = localStorage.getItem('ludarp_gsheet_url') || url;
+  if (!savedUrl) {
+    showToast('⚠️ No Google Sheet URL configured. Go to Database Manager to set it up.', 'error');
+    return;
+  }
+
+  const emptyEl = document.getElementById('cloudviewer-empty');
+  if (emptyEl) {
+    emptyEl.style.display = 'block';
+    emptyEl.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px;">
+        <div class="ai-spinner"></div>
+        <p style="font-weight:700; color:var(--text-primary);">Fetching live data from Google Sheet...</p>
+      </div>`;
+  }
+
+  try {
+    const res = await fetch(savedUrl);
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      if (emptyEl) {
+        emptyEl.style.display = 'block';
+        emptyEl.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:52px;height:52px;margin-bottom:14px;opacity:0.35;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <p style="font-weight:800; font-size:1rem; color:var(--text-primary);">Google Sheet is empty</p>
+          <p style="font-size:0.82rem; margin-top:6px; opacity:0.7;">Add posts via Bulk Post Importer and click <b>📤 Push TO Cloud</b> in Database Manager first.</p>`;
+      }
+      showToast('⚠️ Google Sheet returned no data rows.', 'warning');
+      return;
+    }
+
+    cloudViewerData = data;
+    const countBadge = document.getElementById('cloudviewer-count-badge');
+    if (countBadge) countBadge.textContent = `${data.length} row${data.length !== 1 ? 's' : ''}`;
+
+    showToast(`✅ Loaded ${data.length} rows from Google Sheet!`, 'success');
+    renderCloudViewerContent();
+  } catch (err) {
+    console.error('Cloud Viewer Fetch Error:', err);
+    if (emptyEl) {
+      emptyEl.style.display = 'block';
+      emptyEl.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:52px;height:52px;margin-bottom:14px;opacity:0.35;color:var(--error);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p style="font-weight:800; font-size:1rem; color:var(--error);">Failed to connect to Google Sheet</p>
+        <p style="font-size:0.82rem; margin-top:6px; opacity:0.7;">Make sure your Apps Script is deployed as a public Web App and the URL is correct.</p>`;
+    }
+    showToast('❌ Could not reach Google Sheet. Check your deployment.', 'error');
+  }
+}
+
+function renderCloudViewerContent() {
+  const searchVal = (document.getElementById('cloudviewer-search')?.value || '').toLowerCase();
+  const softwareVal = document.getElementById('cloudviewer-filter-software')?.value || '';
+  const diffVal = document.getElementById('cloudviewer-filter-difficulty')?.value || '';
+  const viewMode = document.getElementById('cloudviewer-view-mode')?.value || 'table';
+
+  const emptyEl = document.getElementById('cloudviewer-empty');
+  const tableWrap = document.getElementById('cloudviewer-table-wrap');
+  const cardsGrid = document.getElementById('cloudviewer-cards-grid');
+
+  // Filter
+  let rows = cloudViewerData.filter(row => {
+    const sw = (row.software || '').toLowerCase();
+    const diff = (row.difficulty || '');
+    const text = JSON.stringify(row).toLowerCase();
+
+    if (softwareVal && !sw.includes(softwareVal.toLowerCase())) return false;
+    if (diffVal && diff !== diffVal) return false;
+    if (searchVal && !text.includes(searchVal)) return false;
+    return true;
+  });
+
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  if (viewMode === 'table') {
+    if (tableWrap) tableWrap.style.display = 'block';
+    if (cardsGrid) cardsGrid.style.display = 'none';
+    renderCloudTable(rows);
+  } else {
+    if (tableWrap) tableWrap.style.display = 'none';
+    if (cardsGrid) { cardsGrid.style.display = 'grid'; renderCloudCards(rows, cardsGrid); }
+  }
+}
+
+function renderCloudTable(rows) {
+  const thead = document.getElementById('cloudviewer-thead');
+  const tbody = document.getElementById('cloudviewer-tbody');
+  if (!thead || !tbody) return;
+
+  if (rows.length === 0) {
+    thead.innerHTML = '';
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);font-weight:700;">No matching records found</td></tr>`;
+    return;
+  }
+
+  // Determine column order (priority cols first, then rest)
+  const allKeys = Object.keys(rows[0]);
+  const prioritized = PRIORITY_COLS.filter(k => allKeys.includes(k));
+  const rest = allKeys.filter(k => !PRIORITY_COLS.includes(k));
+  const cols = [...prioritized, ...rest];
+
+  // Thead
+  thead.innerHTML = `<tr style="background:var(--bg-tertiary); position:sticky; top:0; z-index:2;">
+    ${cols.map(col => `<th style="padding:10px 12px; text-align:left; font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); white-space:nowrap; border-bottom:2px solid var(--border);">${col}</th>`).join('')}
+  </tr>`;
+
+  // Tbody
+  tbody.innerHTML = rows.map((row, i) => {
+    const bg = i % 2 === 0 ? 'var(--bg-primary)' : 'var(--bg-secondary)';
+    const diffColor = DIFFICULTY_COLORS[row.difficulty] || 'var(--text-muted)';
+    return `<tr style="background:${bg}; transition:background 0.15s;" onmouseover="this.style.background='var(--bg-tertiary)'" onmouseout="this.style.background='${bg}'">
+      ${cols.map(col => {
+        let val = row[col] ?? '';
+        if (typeof val === 'object') val = JSON.stringify(val);
+        val = String(val);
+
+        // Special styling per column
+        if (col === 'difficulty' && val) {
+          return `<td style="padding:8px 12px; border-bottom:1px solid var(--border);">
+            <span style="font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:10px; background:${diffColor}22; color:${diffColor}; border:1px solid ${diffColor}44;">${val}</span>
+          </td>`;
+        }
+        if (col === 'keys' || col === 'shortcut') {
+          return `<td style="padding:8px 12px; border-bottom:1px solid var(--border); font-family:var(--font-mono); font-weight:900; color:var(--accent);">${val}</td>`;
+        }
+        if (col === 'software') {
+          return `<td style="padding:8px 12px; border-bottom:1px solid var(--border); font-weight:800; color:var(--text-primary);">${val}</td>`;
+        }
+        if (col === 'action' || col === 'title') {
+          return `<td style="padding:8px 12px; border-bottom:1px solid var(--border); font-weight:700; color:var(--text-primary); max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${val}">${val}</td>`;
+        }
+        return `<td style="padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text-secondary); max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${val}">${val}</td>`;
+      }).join('')}
+    </tr>`;
+  }).join('');
+}
+
+function renderCloudCards(rows, container) {
+  container.innerHTML = '';
+  if (rows.length === 0) {
+    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); font-weight:700;">No matching records found</div>`;
+    return;
+  }
+
+  rows.forEach(row => {
+    const diffColor = DIFFICULTY_COLORS[row.difficulty] || 'var(--text-muted)';
+    const keys = row.keys || row.shortcut || '—';
+    const action = row.action || row.title || 'No Title';
+    const desc = row.desc || row.description || '';
+    const proTip = row.proTip || '';
+    const mistake = row.commonMistake || '';
+    const software = row.software || '';
+    const difficulty = row.difficulty || '';
+    const category = row.category || '';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cssText = 'padding:18px; display:flex; flex-direction:column; gap:10px; position:relative; overflow:hidden;';
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+        <div style="font-family:var(--font-mono); font-size:1.6rem; font-weight:900; color:var(--accent); line-height:1;">${keys}</div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+          ${software ? `<span style="font-size:0.68rem; font-weight:800; padding:2px 7px; border-radius:8px; background:var(--accent-dim); color:var(--accent);">${software}</span>` : ''}
+          ${difficulty ? `<span style="font-size:0.65rem; font-weight:800; padding:2px 7px; border-radius:8px; background:${diffColor}22; color:${diffColor};">${difficulty}</span>` : ''}
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:800; font-size:0.95rem; color:var(--text-primary); line-height:1.3;">${action}</div>
+        ${category ? `<div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); margin-top:3px; text-transform:uppercase; letter-spacing:0.05em;">${category}</div>` : ''}
+      </div>
+      ${desc ? `<p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.5; margin:0;">${desc}</p>` : ''}
+      ${proTip ? `<div style="font-size:0.75rem; font-weight:700; color:var(--warning); background:rgba(245,158,11,0.1); padding:6px 10px; border-radius:6px; border-left:3px solid var(--warning);">💡 ${proTip}</div>` : ''}
+      ${mistake ? `<div style="font-size:0.75rem; font-weight:700; color:var(--error); background:rgba(239,68,68,0.1); padding:6px 10px; border-radius:6px; border-left:3px solid var(--error);">❌ ${mistake}</div>` : ''}
+    `;
+    container.appendChild(card);
+  });
 }
