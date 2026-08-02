@@ -1050,6 +1050,32 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); bor
 .theme-blueprint .tb-value { color: #f0ede4; }
 .theme-blueprint .card-description { color: rgba(240,237,228,0.75); }
 
+/* Crimson Redline CAD Theme */
+.instagram-card.theme-redline {
+  background: linear-gradient(160deg, #1a0505, #360a0a) !important;
+  color: #fef2f2 !important;
+  border: 3px solid #ef4444;
+}
+.theme-redline .card-bg-grid {
+  background-image: linear-gradient(to right, rgba(239,68,68,0.18) 1.5px, transparent 1.5px), linear-gradient(to bottom, rgba(239,68,68,0.18) 1.5px, transparent 1.5px);
+  background-size: 45px 45px;
+}
+.theme-redline .software-badge { background: rgba(239,68,68,0.2); border: 2px solid #ef4444; color: #ef4444; font-family: 'Big Shoulders Stencil Text', sans-serif; font-weight: 900; }
+.theme-redline .action-title { color: #fef2f2; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-transform: uppercase; }
+.theme-redline .card-step-num { border: 2px solid #ef4444; color: #ef4444; background: #1a0505; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; box-shadow: 0 0 0 6px #1a0505; z-index: 2; }
+.theme-redline .card-steps { position: relative; }
+.theme-redline .card-steps::before { content: ''; position: absolute; left: 22px; top: 15px; bottom: 15px; width: 2px; background: rgba(239,68,68,0.3); z-index: 1; }
+.theme-redline .pro-tip-box { background: #fef08a !important; color: #1e1b4b !important; box-shadow: 5px 15px 30px rgba(0,0,0,0.5); transform: rotate(-0.8deg); border-left: none; border-radius: 4px; }
+.theme-redline .pro-tip-tag { background: #ef4444; color: #fff; border: 1px solid #ef4444; }
+.theme-redline .pro-tip-text { font-family: 'Chakra Petch', sans-serif; font-weight: 700; color: #1e293b !important; }
+.theme-redline .cta-message { color: #ef4444; }
+.theme-redline .cad-title-block { border-color: #ef4444; }
+.theme-redline .tb-cell { border-color: #ef4444; }
+.theme-redline .tb-row { border-color: #ef4444; }
+.theme-redline .tb-label { color: rgba(254,242,242,0.5); }
+.theme-redline .tb-value { color: #fef2f2; }
+.theme-redline .card-description { color: rgba(254,242,242,0.75); }
+
 /* Obsidian */
 .instagram-card.theme-obsidian {
   background: linear-gradient(160deg, #09090b, #18181b) !important;

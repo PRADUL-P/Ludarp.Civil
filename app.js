@@ -3425,7 +3425,13 @@ if (btnImporterClear) {
 
 function parseRawTextToPosts(rawText) {
   if (!rawText || !rawText.trim()) return [];
-  const blocks = rawText.split(/---+/);
+  let blocks = rawText.split(/---+/);
+
+  // Auto-split multi-post blocks if '---' separators are omitted
+  if (blocks.length === 1 && (rawText.match(/Software:|Shortcut:|Action:/gi) || []).length > 1) {
+    blocks = rawText.split(/(?=(?:Software|Shortcut|Action):)/i);
+  }
+
   const parsed = [];
 
   blocks.forEach((block, idx) => {
