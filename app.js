@@ -183,9 +183,8 @@ if (localStorage.getItem('ludarp_calendar_db_v2_cleared') !== 'true') {
   localStorage.setItem('ludarp_calendar_db_v2_cleared', 'true');
 }
 
-// Load clean database arrays
-let shortcutDb = JSON.parse(localStorage.getItem('ludarp_shortcuts')) || [];
-let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
+// Load clean single database array
+let calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || JSON.parse(localStorage.getItem('ludarp_shortcuts')) || [];
 
 // Fallback to preloaded data if local storage is empty
 const defaultData = (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar) && autocadCalendar.length > 0)
@@ -197,18 +196,13 @@ const defaultData = (typeof autocadCalendar !== 'undefined' && Array.isArray(aut
 if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
   if (defaultData.length > 0) {
     calendarDb = JSON.parse(JSON.stringify(defaultData));
-    localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
   }
 }
 
-if (!Array.isArray(shortcutDb) || shortcutDb.length === 0) {
-  if (calendarDb.length > 0) {
-    shortcutDb = JSON.parse(JSON.stringify(calendarDb));
-  } else {
-    shortcutDb = JSON.parse(JSON.stringify(defaultShortcuts));
-  }
-  localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
-}
+// Single Unified Database: shortcutDb references calendarDb
+let shortcutDb = calendarDb;
+localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
 
 // State variables
 let currentFormat = "square"; // "square" or "story"
@@ -367,6 +361,53 @@ function updateCardPreview() {
   // Update software badge
   const softwareVal = contentSoftwareSelect.value;
   cardSoftwareName.textContent = softwareVal.toUpperCase();
+
+  // Update Carousel ID badge & Slide Switcher chips
+  const carouselInput = document.getElementById('content-carousel-id');
+  const baseCode = (carouselInput && carouselInput.value.trim() ? carouselInput.value.trim() : 'AC-001').toUpperCase();
+  
+  const carouselBadge = document.getElementById('card-carousel-id-badge');
+  const slideChipsContainer = document.getElementById('carousel-slide-chips');
+  if (slideChipsContainer) {
+    const activeChip = slideChipsContainer.querySelector('.btn-slide-chip.active');
+    const currentSlide = activeChip ? activeChip.dataset.slide : 'A';
+    if (carouselBadge) carouselBadge.textContent = `${baseCode}${currentSlide}`;
+
+    slideChipsContainer.querySelectorAll('.btn-slide-chip').forEach(chip => {
+      const isCur = chip.dataset.slide === currentSlide;
+      chip.textContent = `${baseCode}${chip.dataset.slide} (${chip.dataset.slide === 'A' ? 'Hook' : chip.dataset.slide === 'B' ? 'Steps' : 'ProTip'})`;
+      chip.onclick = () => {
+        const slideLetter = chip.dataset.slide;
+        const descEl = document.getElementById('card-desc');
+        const stepsEl = document.getElementById('card-steps-list');
+        const proTipEl = document.querySelector('.pro-tip-box');
+        
+        slideChipsContainer.querySelectorAll('.btn-slide-chip').forEach(c => {
+          const isActive = c === chip;
+          c.classList.toggle('active', isActive);
+          c.style.background = isActive ? 'var(--accent)' : 'var(--bg-tertiary)';
+          c.style.color = isActive ? '#000' : 'var(--text-primary)';
+          c.style.border = isActive ? 'none' : '1px solid var(--border)';
+        });
+
+        if (carouselBadge) carouselBadge.textContent = `${baseCode}${slideLetter}`;
+
+        if (slideLetter === 'A') {
+          if (descEl) descEl.style.display = 'block';
+          if (stepsEl) stepsEl.style.display = 'none';
+          if (proTipEl) proTipEl.style.display = 'none';
+        } else if (slideLetter === 'B') {
+          if (descEl) descEl.style.display = 'none';
+          if (stepsEl) stepsEl.style.display = 'flex';
+          if (proTipEl) proTipEl.style.display = 'none';
+        } else if (slideLetter === 'C') {
+          if (descEl) descEl.style.display = 'none';
+          if (stepsEl) stepsEl.style.display = 'none';
+          if (proTipEl) proTipEl.style.display = 'flex';
+        }
+      };
+    });
+  }
   
   // Update keys, symbol & action title
   const keysVal = contentKeysInput.value.trim() || "KEY";
@@ -556,10 +597,9 @@ function updateCardPreview() {
 // Bind event listeners to input elements for real-time visual syncing and database auto-saving
 const contentDifficultyInput = document.getElementById('content-difficulty');
 const contentCategoryInput = document.getElementById('content-category');
-const contentCommonMistakeInput = document.getElementById('content-common-mistake');
-const contentSymbolInput = document.getElementById('content-symbol');
+const contentCarouselIdInput = document.getElementById('content-carousel-id');
 
-[brandHandleInput, contentSoftwareSelect, contentKeysInput, contentSymbolInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput, contentDifficultyInput, contentCategoryInput, contentCommonMistakeInput].forEach(el => {
+[brandHandleInput, contentSoftwareSelect, contentCarouselIdInput, contentKeysInput, contentSymbolInput, contentActionInput, contentDescInput, contentProTipInput, contentHashtagsInput, contentDifficultyInput, contentCategoryInput, contentCommonMistakeInput].forEach(el => {
   if (el) {
     el.addEventListener('input', () => {
       updateCardPreview();
@@ -1236,8 +1276,16 @@ if (btnImportBackup && fileImportBackup) {
           return;
         }
         
-        if (confirm(`Are you sure you want to import ${imported.shortcuts.length} shortcuts and overwrite your library?`)) {
-          shortcutDb = imported.shortcuts;
+        const listToImport = imported.calendar || imported.shortcuts;
+        if (!listToImport || !Array.isArray(listToImport)) {
+          showToast("Invalid backup file format.", "error");
+          return;
+        }
+        
+        if (confirm(`Are you sure you want to import ${listToImport.length} items and overwrite your library?`)) {
+          calendarDb = listToImport;
+          shortcutDb = calendarDb;
+          localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
           localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
           
           let progressList = null;
@@ -1932,9 +1980,13 @@ function loadCalendarItemToEditor(item) {
   contentSoftwareSelect.value = item.software || 'AutoCAD';
   
   // Set values in Creator Studio inputs
+  const carouselIdInput = document.getElementById('content-carousel-id');
+  if (carouselIdInput) {
+    carouselIdInput.value = item.carouselId || (item.day ? `AC-${String(item.day).padStart(3, '0')}` : 'AC-001');
+  }
   contentKeysInput.value = keys;
   const contentSymbolInput = document.getElementById('content-symbol');
-  if (contentSymbolInput) contentSymbolInput.value = item.symbol || '⚡';
+  if (contentSymbolInput) contentSymbolInput.value = item.symbol || '';
   
   const contentImageUrlInput = document.getElementById('content-image-url');
   const imagePosSelect = document.getElementById('image-position-select');
@@ -2049,12 +2101,18 @@ function loadCalendarItemToEditor(item) {
   }
 
   // Restore font size sliders
-  if (item._fontSizes) {
-    Object.entries(item._fontSizes).forEach(([id, val]) => {
-      const el = document.getElementById(id);
-      if (el) { el.value = val; el.dispatchEvent(new Event('input')); }
-    });
-  }
+  const defaultFontSizes = {
+    'font-size-title': '55',
+    'font-size-keycap': '30',
+    'font-size-desc': '30',
+    'font-size-steps': '16',
+    'font-size-protip': '20'
+  };
+  const fontSizesToApply = Object.assign({}, defaultFontSizes, item._fontSizes || {});
+  Object.entries(fontSizesToApply).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) { el.value = val; el.dispatchEvent(new Event('input')); }
+  });
 
   // Restore layout/overlay sliders
   if (item._layoutSettings) {
@@ -2108,16 +2166,25 @@ if (btnMarkDayDone) {
     
     if (completedCalendarDays.has(dayStr)) {
       completedCalendarDays.delete(dayStr);
-      showToast(`Day ${dayStr} marked as Pending.`);
+      if (post) {
+        post.posted = false;
+        post.status = 'draft';
+      }
+      showToast(`Lesson ${dayStr} marked as Pending.`);
     } else {
       completedCalendarDays.add(dayStr);
-      showToast(`✅ Day ${dayStr} marked as Done!`, 'success');
+      if (post) {
+        post.posted = true;
+        post.status = 'published';
+      }
+      showToast(`✅ Lesson ${dayStr} marked as Published!`, 'success');
     }
     
     localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
     updateCalendarProgress();
     renderCalendarHub();
     renderSidebarDaysList();
+    renderShortcutsHub();
     saveAllDataToSyncFile();
     
     // Auto-advance to next day after marking done
@@ -2295,7 +2362,10 @@ if (btnExportCarousel) {
       
       let slideIdx = 1;
       
-      // --- Slide 1: Hook / Title ---
+      const carouselInput = document.getElementById('content-carousel-id');
+      const baseCode = (carouselInput && carouselInput.value.trim() ? carouselInput.value.trim() : 'AC-001').toUpperCase();
+
+      // --- Slide 1 (Hook / Title) -> AC-001A ---
       if (cloneDesc) cloneDesc.style.display = 'block';
       if (cloneStepsList) cloneStepsList.style.display = 'none';
       if (cloneProTipBox) cloneProTipBox.style.display = 'none';
@@ -2303,10 +2373,9 @@ if (btnExportCarousel) {
       // Small delay to ensure styles apply before capture
       await new Promise(resolve => setTimeout(resolve, 100));
       let canvas = await html2canvas(clone, { scale: 2, backgroundColor: null, logging: false });
-      zip.file(`slide_${slideIdx.toString().padStart(2, '0')}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
-      slideIdx++;
+      zip.file(`${baseCode}A.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
       
-      // --- Slides 2..N: One Step per Slide ---
+      // --- Slides 2..N (Steps) -> AC-001B, AC-001C... ---
       if (cloneDesc) cloneDesc.style.display = 'none';
       if (cloneStepsList) {
         cloneStepsList.style.display = 'flex';
@@ -2317,6 +2386,7 @@ if (btnExportCarousel) {
       if (cloneProTipBox) cloneProTipBox.style.display = 'none';
       
       for (let i = 0; i < steps.length; i++) {
+        const letter = String.fromCharCode(66 + i); // 'B', 'C', 'D'...
         if (cloneStepsList) {
           cloneStepsList.innerHTML = `
             <div class="card-step-item" style="flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 40px 20px; height: 100%; justify-content: center;">
@@ -2328,11 +2398,11 @@ if (btnExportCarousel) {
         
         await new Promise(resolve => setTimeout(resolve, 100));
         canvas = await html2canvas(clone, { scale: 2, backgroundColor: null, logging: false });
-        zip.file(`slide_${slideIdx.toString().padStart(2, '0')}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
-        slideIdx++;
+        zip.file(`${baseCode}${letter}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
       }
       
-      // --- Slide N+1: Pro Tip + CTA ---
+      // --- Final Slide (Pro Tip + CTA) -> AC-001[Final] ---
+      const finalLetter = String.fromCharCode(66 + steps.length);
       if (cloneStepsList) cloneStepsList.style.display = 'none';
       if (cloneProTipBox) {
         cloneProTipBox.style.display = 'flex';
@@ -2365,7 +2435,7 @@ if (btnExportCarousel) {
       
       await new Promise(resolve => setTimeout(resolve, 100));
       canvas = await html2canvas(clone, { scale: 2, backgroundColor: null, logging: false });
-      zip.file(`slide_${slideIdx.toString().padStart(2, '0')}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
+      zip.file(`${baseCode}${finalLetter}.png`, canvas.toDataURL('image/png').split(',')[1], { base64: true });
       
       document.body.removeChild(clone);
       
@@ -2561,6 +2631,11 @@ async function saveCurrentDayData() {
   d.description = d.desc; // keep both fields in sync
   d.proTip = contentProTipInput.value.trim();
   
+  const carouselIdInput = document.getElementById('content-carousel-id');
+  if (carouselIdInput) {
+    d.carouselId = carouselIdInput.value.trim() || `AC-${String(d.day).padStart(3, '0')}`;
+  }
+  
   const contentDiffInput = document.getElementById('content-difficulty');
   const contentCatInput = document.getElementById('content-category');
   const contentCommonMistakeInput = document.getElementById('content-common-mistake');
@@ -2742,15 +2817,15 @@ async function loadSyncDataFromFile(handle) {
     const contents = await file.text();
     if (contents.trim()) {
       const data = JSON.parse(contents);
-      if (data.shortcuts && Array.isArray(data.shortcuts)) {
-        shortcutDb = data.shortcuts;
-        localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
-        renderShortcutsHub();
-      }
       if (data.calendar && Array.isArray(data.calendar)) {
         calendarDb = data.calendar;
-        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+      } else if (data.shortcuts && Array.isArray(data.shortcuts)) {
+        calendarDb = data.shortcuts;
       }
+      shortcutDb = calendarDb;
+      localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+      localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
+      renderShortcutsHub();
       if (data.completed && Array.isArray(data.completed)) {
         completedCalendarDays = new Set(data.completed.map(String));
         localStorage.setItem('ludarp_completed_calendar', JSON.stringify([...completedCalendarDays]));
@@ -2820,6 +2895,11 @@ async function saveAllDataToSyncFile() {
     } catch (err) {
       console.error("Auto-sync disk write failed:", err);
     }
+  }
+
+  // Auto-sync data to Google Sheet / Excel if configured
+  if (typeof window.pushPostsToGoogleSheet === 'function') {
+    window.pushPostsToGoogleSheet(true);
   }
 }
 
@@ -3422,7 +3502,7 @@ ${item.hashtags || '#autocad #civilengineering #ludarpcivil'}`;
   function getActiveEditorAsItem() {
     const sw = contentSoftware ? contentSoftware.value : 'AutoCAD';
     const keys = contentKeysInput ? contentKeysInput.value : '';
-    const symbolVal = document.getElementById('content-symbol') ? document.getElementById('content-symbol').value : '⚡';
+    const symbolVal = document.getElementById('content-symbol') ? document.getElementById('content-symbol').value : '';
     const action = contentActionInput ? contentActionInput.value : '';
     const desc = contentDescInput ? contentDescInput.value : '';
     const proTip = contentProTipInput ? contentProTipInput.value : '';
@@ -3868,12 +3948,12 @@ if (dbBtnImportJson && dbFileImportInput) {
         const data = JSON.parse(evt.target.result);
         if (data.calendar && Array.isArray(data.calendar)) {
           calendarDb = data.calendar;
-          localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+        } else if (data.shortcuts && Array.isArray(data.shortcuts)) {
+          calendarDb = data.shortcuts;
         }
-        if (data.shortcuts && Array.isArray(data.shortcuts)) {
-          shortcutDb = data.shortcuts;
-          localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
-        }
+        shortcutDb = calendarDb;
+        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+        localStorage.setItem('ludarp_shortcuts', JSON.stringify(calendarDb));
         if (data.completed && Array.isArray(data.completed)) {
           completedCalendarDays = new Set(data.completed.map(String));
           localStorage.setItem('ludarp_completed_calendar', JSON.stringify([...completedCalendarDays]));
@@ -4271,7 +4351,7 @@ function parseRawTextToPosts(rawText) {
         id: customId || `LCS-${String(idx + 1).padStart(3, '0')}`,
         software: sw || 'Ludarp Civil Studio',
         keys: shortcut || 'START',
-        symbol: symbolVal || '⚡',
+        symbol: symbolVal || '',
         action: action || 'Shortcut Action',
         title: shortcut ? `${shortcut}: ${action}` : action,
         category: category || 'Introduction',

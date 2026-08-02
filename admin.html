@@ -340,13 +340,17 @@
               </div>
 
               <div class="form-row" style="display:flex; gap:10px;">
-                <div class="form-group" id="key-field" style="flex:2;">
+                <div class="form-group" id="carousel-id-field" style="flex:1;">
+                  <label for="content-carousel-id" style="color:var(--accent); font-weight:800;">🎠 Carousel Base ID</label>
+                  <input type="text" id="content-carousel-id" placeholder="e.g. AC-003" value="AC-001">
+                </div>
+                <div class="form-group" id="key-field" style="flex:1.5;">
                   <label for="content-keys">Shortcut Keys</label>
                   <input type="text" id="content-keys" placeholder="e.g. TR or NCOPY" value="">
                 </div>
                 <div class="form-group" id="symbol-field" style="flex:1;">
                   <label for="content-symbol">Symbol / Icon</label>
-                  <input type="text" id="content-symbol" placeholder="e.g. ✂️ or 📐" value="⚡">
+                  <input type="text" id="content-symbol" placeholder="e.g. ✂️ or 📐 (Optional)" value="">
                 </div>
               </div>
 
@@ -779,32 +783,32 @@
 
                 <!-- Title Font Size -->
                 <div class="form-group">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Action Title Size (<span id="val-font-title">36</span>px)</label>
-                  <input type="range" id="font-size-title" min="20" max="64" value="36" style="width:100%; accent-color:var(--accent);">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Action Title Size (<span id="val-font-title">55</span>px)</label>
+                  <input type="range" id="font-size-title" min="20" max="80" value="55" style="width:100%; accent-color:var(--accent);">
                 </div>
 
                 <!-- Keycap Font Size -->
                 <div class="form-group">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Keycap Size (<span id="val-font-keycap">54</span>px)</label>
-                  <input type="range" id="font-size-keycap" min="28" max="90" value="54" style="width:100%; accent-color:var(--accent);">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Keycap Size (<span id="val-font-keycap">30</span>px)</label>
+                  <input type="range" id="font-size-keycap" min="15" max="90" value="30" style="width:100%; accent-color:var(--accent);">
                 </div>
 
                 <!-- Description Font Size -->
                 <div class="form-group">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Description Size (<span id="val-font-desc">18</span>px)</label>
-                  <input type="range" id="font-size-desc" min="12" max="32" value="18" style="width:100%; accent-color:var(--accent);">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Description Size (<span id="val-font-desc">30</span>px)</label>
+                  <input type="range" id="font-size-desc" min="12" max="60" value="30" style="width:100%; accent-color:var(--accent);">
                 </div>
 
                 <!-- Steps Font Size -->
                 <div class="form-group">
                   <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Steps List Size (<span id="val-font-steps">16</span>px)</label>
-                  <input type="range" id="font-size-steps" min="11" max="28" value="16" style="width:100%; accent-color:var(--accent);">
+                  <input type="range" id="font-size-steps" min="10" max="40" value="16" style="width:100%; accent-color:var(--accent);">
                 </div>
 
                 <!-- Pro Tip Size -->
                 <div class="form-group" style="grid-column: span 2;">
-                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Sticky Pro Tip Size (<span id="val-font-protip">15</span>px)</label>
-                  <input type="range" id="font-size-protip" min="11" max="24" value="15" style="width:100%; accent-color:var(--accent);">
+                  <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Sticky Pro Tip Size (<span id="val-font-protip">20</span>px)</label>
+                  <input type="range" id="font-size-protip" min="10" max="40" value="20" style="width:100%; accent-color:var(--accent);">
                 </div>
 
               </div>
@@ -818,6 +822,14 @@
               <div class="preview-header-left">
                 <div class="preview-live-dot"></div>
                 <span>LIVE PREVIEW</span>
+              </div>
+              <div id="carousel-slide-bar" style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.68rem; font-weight:800; color:var(--accent);">🎠 SLIDE SET:</span>
+                <div id="carousel-slide-chips" style="display:flex; gap:4px;">
+                  <button type="button" class="btn-slide-chip active" data-slide="A" style="padding:2px 8px; font-size:0.7rem; font-weight:800; background:var(--accent); color:#000; border:none; border-radius:6px; cursor:pointer;">AC-001A (Title)</button>
+                  <button type="button" class="btn-slide-chip" data-slide="B" style="padding:2px 8px; font-size:0.7rem; font-weight:800; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:6px; cursor:pointer;">AC-001B (Steps)</button>
+                  <button type="button" class="btn-slide-chip" data-slide="C" style="padding:2px 8px; font-size:0.7rem; font-weight:800; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:6px; cursor:pointer;">AC-001C (ProTip)</button>
+                </div>
               </div>
               <span id="preview-aspect-label" class="preview-size-label">1080 × 1080 PX</span>
             </div>
@@ -859,6 +871,7 @@
                 <div class="card-header-row">
                   <div class="software-badge">
                     <span id="card-software-name">AUTOCAD</span>
+                    <span id="card-carousel-id-badge" style="margin-left:6px; padding:2px 7px; background:rgba(255,107,53,0.25); border:1px solid var(--accent); border-radius:4px; font-size:0.75rem; color:#fff; font-weight:800; font-family:var(--font-mono);">AC-001A</span>
                   </div>
                   <div class="creator-tag">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="instagram-icon">
@@ -874,7 +887,7 @@
                 <div class="card-body">
                   <div class="shortcut-box">
                     <div class="keycap-container" style="display:flex; align-items:center; gap:10px;">
-                      <div class="keycap-symbol" id="card-symbol" style="font-size:2.2rem; filter:drop-shadow(0 0 10px rgba(56,189,248,0.5));">⚡</div>
+                      <div class="keycap-symbol" id="card-symbol" style="display:none; font-size:2.2rem; filter:drop-shadow(0 0 10px rgba(56,189,248,0.5));"></div>
                       <img id="card-image-top" style="display:none; max-height:48px; border-radius:6px; object-fit:contain; border:1px solid var(--accent);" src="" alt="Top Icon">
                       <div class="keycap" id="card-keys">TR</div>
                     </div>
