@@ -368,7 +368,40 @@
                 <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Zoom / Find">🔍</span>
                 <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Layers / View">👁️</span>
                 <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Settings">⚙️</span>
-                <span class="symbol-chip" style="cursor:pointer; padding:2px 6px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:4px; font-size:0.85rem;" title="Building / Structure">🏗️</span>
+              </div>
+
+              <!-- Custom Post Image Section -->
+              <div class="form-group" id="image-upload-field" style="margin-top:6px; margin-bottom:12px; padding-top:10px; border-top:1px dashed var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <label for="content-image-url" style="margin:0; font-weight:700; color:var(--accent);">🖼️ Custom Post Image / CAD Diagram</label>
+                  <button type="button" id="btn-clear-image" style="padding:2px 8px; font-size:0.72rem; font-weight:700; background:rgba(239,68,68,0.2); color:#ef4444; border:1px solid #ef4444; border-radius:6px; cursor:pointer;">
+                    Clear Image
+                  </button>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input type="file" id="content-image-file" accept="image/*" style="display:none;">
+                  <button type="button" id="btn-browse-image" style="padding:6px 12px; font-size:0.78rem; font-weight:700; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    📂 Upload
+                  </button>
+                  <input type="text" id="content-image-url" placeholder="Or paste image URL (https://...)" style="padding:6px 10px; font-size:0.78rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); flex:1;">
+                </div>
+
+                <!-- Image Position & Size Controls -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
+                  <div>
+                    <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Image Position</label>
+                    <select id="image-position-select" style="padding:4px 8px; font-size:0.75rem; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); width:100%;">
+                      <option value="bottom" selected>📍 Bottom Side (Above Footer)</option>
+                      <option value="middle">📍 Middle Area (Between Desc & Steps)</option>
+                      <option value="top">📍 Top Badge (Next to Keycap)</option>
+                      <option value="full">🖼️ Hero Banner (Above Desc)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:700;">Image Max Height (<span id="val-image-height">160</span>px)</label>
+                    <input type="range" id="image-height-slider" min="60" max="360" value="160" style="width:100%; accent-color:var(--accent);">
+                  </div>
+                </div>
               </div>
 
               <div class="form-group">
@@ -630,6 +663,9 @@
                       <input type="checkbox" id="toggle-elem-symbol" checked style="accent-color:var(--accent);"> Command Symbol
                     </label>
                     <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
+                      <input type="checkbox" id="toggle-elem-image" checked style="accent-color:var(--accent);"> Custom Post Image
+                    </label>
+                    <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
                       <input type="checkbox" id="toggle-elem-keycap" checked style="accent-color:var(--accent);"> Keycap Box
                     </label>
                     <label style="font-size:0.75rem; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-secondary); font-weight:600;">
@@ -804,11 +840,24 @@
                   <div class="shortcut-box">
                     <div class="keycap-container" style="display:flex; align-items:center; gap:10px;">
                       <div class="keycap-symbol" id="card-symbol" style="font-size:2.2rem; filter:drop-shadow(0 0 10px rgba(56,189,248,0.5));">⚡</div>
+                      <img id="card-image-top" style="display:none; max-height:48px; border-radius:6px; object-fit:contain; border:1px solid var(--accent);" src="" alt="Top Icon">
                       <div class="keycap" id="card-keys">TR</div>
                     </div>
                     <div class="action-title" id="card-action">Trim Objects</div>
                   </div>
+
+                  <!-- Hero Banner Image Slot -->
+                  <div id="card-image-hero-wrap" style="display:none; margin:10px 0; text-align:center;">
+                    <img id="card-image-hero" style="width:100%; max-height:160px; border-radius:8px; border:2px solid var(--accent); object-fit:cover;" src="" alt="Hero Image">
+                  </div>
+
                   <div class="card-description" id="card-desc">Trims elements to meet the edges of other selected elements.</div>
+
+                  <!-- Middle Image Slot -->
+                  <div id="card-image-middle-wrap" style="display:none; margin:10px 0; text-align:center;">
+                    <img id="card-image-middle" style="width:100%; max-height:160px; border-radius:8px; border:2px solid var(--accent); object-fit:cover;" src="" alt="Middle Diagram">
+                  </div>
+
                   <div class="card-steps" id="card-steps-list">
                     <div class="card-step-item">
                       <div class="card-step-num">01</div>
@@ -827,6 +876,10 @@
 
                 <!-- Footer -->
                 <div class="card-footer-row">
+                  <!-- Bottom Image Slot -->
+                  <div id="card-image-bottom-wrap" style="display:none; margin-bottom:10px; text-align:center;">
+                    <img id="card-image-bottom" style="width:100%; max-height:160px; border-radius:8px; border:2px solid var(--accent); object-fit:cover;" src="" alt="Bottom Diagram">
+                  </div>
                   <div class="pro-tip-box">
                     <div class="sticky-tape tape-left"></div>
                     <div class="sticky-tape tape-right"></div>

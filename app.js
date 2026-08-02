@@ -389,6 +389,48 @@ function updateCardPreview() {
   
   // Update description
   cardDesc.textContent = contentDescInput.value.trim() || "Description of shortcut goes here.";
+
+  // Update Custom Image Slots
+  const imageUrlVal = document.getElementById('content-image-url') ? document.getElementById('content-image-url').value.trim() : '';
+  const imagePosVal = document.getElementById('image-position-select') ? document.getElementById('image-position-select').value : 'bottom';
+  const imageHeightVal = document.getElementById('image-height-slider') ? document.getElementById('image-height-slider').value : '160';
+  const valImageHeightEl = document.getElementById('val-image-height');
+  if (valImageHeightEl) valImageHeightEl.textContent = imageHeightVal;
+
+  const toggleElemImage = document.getElementById('toggle-elem-image');
+  const isImageVisible = (!toggleElemImage || toggleElemImage.checked) && imageUrlVal !== '';
+
+  const slots = {
+    top: document.getElementById('card-image-top'),
+    hero: document.getElementById('card-image-hero-wrap'),
+    middle: document.getElementById('card-image-middle-wrap'),
+    bottom: document.getElementById('card-image-bottom-wrap')
+  };
+
+  if (slots.top) slots.top.style.display = 'none';
+  if (slots.hero) slots.hero.style.display = 'none';
+  if (slots.middle) slots.middle.style.display = 'none';
+  if (slots.bottom) slots.bottom.style.display = 'none';
+
+  if (isImageVisible) {
+    if (imagePosVal === 'top' && slots.top) {
+      slots.top.src = imageUrlVal;
+      slots.top.style.maxHeight = `${Math.min(imageHeightVal, 60)}px`;
+      slots.top.style.display = 'inline-block';
+    } else if (imagePosVal === 'full' && slots.hero) {
+      const img = document.getElementById('card-image-hero');
+      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; }
+      slots.hero.style.display = 'block';
+    } else if (imagePosVal === 'middle' && slots.middle) {
+      const img = document.getElementById('card-image-middle');
+      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; }
+      slots.middle.style.display = 'block';
+    } else if (slots.bottom) {
+      const img = document.getElementById('card-image-bottom');
+      if (img) { img.src = imageUrlVal; img.style.maxHeight = `${imageHeightVal}px`; }
+      slots.bottom.style.display = 'block';
+    }
+  }
   
   // Update steps
   cardStepsList.innerHTML = '';
@@ -1862,6 +1904,12 @@ function loadCalendarItemToEditor(item) {
   contentKeysInput.value = keys;
   const contentSymbolInput = document.getElementById('content-symbol');
   if (contentSymbolInput) contentSymbolInput.value = item.symbol || '⚡';
+  
+  const contentImageUrlInput = document.getElementById('content-image-url');
+  const imagePosSelect = document.getElementById('image-position-select');
+  if (contentImageUrlInput) contentImageUrlInput.value = item.imageUrl || item.image || '';
+  if (imagePosSelect) imagePosSelect.value = item.imagePos || 'bottom';
+
   contentActionInput.value = action;
   
   // Build description
@@ -2894,6 +2942,49 @@ function resetCreatorStudioForm() {
   const toggleElemDesc = document.getElementById('toggle-elem-desc');
   const toggleElemSteps = document.getElementById('toggle-elem-steps');
   const toggleElemMistake = document.getElementById('toggle-elem-mistake');
+
+  // ── Custom Post Image Controls Engine ────────────────────────────────────
+  const contentImageUrlInput = document.getElementById('content-image-url');
+  const contentImageFileInput = document.getElementById('content-image-file');
+  const btnBrowseImage = document.getElementById('btn-browse-image');
+  const btnClearImage = document.getElementById('btn-clear-image');
+  const imagePositionSelect = document.getElementById('image-position-select');
+  const imageHeightSlider = document.getElementById('image-height-slider');
+  const toggleElemImage = document.getElementById('toggle-elem-image');
+
+  if (btnBrowseImage && contentImageFileInput) {
+    btnBrowseImage.addEventListener('click', () => contentImageFileInput.click());
+    contentImageFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          if (contentImageUrlInput) {
+            contentImageUrlInput.value = evt.target.result;
+            updateCardPreview();
+            showToast("🖼️ Loaded image onto post card!", "success");
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (btnClearImage && contentImageUrlInput) {
+    btnClearImage.addEventListener('click', () => {
+      contentImageUrlInput.value = '';
+      if (contentImageFileInput) contentImageFileInput.value = '';
+      updateCardPreview();
+      showToast("Cleared post image.");
+    });
+  }
+
+  [contentImageUrlInput, imagePositionSelect, imageHeightSlider, toggleElemImage].forEach(el => {
+    if (el) {
+      el.addEventListener('input', updateCardPreview);
+      el.addEventListener('change', updateCardPreview);
+    }
+  });
 
   if (toggleElemSymbol) {
     toggleElemSymbol.addEventListener('change', () => {
