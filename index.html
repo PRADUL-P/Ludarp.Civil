@@ -65,6 +65,14 @@
           </svg>
           AI Research Hub
         </button>
+        <button class="nav-btn" data-tab="database">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+          </svg>
+          Database Manager
+        </button>
       </nav>
 
       <!-- Production Line (Calendar Days Sidebar) -->
@@ -686,6 +694,99 @@
                 <button class="btn-action btn-secondary-action" id="btn-save-research-to-hub" style="flex:1">Save to Hub</button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════════════════╗
+           ║   TAB 5: DATABASE MANAGER                       ║
+           ╚══════════════════════════════════════════════════╝ -->
+      <section id="database-view" class="tab-view">
+        <header class="view-header">
+          <div>
+            <h2>🗄️ Database Manager</h2>
+            <p>Manage, search, edit, export, and backup all calendar entries & shortcut datasets</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-action btn-primary-action" id="db-btn-export-json">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export JSON
+            </button>
+            <button class="btn-action btn-secondary-action" id="db-btn-import-json">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Import JSON
+            </button>
+            <input type="file" id="db-file-import-input" accept=".json" style="display:none">
+          </div>
+        </header>
+
+        <!-- Stats Overview Cards -->
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:14px;">
+          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:var(--accent-dim); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">📅</div>
+            <div>
+              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Calendar Entries</span>
+              <h3 id="db-stat-calendar-count" style="font-size:1.3rem; font-weight:800; margin-top:2px;">84</h3>
+            </div>
+          </div>
+          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:var(--success-dim); color:var(--success); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">✅</div>
+            <div>
+              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Posted / Completed</span>
+              <h3 id="db-stat-posted-count" style="font-size:1.3rem; font-weight:800; margin-top:2px;">0 / 84</h3>
+            </div>
+          </div>
+          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(168,85,247,0.15); color:#a855f7; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">⚡</div>
+            <div>
+              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Library Shortcuts</span>
+              <h3 id="db-stat-shortcuts-count" style="font-size:1.3rem; font-weight:800; margin-top:2px;">3</h3>
+            </div>
+          </div>
+          <div class="card" style="padding:16px; display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(245,158,11,0.15); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem;">💾</div>
+            <div>
+              <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Disk Sync Status</span>
+              <h3 id="db-stat-sync-status" style="font-size:0.85rem; font-weight:700; margin-top:4px; color:var(--text-secondary);">Sandbox</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="card" style="padding:14px 18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
+          <div style="display:flex; gap:10px; flex:1; min-width:280px; align-items:center;">
+            <input type="text" id="db-search-input" placeholder="🔍 Search by title, keys, software, or script..." style="flex:1; padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
+            <select id="db-filter-software" style="padding:8px 12px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--r-md); color:var(--text-primary); font-size:0.85rem;">
+              <option value="all">All Softwares</option>
+              <option value="AutoCAD">AutoCAD</option>
+              <option value="Revit">Revit</option>
+              <option value="Civil 3D">Civil 3D</option>
+              <option value="ETABS">ETABS</option>
+              <option value="SketchUp">SketchUp</option>
+            </select>
+          </div>
+          <button class="btn-action btn-ghost-action" id="db-btn-reset-factory" style="font-size:0.78rem;">🔄 Reset Factory DB</button>
+        </div>
+
+        <!-- Interactive Database Data Table -->
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
+              <thead>
+                <tr style="background:var(--bg-tertiary); border-bottom:1px solid var(--border); color:var(--text-muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em;">
+                  <th style="padding:12px 16px;">Day</th>
+                  <th style="padding:12px 16px;">Software</th>
+                  <th style="padding:12px 16px;">Keys / Title</th>
+                  <th style="padding:12px 16px;">Format</th>
+                  <th style="padding:12px 16px;">Phase</th>
+                  <th style="padding:12px 16px;">Status</th>
+                  <th style="padding:12px 16px; text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="db-table-body">
+                <!-- Populated dynamically by JS -->
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

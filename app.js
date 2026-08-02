@@ -506,6 +506,8 @@ sidebarButtons.forEach(btn => {
       renderShortcutsHub();
     } else if (targetTab === 'calendar') {
       renderCalendarHub();
+    } else if (targetTab === 'database') {
+      renderDatabaseManagerTable();
     }
   });
 });
@@ -2752,3 +2754,208 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 });
+
+// ==========================================================================
+// 12. Database Manager Tab Engine
+// ==========================================================================
+
+const dbTableBody = document.getElementById('db-table-body');
+const dbSearchInput = document.getElementById('db-search-input');
+const dbFilterSoftware = document.getElementById('db-filter-software');
+const dbBtnExportJson = document.getElementById('db-btn-export-json');
+const dbBtnImportJson = document.getElementById('db-btn-import-json');
+const dbFileImportInput = document.getElementById('db-file-import-input');
+const dbBtnResetFactory = document.getElementById('db-btn-reset-factory');
+
+const dbStatCalendarCount = document.getElementById('db-stat-calendar-count');
+const dbStatPostedCount = document.getElementById('db-stat-posted-count');
+const dbStatShortcutsCount = document.getElementById('db-stat-shortcuts-count');
+const dbStatSyncStatus = document.getElementById('db-stat-sync-status');
+
+function renderDatabaseManagerTable() {
+  if (!dbTableBody) return;
+  
+  // Stats update
+  const totalCal = calendarDb.length;
+  const postedCal = calendarDb.filter(item => completedCalendarDays.has(String(item.day))).length;
+  const totalShortcuts = shortcutDb.length;
+  
+  if (dbStatCalendarCount) dbStatCalendarCount.textContent = totalCal;
+  if (dbStatPostedCount) dbStatPostedCount.textContent = `${postedCal} / ${totalCal}`;
+  if (dbStatShortcutsCount) dbStatShortcutsCount.textContent = totalShortcuts;
+  if (dbStatSyncStatus) dbStatSyncStatus.textContent = fileHandle ? fileHandle.name : 'Local Sandbox';
+  
+  const searchVal = dbSearchInput ? dbSearchInput.value.toLowerCase().trim() : '';
+  const softwareFilter = dbFilterSoftware ? dbFilterSoftware.value : 'all';
+  
+  dbTableBody.innerHTML = '';
+  
+  const filtered = calendarDb.filter(item => {
+    const matchesSoftware = softwareFilter === 'all' || (item.software || 'AutoCAD') === softwareFilter;
+    const itemText = `${item.day} ${item.title} ${item.keys || ''} ${item.software || ''} ${item.phase || ''} ${item.desc || ''}`.toLowerCase();
+    const matchesSearch = !searchVal || itemText.includes(searchVal);
+    return matchesSoftware && matchesSearch;
+  });
+  
+  if (filtered.length === 0) {
+    dbTableBody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">
+          No database entries found matching filters.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  filtered.forEach(item => {
+    const isCompleted = completedCalendarDays.has(String(item.day));
+    const tr = document.createElement('tr');
+    tr.style.cssText = 'border-bottom:1px solid var(--border); transition:0.15s background;';
+    
+    // Parse keys and title
+    let keys = item.keys || 'CAD';
+    let action = item.title;
+    const colonMatch = item.title.match(/^([^:]+):\s*(.*)$/);
+    if (colonMatch) {
+      keys = colonMatch[1].trim();
+      action = colonMatch[2].trim();
+    }
+    
+    tr.innerHTML = `
+      <td style="padding:10px 16px; font-family:var(--font-mono); font-weight:700; color:var(--accent);">Day ${item.day}</td>
+      <td style="padding:10px 16px; font-weight:700;">${item.software || 'AutoCAD'}</td>
+      <td style="padding:10px 16px;">
+        <span style="font-family:var(--font-mono); font-weight:800; color:var(--text-primary); background:var(--bg-tertiary); padding:2px 6px; border-radius:4px; border:1px solid var(--border);">${keys}</span>
+        <span style="margin-left:6px; color:var(--text-secondary); font-weight:600;">${action}</span>
+      </td>
+      <td style="padding:10px 16px; font-size:0.75rem; text-transform:capitalize;">
+        ${item.format === 'carousel' ? '🎠 Carousel' : item.format === 'reel' ? '🎥 Reel' : '🖼️ Post'}
+      </td>
+      <td style="padding:10px 16px; font-size:0.72rem; color:var(--text-muted); text-transform:uppercase;">${item.phase || ''}</td>
+      <td style="padding:10px 16px;">
+        <span style="font-size:0.72rem; padding:3px 8px; border-radius:12px; font-weight:800; ${isCompleted ? 'background:var(--success-dim); color:var(--success);' : 'background:rgba(255,255,255,0.06); color:var(--text-muted);'}">
+          ${isCompleted ? 'Posted ✓' : 'Pending'}
+        </span>
+      </td>
+      <td style="padding:10px 16px; text-align:right;">
+        <div style="display:inline-flex; gap:6px;">
+          <button class="db-btn-sm btn-action btn-primary-action" data-action="load" data-day="${item.day}">Load</button>
+          <button class="db-btn-sm btn-action btn-secondary-action" data-action="toggle" data-day="${item.day}">${isCompleted ? 'Undo' : 'Mark Done'}</button>
+          <button class="db-btn-sm btn-action btn-ghost-action" data-action="delete" data-day="${item.day}" style="color:var(--error);">Delete</button>
+        </div>
+      </td>
+    `;
+    
+    // Bind row button events
+    tr.querySelector('[data-action="load"]').onclick = () => {
+      activeCalendarDayNum = item.day;
+      loadCalendarItemToEditor(item);
+      document.querySelector('.nav-btn[data-tab="studio"]').click();
+      showToast(`Loaded Day ${item.day}: "${action}" into Creator Studio!`);
+    };
+    
+    tr.querySelector('[data-action="toggle"]').onclick = () => {
+      const dayStr = String(item.day);
+      if (completedCalendarDays.has(dayStr)) {
+        completedCalendarDays.delete(dayStr);
+        showToast(`Day ${dayStr} marked as Pending.`);
+      } else {
+        completedCalendarDays.add(dayStr);
+        showToast(`✅ Day ${dayStr} marked as Posted!`, 'success');
+      }
+      localStorage.setItem('ludarp_completed_calendar', JSON.stringify(Array.from(completedCalendarDays)));
+      updateCalendarProgress();
+      renderSidebarDaysList();
+      renderDatabaseManagerTable();
+      saveAllDataToSyncFile();
+    };
+    
+    tr.querySelector('[data-action="delete"]').onclick = () => {
+      if (confirm(`Are you sure you want to delete Day ${item.day}: "${item.title}"?`)) {
+        calendarDb = calendarDb.filter(d => String(d.day) !== String(item.day));
+        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+        renderSidebarDaysList();
+        renderDatabaseManagerTable();
+        saveAllDataToSyncFile();
+        showToast(`Deleted Day ${item.day} from database.`, 'info');
+      }
+    };
+    
+    dbTableBody.appendChild(tr);
+  });
+}
+
+// Search & Filter Listeners for Database Manager
+if (dbSearchInput) dbSearchInput.addEventListener('input', renderDatabaseManagerTable);
+if (dbFilterSoftware) dbFilterSoftware.addEventListener('change', renderDatabaseManagerTable);
+
+// Export JSON
+if (dbBtnExportJson) {
+  dbBtnExportJson.addEventListener('click', () => {
+    const payload = {
+      appName: "CivilCut Creator Studio",
+      version: "2.0.0",
+      updatedAt: new Date().toISOString().split('T')[0],
+      shortcuts: shortcutDb,
+      calendar: calendarDb,
+      completed: Array.from(completedCalendarDays)
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "database.json";
+    link.click();
+    showToast("Downloaded master database.json!");
+  });
+}
+
+// Import JSON
+if (dbBtnImportJson && dbFileImportInput) {
+  dbBtnImportJson.addEventListener('click', () => dbFileImportInput.click());
+  dbFileImportInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = JSON.parse(evt.target.result);
+        if (data.calendar && Array.isArray(data.calendar)) {
+          calendarDb = data.calendar;
+          localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+        }
+        if (data.shortcuts && Array.isArray(data.shortcuts)) {
+          shortcutDb = data.shortcuts;
+          localStorage.setItem('ludarp_shortcuts', JSON.stringify(shortcutDb));
+        }
+        if (data.completed && Array.isArray(data.completed)) {
+          completedCalendarDays = new Set(data.completed.map(String));
+          localStorage.setItem('ludarp_completed_calendar', JSON.stringify([...completedCalendarDays]));
+        }
+        renderSidebarDaysList();
+        renderDatabaseManagerTable();
+        saveAllDataToSyncFile();
+        showToast("Database imported & synced successfully!", "success");
+      } catch (err) {
+        showToast("Error parsing JSON file.", "error");
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+// Reset Factory DB
+if (dbBtnResetFactory) {
+  dbBtnResetFactory.addEventListener('click', () => {
+    if (confirm("Reset database back to original factory 84-item AutoCAD schedule?")) {
+      if (typeof autocadCalendar !== 'undefined') {
+        calendarDb = JSON.parse(JSON.stringify(autocadCalendar));
+        localStorage.setItem('ludarp_calendar_db', JSON.stringify(calendarDb));
+        renderSidebarDaysList();
+        renderDatabaseManagerTable();
+        saveAllDataToSyncFile();
+        showToast("Restored factory database!", "success");
+      }
+    }
+  });
+}
