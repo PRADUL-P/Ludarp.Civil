@@ -497,7 +497,7 @@ sidebarButtons.forEach(btn => {
     
     // Toggle contextual sidebar elements
     if (sidebarStudioContext) {
-      sidebarStudioContext.style.display = (targetTab === 'studio') ? 'block' : 'none';
+      sidebarStudioContext.style.display = (targetTab === 'studio') ? 'flex' : 'none';
     }
     
     // If switching to hub view, reload grid

@@ -217,6 +217,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 7px;
+  background: var(--bg-secondary);
+  position: relative;
+  z-index: 10;
 }
 .sync-status-card {
   display: flex;
@@ -276,12 +279,16 @@ body {
 
 /* Footer */
 .sidebar-footer {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   padding-top: 12px;
   border-top: 1px solid var(--border);
   margin-top: 10px;
+  background: var(--bg-secondary);
+  position: relative;
+  z-index: 10;
 }
 .sidebar-footer p { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
 .pulse-indicator {
