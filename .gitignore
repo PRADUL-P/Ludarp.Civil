@@ -2,4 +2,4 @@ scratch/
 .gemini/
 .agents/
 *.zip
-*.png
+!downloads/*.zip

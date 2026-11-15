@@ -1,1041 +1,514 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ludarp Civil Studio — AutoCAD Shorts & Mastery Hub</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ludarp Civil | AEC Tools Hub & Publishes</title>
+  
+  <!-- Favicon / Meta -->
+  <link rel="icon" href="profile.jpg" type="image/jpeg" />
+  <meta name="description" content="Published AutoCAD LISP routines, Revit pyRevit tools, Dynamo scripts, and CAD shortcuts by Pradul-P (Ludarp Civil)." />
+
+  <!-- Fonts & CDN Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    if (window.location.hash === '#admin' || window.location.search.includes('admin') || window.location.pathname.endsWith('/admin')) {
-      window.location.href = 'admin.html';
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cyan: '#38bdf8',
+              blue: '#0284c7',
+              orange: '#f97316',
+              dark: '#0a0d14',
+              surface: '#111726',
+              surfaceLight: '#182136',
+              border: '#24324d',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    :root {
-      --bg-primary: #060911;
-      --bg-secondary: #0f172a;
-      --bg-tertiary: #1e293b;
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.35);
-      --accent-green: #10b981;
-      --accent-green-glow: rgba(16, 185, 129, 0.3);
-      --accent-purple: #a855f7;
-      --accent-orange: #f59e0b;
-      --border: rgba(255, 255, 255, 0.1);
-      --border-accent: rgba(56, 189, 248, 0.4);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-    }
 
-    html, body {
-      height: auto !important;
-      min-height: 100vh;
-      overflow-x: hidden !important;
-      overflow-y: auto !important;
-    }
-
-    body {
-      background-color: var(--bg-primary);
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.12), transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.1), transparent 40%);
-      background-attachment: fixed;
-      color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* Top Navigation Bar */
-    .pub-header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(6, 9, 17, 0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .pub-brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: var(--text-primary);
-    }
-    .pub-brand-logo {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, #0284c7, #38bdf8, #818cf8);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .pub-nav {
-      display: flex;
-      gap: 6px;
-      background: rgba(15, 23, 42, 0.8);
-      padding: 5px;
-      border-radius: 30px;
-      border: 1px solid var(--border);
-    }
-    .pub-nav-btn {
-      padding: 9px 20px;
-      border-radius: 20px;
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .pub-nav-btn:hover {
-      color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.05);
-    }
-    .pub-nav-btn.active {
-      background: linear-gradient(135deg, #38bdf8, #0284c7);
-      color: #000;
-      font-weight: 800;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    /* Hero Banner */
-    .hero-banner {
-      max-width: 1080px;
-      margin: 30px auto 24px auto;
-      padding: 32px;
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border-accent);
-      border-radius: 24px;
-      display: flex;
-      gap: 32px;
-      align-items: center;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
-    .hero-avatar {
-      width: 105px;
-      height: 105px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #38bdf8, #a855f7, #10b981);
-      padding: 4px;
-      box-shadow: 0 0 35px var(--accent-glow);
-      flex-shrink: 0;
-    }
-    .hero-avatar-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: var(--bg-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.8rem;
-    }
-    .hero-title {
-      font-size: 1.7rem;
-      font-weight: 900;
-      margin: 0 0 6px 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: linear-gradient(to right, #ffffff, #93c5fd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero-stats-row {
-      display: flex;
-      gap: 16px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    .stat-badge {
-      background: rgba(30, 41, 59, 0.7);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 14px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .stat-badge strong {
-      color: var(--accent);
-      font-weight: 800;
-    }
-
-    /* Tab Sections */
-    .tab-section {
-      max-width: 1080px;
-      margin: 0 auto 60px auto;
-      padding: 0 20px;
-      display: none;
-    }
-    .tab-section.active {
-      display: block;
-    }
-
-    /* CAD Cards Grid */
-    .insta-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    /* Mobile Responsive Optimizations */
-    @media (max-width: 860px) {
-      .insta-grid { grid-template-columns: repeat(2, 1fr); }
-      .hero-banner { flex-direction: column; text-align: center; }
-      .hero-stats-row { justify-content: center; }
-    }
-    @media (max-width: 640px) {
-      .insta-grid { grid-template-columns: 1fr; }
-      .pub-header {
-        padding: 10px 16px;
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
-      }
-      .pub-brand {
-        justify-content: center;
-      }
-      .pub-nav {
-        overflow-x: auto;
-        white-space: nowrap;
-        padding: 4px;
-        border-radius: 20px;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        max-width: 100%;
-      }
-      .pub-nav::-webkit-scrollbar {
-        display: none;
-      }
-      .pub-nav-btn {
-        padding: 8px 14px;
-        font-size: 0.78rem;
-        flex-shrink: 0;
-      }
-      .hero-banner {
-        padding: 20px 16px;
-        margin: 16px auto;
-        gap: 16px;
-        border-radius: 18px;
-      }
-      .hero-avatar {
-        width: 80px;
-        height: 80px;
-      }
-      .hero-title {
-        font-size: 1.35rem;
-        justify-content: center;
-      }
-      .quiz-container {
-        padding: 20px 16px;
-        border-radius: 18px;
-      }
-      .level-selector-row {
-        flex-direction: column;
-        gap: 8px;
-      }
-      .level-btn {
-        width: 100%;
-        text-align: center;
-        padding: 12px 16px;
-      }
-      .quiz-option-btn {
-        font-size: 0.9rem;
-        padding: 14px 16px;
-      }
-      .tab-section {
-        padding: 0 12px;
-      }
-    }
-
-    .cad-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-    }
-    .cad-card:hover {
-      transform: translateY(-6px);
-      border-color: var(--accent);
-      box-shadow: 0 16px 35px rgba(56, 189, 248, 0.25);
-      background: rgba(30, 41, 59, 0.8);
-    }
-    .card-key-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: var(--accent);
-      background: rgba(30, 41, 59, 0.9);
-      padding: 6px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border-accent);
-      display: inline-block;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    /* Quiz Level System Styles */
-    .quiz-container {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid var(--border-accent);
-      border-radius: 24px;
-      padding: 36px;
-      max-width: 700px;
-      margin: 20px auto;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-    }
-    .level-selector-row {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-bottom: 24px;
-    }
-    .level-btn {
-      padding: 10px 22px;
-      border-radius: 16px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-    .level-btn.active-beginner {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: var(--accent-green);
-      color: var(--accent-green);
-      box-shadow: 0 0 15px var(--accent-green-glow);
-    }
-    .level-btn.active-intermediate {
-      background: rgba(245, 158, 11, 0.2);
-      border-color: var(--accent-orange);
-      color: var(--accent-orange);
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-    }
-    .level-btn.active-advanced {
-      background: rgba(168, 85, 247, 0.2);
-      border-color: var(--accent-purple);
-      color: var(--accent-purple);
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
-    }
-
-    .quiz-progress-bar-wrap {
-      width: 100%;
-      height: 8px;
-      background: var(--bg-tertiary);
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 16px 0 24px 0;
-    }
-    .quiz-progress-fill {
-      height: 100%;
-      width: 10%;
-      background: linear-gradient(to right, var(--accent), var(--accent-green));
-      border-radius: 10px;
-      transition: width 0.3s;
-    }
-    .quiz-option-btn {
-      width: 100%;
-      padding: 16px 20px;
-      margin: 10px 0;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--text-primary);
-      font-size: 0.98rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: left;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .quiz-option-btn:hover {
-      border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.1);
-      transform: translateX(4px);
-    }
-    .quiz-option-btn.correct {
-      background: rgba(16, 185, 129, 0.25) !important;
-      border-color: var(--accent-green) !important;
-      color: var(--accent-green) !important;
-    }
-    .quiz-option-btn.wrong {
-      background: rgba(239, 68, 68, 0.25) !important;
-      border-color: #ef4444 !important;
-      color: #ef4444 !important;
-    }
-
-    /* Modal Overlay */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(12px);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-accent);
-      border-radius: 24px;
-      max-width: 650px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 36px;
-      position: relative;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-    }
-    .modal-close {
-      position: absolute;
-      top: 20px; right: 20px;
-      background: none; border: none;
-      color: var(--text-muted);
-      font-size: 1.8rem; cursor: pointer;
-    }
-  </style>
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="hub-style.css" />
 </head>
-<body>
 
-  <!-- Top Sticky Navigation Bar -->
-  <header class="pub-header">
-    <a href="#" class="pub-brand">
-      <div class="pub-brand-logo" style="overflow:hidden; padding:0;">
-        <img src="profile.jpg" alt="Ludarp Civil Studio Logo" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
-      </div>
-      <div>
-        <div style="font-weight: 900; font-size: 1.05rem; letter-spacing: -0.02em;">Ludarp Civil Studio</div>
-        <div style="font-size: 0.74rem; color: var(--accent); font-weight: 700;">AutoCAD Shorts & Mastery Hub</div>
-      </div>
-    </a>
+<body class="blueprint-grid-bg transition-colors duration-300">
 
-    <nav class="pub-nav">
-      <button class="pub-nav-btn active" data-tab="quiz">🧠 10-Set Quiz</button>
-      <button class="pub-nav-btn" data-tab="feed">📸 Published Feed</button>
-      <button class="pub-nav-btn" data-tab="search">🔍 Shortcut Hub</button>
-      <button class="pub-nav-btn" data-tab="cheatsheet">📄 Cheat Sheet</button>
-      <a href="admin.html" class="pub-nav-btn" style="border: 1px solid var(--accent); color: var(--accent);">⚙️ Admin</a>
-    </nav>
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-opacity-90 border-b border-slate-800 dark:border-brand-border bg-slate-900/90 dark:bg-brand-dark/90 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Profile -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="relative w-10 h-10 rounded-xl overflow-hidden border border-brand-cyan/40 p-0.5 shadow-lg group-hover:scale-105 transition-transform">
+          <img src="profile.jpg" alt="Ludarp Civil Profile" class="w-full h-full object-cover rounded-lg" onerror="this.src='https://ui-avatars.com/api/?name=Ludarp+Civil&background=0284c7&color=fff'" />
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5 font-bold text-slate-100 text-base tracking-tight group-hover:text-brand-cyan transition-colors">
+            <span>Ludarp Civil</span>
+            <i class="fa-solid fa-circle-check text-brand-cyan text-xs"></i>
+          </div>
+          <div class="text-xs text-slate-400 font-mono">Tools Hub & Publishes</div>
+        </div>
+      </a>
+
+      <!-- Navigation & Action Buttons -->
+      <div class="flex items-center gap-3">
+        <!-- Creator Studio Link -->
+        <a href="studio.html" 
+           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 transition-all">
+          <i class="fa-solid fa-paintbrush"></i>
+          <span class="hidden sm:inline">Creator Studio</span>
+        </a>
+
+        <!-- GitHub Repo Link -->
+        <a href="https://github.com/PRADUL-P/Ludarp.Civil" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-brand-cyan transition-all">
+          <i class="fa-brands fa-github text-sm"></i>
+          <span class="hidden sm:inline">GitHub Repository</span>
+        </a>
+
+        <!-- How to Load Guide Modal Trigger -->
+        <button id="guideBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-blue/20 hover:bg-brand-blue/30 text-brand-cyan border border-brand-cyan/30 transition-all">
+          <i class="fa-solid fa-book-bookmark"></i>
+          <span class="hidden sm:inline">Load Guides</span>
+        </button>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button id="themeToggleBtn" aria-label="Toggle Theme" 
+                class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-amber-400 transition-colors">
+          <i id="themeIcon" class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+
+    </div>
   </header>
 
-  <!-- Hero Profile Banner -->
-  <section class="hero-banner">
-    <div class="hero-avatar">
-      <div class="hero-avatar-inner" style="overflow:hidden;">
-        <img src="profile.jpg" alt="Ludarp Civil Studio Profile" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
-      </div>
-    </div>
-    <div style="flex: 1;">
-      <h1 class="hero-title">
-        ludarp.civil
-        <span style="color: var(--accent); font-size: 1.3rem;">✓</span>
-      </h1>
-      <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">
-        🚀 Daily AutoCAD shortcuts, 2D drafting hacks, and 3D modeling tips for civil engineers & architects.
-      </p>
+  <!-- ================= HERO & BIO BANNER ================= -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/90 via-slate-900/60 to-slate-800/40 border border-brand-border p-6 sm:p-8 backdrop-blur-sm shadow-2xl">
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-brand-orange/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="hero-stats-row">
-        <div class="stat-badge">⚡ <strong>141</strong> <span>AutoCAD Shortcuts</span></div>
-        <div class="stat-badge">🎯 <span>Beginner to Expert</span></div>
-        <div class="stat-badge">📐 <strong style="color: var(--accent-green)">2D & 3D</strong> <span>Mastery</span></div>
+      <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex items-start sm:items-center gap-5">
+          <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-brand-cyan/60 shadow-xl flex-shrink-0 pulse-glow">
+            <img src="profile.jpg" alt="Pradul-P" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=PRADUL+P&background=0284c7&color=fff'" />
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Pradul-P</h1>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30">
+                AEC Developer & Creator
+              </span>
+            </div>
+            <p class="text-sm sm:text-base text-slate-300 mt-1.5 max-w-2xl font-normal leading-relaxed">
+              Official catalog of published <strong class="text-brand-cyan">AutoCAD AutoLISP</strong> scripts, <strong class="text-orange-400">Revit pyRevit</strong> extensions, and the <strong class="text-emerald-400">Ludarp.Civil</strong> automation & shortcut library. Built for civil engineers, BIM managers, and computational drafters.
+            </p>
+            <div class="flex items-center gap-3 mt-3 text-xs text-slate-400 flex-wrap">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-brand-cyan"></i> AEC & Civil Engineering</span>
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-code text-orange-400"></i> AutoLISP • Python • pyRevit • Dynamo</span>
+              <a href="https://github.com/PRADUL-P" target="_blank" class="flex items-center gap-1 text-brand-cyan hover:underline">
+                <i class="fa-brands fa-github"></i> @PRADUL-P
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full md:w-auto">
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
+            <div id="statTotalTools" class="text-xl font-extrabold text-brand-cyan">15</div>
+            <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Published</div>
+          </div>
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
+            <div id="statLispCount" class="text-xl font-extrabold text-orange-400">8</div>
+            <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">CAD LISPs</div>
+          </div>
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
+            <div id="statPyRevitCount" class="text-xl font-extrabold text-purple-400">7</div>
+            <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">pyRevit Tools</div>
+          </div>
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
+            <div id="statUpcomingCount" class="text-xl font-extrabold text-amber-400">10</div>
+            <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Upcoming / Test</div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- =========================================================================
-       TAB 1: LEVEL-BASED 10-QUESTION QUIZ GAME (FIRST ACTIVE TAB)
-       ========================================================================= -->
-  <main class="tab-section active" id="tab-quiz">
-    <!-- Persistent User Scorecard & High Scores -->
-    <div style="background:linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); border:1px solid var(--border-accent); border-radius:20px; padding:20px 24px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; box-shadow:0 10px 30px rgba(0,0,0,0.4);">
-      <div>
-        <div style="font-size:0.75rem; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em;">YOUR QUIZ MASTERY SCORECARD</div>
-        <div style="font-size:1.25rem; font-weight:900; color:var(--text-primary); margin-top:2px;" id="user-rank-badge">🐣 CAD Novice (0 XP)</div>
-      </div>
+  <!-- ================= TABS & FILTER BAR ================= -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+    
+    <!-- Platform Navigation Tabs -->
+    <div class="flex items-center justify-between border-b border-slate-800 dark:border-brand-border overflow-x-auto pb-1 gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-3 flex-nowrap" id="platformTabs">
+        <button data-tab="all" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-brand-cyan text-brand-cyan bg-brand-cyan/10">
+          <i class="fa-solid fa-shapes"></i>
+          <span>All Published</span>
+          <span id="badgeAll" class="px-2 py-0.5 text-xs rounded-full bg-brand-cyan/20 text-brand-cyan font-mono">15</span>
+        </button>
 
-      <div style="display:flex; gap:14px; flex-wrap:wrap;">
-        <div style="text-align:center; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); padding:8px 16px; border-radius:14px;">
-          <div style="font-size:0.68rem; font-weight:800; color:var(--accent-green);">🟢 BEGINNER BEST</div>
-          <div style="font-size:1.15rem; font-weight:900; color:var(--text-primary);" id="high-score-beginner">0 / 100</div>
-        </div>
+        <button data-tab="AutoLISP" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+          <i class="fa-solid fa-code text-orange-400"></i>
+          <span>AutoCAD LISPs</span>
+          <span id="badgeLisp" class="px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">8</span>
+        </button>
 
-        <div style="text-align:center; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); padding:8px 16px; border-radius:14px;">
-          <div style="font-size:0.68rem; font-weight:800; color:var(--accent-orange);">🟡 INTERMEDIATE BEST</div>
-          <div style="font-size:1.15rem; font-weight:900; color:var(--text-primary);" id="high-score-intermediate">0 / 100</div>
-        </div>
+        <button data-tab="pyRevit" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+          <i class="fa-solid fa-cubes-stacked text-purple-400"></i>
+          <span>Revit pyRevit</span>
+          <span id="badgePyRevit" class="px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">7</span>
+        </button>
 
-        <div style="text-align:center; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); padding:8px 16px; border-radius:14px;">
-          <div style="font-size:0.68rem; font-weight:800; color:var(--accent-purple);">🔴 ADVANCED BEST</div>
-          <div style="font-size:1.15rem; font-weight:900; color:var(--text-primary);" id="high-score-advanced">0 / 100</div>
-        </div>
-      </div>
-    </div>
+        <button data-tab="upcoming" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+          <i class="fa-solid fa-hourglass-half text-amber-400"></i>
+          <span>Upcoming & Testing</span>
+          <span id="badgeUpcoming" class="px-2 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-400 font-mono">10</span>
+        </button>
 
-    <div class="quiz-container">
-      <div style="text-align:center;">
-        <h2 style="font-size:1.4rem; font-weight:900; margin:0 0 6px 0; color:var(--text-primary);">🧠 AutoCAD Mastery Quiz</h2>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 20px 0;">Select your skill level to start a 10-question challenge set!</p>
+        <button data-tab="shortcuts" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+          <i class="fa-solid fa-bolt text-emerald-400"></i>
+          <span>Ludarp Shortcuts Hub</span>
+          <span class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-400 font-mono">141</span>
+        </button>
 
-        <!-- Level Selector Buttons -->
-        <div class="level-selector-row">
-          <button class="level-btn active-beginner" id="btn-level-beginner">🟢 Beginner (10 Questions)</button>
-          <button class="level-btn" id="btn-level-intermediate">🟡 Intermediate (10 Questions)</button>
-          <button class="level-btn" id="btn-level-advanced">🔴 Advanced (10 Questions)</button>
-        </div>
-      </div>
-
-      <!-- Question Card Body -->
-      <div id="quiz-game-body">
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; font-weight:800; color:var(--text-secondary);">
-          <span id="quiz-question-counter">Question 1 of 10</span>
-          <span>Score: <strong style="color:var(--accent-green); font-size:1rem;" id="quiz-score-val">0 / 100</strong></span>
-        </div>
-
-        <div class="quiz-progress-bar-wrap">
-          <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
-        </div>
-
-        <div style="font-size:1.25rem; font-weight:800; margin:20px 0; color:var(--text-primary); line-height:1.4;" id="quiz-question-text">
-          Loading Question...
-        </div>
-
-        <div id="quiz-options-container">
-          <!-- Options injected here -->
-        </div>
-
-        <div style="margin-top:24px; display:flex; justify-content:flex-end;">
-          <button id="quiz-next-btn" style="padding:12px 24px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; font-size:0.9rem; cursor:pointer; display:none;">
-            Next Question ➔
-          </button>
-        </div>
-      </div>
-
-      <!-- Final Results Screen -->
-      <div id="quiz-results-screen" style="display:none; text-align:center; padding:20px 0;">
-        <div style="font-size:3.5rem; margin-bottom:10px;">🏆</div>
-        <h2 style="font-size:1.6rem; font-weight:900; margin:0 0 8px 0; color:var(--text-primary);">Level Completed!</h2>
-        <p style="font-size:0.95rem; color:var(--text-secondary); margin:0 0 20px 0;" id="quiz-final-score-text">You scored 80 / 100!</p>
-        <button id="quiz-restart-btn" style="padding:12px 28px; background:var(--accent-green); color:#000; border:none; border-radius:16px; font-weight:900; font-size:0.95rem; cursor:pointer;">
-          🔄 Try Another Quiz Set
+        <button data-tab="studio" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+          <i class="fa-solid fa-palette text-pink-400"></i>
+          <span>Creator Studio</span>
+          <span class="px-2 py-0.5 text-xs rounded-full bg-pink-500/20 text-pink-400 font-mono">App</span>
         </button>
       </div>
     </div>
-  </main>
 
-  <!-- =========================================================================
-       TAB 2: PUBLISHED INSTAGRAM FEED
-       ========================================================================= -->
-  <main class="tab-section" id="tab-feed">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h2 style="font-size:1.35rem; font-weight:900; margin:0;">📸 Published Instagram Feed</h2>
-      <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Posts published from Admin Dashboard</span>
-    </div>
+    <!-- Controls Row: Search, Tags & Sort -->
+    <div class="mt-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      
+      <!-- Search Box -->
+      <div class="relative flex-1 max-w-xl">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input type="text" id="searchInput" 
+               placeholder="Search publishes by name, command (e.g. AREACLS, PURGEMAX, pyRevit), tag, or keyword..." 
+               class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl bg-slate-900 dark:bg-brand-surface border border-slate-700 dark:border-brand-border text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan transition-all" />
+        <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs px-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
 
-    <div class="insta-grid" id="pub-feed-grid">
-      <!-- Populated dynamically -->
-    </div>
-  </main>
-
-  <!-- =========================================================================
-       TAB 2: SHORTCUT SEARCH HUB
-       ========================================================================= -->
-  <main class="tab-section" id="tab-search">
-    <div style="background:rgba(15, 23, 42, 0.8); border:1px solid var(--border-accent); border-radius:20px; padding:28px; margin-bottom:24px;">
-      <h2 style="font-size:1.35rem; font-weight:900; margin:0 0 16px 0;">🔍 Interactive AutoCAD Shortcut Library</h2>
-      <div style="display:flex; gap:14px; flex-wrap:wrap;">
-        <input type="text" id="hub-search-input" placeholder="Search shortcut (e.g. TR, F8, LINE), command action, or description..." style="flex:1; min-width:280px; padding:14px 18px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:14px; color:var(--text-primary); font-size:0.92rem;">
-        <select id="hub-cat-filter" style="padding:14px 18px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:14px; color:var(--text-primary); font-size:0.9rem; font-weight:700;">
-          <option value="all">All Categories</option>
-          <option value="Editing">Editing</option>
-          <option value="Drawing">Drawing</option>
-          <option value="3D Modeling">3D Modeling</option>
-          <option value="Layer Management">Layer Management</option>
-          <option value="Annotation">Annotation</option>
+      <!-- Category Filter Pills & Sort Select -->
+      <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+        
+        <!-- Filter Category Select (on Mobile) or Quick Filter Pills -->
+        <select id="subFilterSelect" class="bg-slate-900 dark:bg-brand-surface border border-slate-700 dark:border-brand-border text-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-brand-cyan">
+          <option value="all">All Topics & Workflows</option>
+          <option value="Civil 3D">Civil 3D & Survey</option>
+          <option value="Area Takeoff">Area & Takeoffs</option>
+          <option value="Annotation">Text & Numbering</option>
+          <option value="Documentation">Sheets & Views</option>
+          <option value="File Optimization">Audit & Purge</option>
+          <option value="Toposolid">Topography</option>
         </select>
+
+        <!-- Sort Dropdown -->
+        <select id="sortSelect" class="bg-slate-900 dark:bg-brand-surface border border-slate-700 dark:border-brand-border text-slate-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-brand-cyan">
+          <option value="featured">Featured First</option>
+          <option value="newest">Recently Updated</option>
+          <option value="name">Title (A - Z)</option>
+        </select>
+
       </div>
     </div>
 
-    <div class="insta-grid" id="hub-cards-grid">
-      <!-- Populated dynamically -->
+    <!-- Active Filter Feedback -->
+    <div id="filterStatus" class="mt-2 text-xs text-slate-400 font-mono flex items-center justify-between">
+      <span>Showing <strong id="visibleCount" class="text-brand-cyan">10</strong> publishes</span>
+      <span id="activeSearchTag" class="hidden text-brand-cyan bg-brand-cyan/10 px-2 py-0.5 rounded border border-brand-cyan/20"></span>
     </div>
-  </main>
 
-  <!-- =========================================================================
-       TAB 3: LEVEL-BASED 10-QUESTION QUIZ GAME
-       ========================================================================= -->
-  <main class="tab-section" id="tab-quiz">
-    <div class="quiz-container">
-      <div style="text-align:center;">
-        <h2 style="font-size:1.4rem; font-weight:900; margin:0 0 6px 0; color:var(--text-primary);">🧠 AutoCAD Mastery Quiz</h2>
-        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 20px 0;">Select your skill level to start a 10-question challenge set!</p>
+  </section>
 
-        <!-- Level Selector Buttons -->
-        <div class="level-selector-row">
-          <button class="level-btn active-beginner" id="btn-level-beginner">🟢 Beginner (10 Questions)</button>
-          <button class="level-btn" id="btn-level-intermediate">🟡 Intermediate (10 Questions)</button>
-          <button class="level-btn" id="btn-level-advanced">🔴 Advanced (10 Questions)</button>
-        </div>
+  <!-- ================= MAIN CONTENT GRID ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Tools & Publishes Card Grid -->
+    <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Dynamic tool cards injected via app.js -->
+    </div>
+
+    <!-- Ludarp Shortcuts Grid (Visible when Shortcuts tab is active) -->
+    <div id="shortcutsContainer" class="hidden">
+      <!-- Phase Filter Pills for Shortcuts -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6" id="shortcutPhaseFilters">
+        <button data-phase="all" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-cyan text-brand-dark">All (141)</button>
+        <button data-phase="Basics" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Basics (32)</button>
+        <button data-phase="Intermediate" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Intermediate (58)</button>
+        <button data-phase="Advanced" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Advanced (15)</button>
+        <button data-phase="Expert" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Expert (36)</button>
       </div>
 
-      <!-- Question Card Body -->
-      <div id="quiz-game-body">
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; font-weight:800; color:var(--text-secondary);">
-          <span id="quiz-question-counter">Question 1 of 10</span>
-          <span>Score: <strong style="color:var(--accent-green); font-size:1rem;" id="quiz-score-val">0 / 100</strong></span>
-        </div>
-
-        <div class="quiz-progress-bar-wrap">
-          <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
-        </div>
-
-        <div style="font-size:1.25rem; font-weight:800; margin:20px 0; color:var(--text-primary); line-height:1.4;" id="quiz-question-text">
-          Loading Question...
-        </div>
-
-        <div id="quiz-options-container">
-          <!-- Options injected here -->
-        </div>
-
-        <div style="margin-top:24px; display:flex; justify-content:flex-end;">
-          <button id="quiz-next-btn" style="padding:12px 24px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; font-size:0.9rem; cursor:pointer; display:none;">
-            Next Question ➔
-          </button>
-        </div>
+      <div id="shortcutsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Shortcuts injected dynamically -->
       </div>
 
-      <!-- Final Results Screen -->
-      <div id="quiz-results-screen" style="display:none; text-align:center; padding:20px 0;">
-        <div style="font-size:3.5rem; margin-bottom:10px;">🏆</div>
-        <h2 style="font-size:1.6rem; font-weight:900; margin:0 0 8px 0; color:var(--text-primary);">Level Completed!</h2>
-        <p style="font-size:0.95rem; color:var(--text-secondary); margin:0 0 20px 0;" id="quiz-final-score-text">You scored 80 / 100!</p>
-        <button id="quiz-restart-btn" style="padding:12px 28px; background:var(--accent-green); color:#000; border:none; border-radius:16px; font-weight:900; font-size:0.95rem; cursor:pointer;">
-          🔄 Try Another Quiz Set
+      <!-- Pagination for shortcuts -->
+      <div id="shortcutsPagination" class="mt-8 flex items-center justify-center gap-3">
+        <button id="prevShortcutPage" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold">
+          <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+        </button>
+        <span id="pageIndicator" class="text-xs font-mono text-slate-400">Page 1 of 15</span>
+        <button id="nextShortcutPage" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold">
+          Next <i class="fa-solid fa-chevron-right ml-1"></i>
         </button>
       </div>
     </div>
-  </main>
 
-  <!-- =========================================================================
-       TAB 4: PRINTABLE PDF CHEAT SHEET
-       ========================================================================= -->
-  <main class="tab-section" id="tab-cheatsheet">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h2 style="font-size:1.35rem; font-weight:900; margin:0;">📄 AutoCAD Master Cheat Sheet</h2>
-      <button onclick="window.print()" style="padding:12px 24px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; cursor:pointer; font-size:0.88rem;">
-        🖨️ Print / Save PDF
+    <!-- Creator Studio Tab Container -->
+    <div id="studioContainer" class="hidden">
+      <div class="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-lg flex-shrink-0">
+            <i class="fa-solid fa-palette"></i>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-slate-100">Ludarp Civil — Creator Studio & Graphic Generator</h4>
+            <p class="text-xs text-slate-400">Generate 1:1 Instagram posts, 9:16 reels, blueprint graphics, and export captions.</p>
+          </div>
+        </div>
+        <a href="studio.html" target="_blank" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-all flex-shrink-0">
+          <i class="fa-solid fa-up-right-from-square"></i> Open Studio Fullscreen
+        </a>
+      </div>
+      <iframe id="studioFrame" src="studio.html" class="w-full h-[85vh] rounded-2xl border border-slate-800 shadow-2xl bg-slate-950" loading="lazy"></iframe>
+    </div>
+
+    <!-- Empty State Container -->
+    <div id="emptyState" class="hidden text-center py-16 px-4 bg-slate-900/50 dark:bg-brand-surface/50 border border-dashed border-slate-700 rounded-2xl max-w-lg mx-auto">
+      <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-500 text-2xl">
+        <i class="fa-solid fa-filter-circle-xmark"></i>
+      </div>
+      <h3 class="text-lg font-bold text-white mb-1">No matching tools found</h3>
+      <p class="text-xs text-slate-400 mb-4">Try clearing your search query or switching to another platform tab.</p>
+      <button id="resetFiltersBtn" class="px-4 py-2 rounded-lg bg-brand-blue text-white text-xs font-semibold hover:bg-brand-cyan hover:text-brand-dark transition-all">
+        Reset All Filters
       </button>
     </div>
 
-    <div id="cheatsheet-table-container" style="background:var(--bg-secondary); border:1px solid var(--border-accent); border-radius:20px; padding:24px; overflow-x:auto;">
-      <!-- Table populated dynamically -->
-    </div>
   </main>
 
-  <!-- Detail Modal Overlay -->
-  <div class="modal-overlay" id="detail-modal" style="display:none;">
-    <div class="modal-card">
-      <button class="modal-close" id="modal-close-btn">&times;</button>
-      <div id="modal-content"></div>
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-20 border-t border-slate-800 dark:border-brand-border bg-slate-900/80 dark:bg-brand-dark/80 py-10 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <img src="profile.jpg" alt="Ludarp" class="w-9 h-9 rounded-lg border border-brand-cyan/40 object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Ludarp+Civil'" />
+        <div>
+          <div class="font-bold text-sm text-slate-200">Ludarp Civil Tools Hub</div>
+          <div class="text-xs text-slate-400">Empowering AEC professionals with open-source automation routines.</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-xs text-slate-400">
+        <a href="https://github.com/PRADUL-P/Ludarp.Civil" target="_blank" class="hover:text-brand-cyan transition-colors flex items-center gap-1.5">
+          <i class="fa-brands fa-github text-sm"></i> Ludarp.Civil Repo
+        </a>
+        <span>•</span>
+        <a href="https://github.com/PRADUL-P" target="_blank" class="hover:text-brand-cyan transition-colors">
+          GitHub Profile
+        </a>
+        <span>•</span>
+        <button id="footerGuideTrigger" class="hover:text-brand-cyan transition-colors">
+          Installation Guide
+        </button>
+      </div>
+
+      <div class="text-xs text-slate-500 font-mono">
+        © 2024-2026 Pradul-P. MIT Licensed.
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= TOOL DETAIL & CODE MODAL ================= -->
+  <div id="toolModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="modal-content relative w-full max-w-3xl max-h-[90vh] bg-slate-900 dark:bg-brand-surface border border-slate-700 dark:border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="p-6 border-b border-slate-800 dark:border-brand-border flex items-start justify-between gap-4 bg-slate-900/90 dark:bg-brand-surface/90">
+        <div class="flex items-start gap-3.5">
+          <div id="modalIconBox" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/30">
+            <i class="fa-solid fa-code"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="modalCategoryBadge" class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300">
+                AutoLISP
+              </span>
+              <span id="modalVersionBadge" class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-brand-cyan/15 text-brand-cyan">
+                v1.0.0
+              </span>
+              <span id="modalCompatibilityBadge" class="text-xs text-slate-400 font-mono">
+                AutoCAD 2020+
+              </span>
+            </div>
+            <h2 id="modalTitle" class="text-xl font-bold text-white mt-1">Tool Title</h2>
+          </div>
+        </div>
+
+        <!-- Close Button -->
+        <button id="closeModalBtn" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto flex-1 space-y-5">
+        
+        <!-- Summary Description -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5 font-mono">Overview</h4>
+          <p id="modalSummary" class="text-sm text-slate-300 leading-relaxed"></p>
+        </div>
+
+        <!-- Command Trigger Callout -->
+        <div class="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-cyan font-mono">Command / Access:</span>
+            <code id="modalCommand" class="text-sm font-mono font-bold text-white bg-slate-950 px-2.5 py-1 rounded border border-slate-800 select-all">CMD</code>
+          </div>
+          <button id="copyCommandBtn" class="text-xs text-slate-400 hover:text-brand-cyan transition-colors flex items-center gap-1 font-semibold">
+            <i class="fa-regular fa-copy"></i> Copy
+          </button>
+        </div>
+
+        <!-- How to Load Steps -->
+        <div class="rounded-xl bg-slate-950/60 border border-slate-800 p-4">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-brand-cyan mb-2.5 flex items-center gap-1.5 font-mono">
+            <i class="fa-solid fa-terminal"></i>
+            <span id="modalInstallType">Installation & Loading Steps</span>
+          </h4>
+          <ol id="modalInstallSteps" class="space-y-2 text-xs text-slate-300 list-decimal list-inside"></ol>
+        </div>
+
+        <!-- Code Snippet Box -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
+              <i class="fa-solid fa-file-code"></i> Source Script Preview
+            </h4>
+            <div class="flex items-center gap-2">
+              <button id="modalCopyCodeBtn" class="px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition-all">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy Code</span>
+              </button>
+              <button id="modalDownloadBtn" class="px-2.5 py-1 rounded text-xs font-semibold bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan border border-brand-cyan/40 flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-download"></i>
+                <span>Download File</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="code-container p-4 max-h-72 text-xs">
+            <pre><code id="modalCodeSnippet" class="block whitespace-pre"></code></pre>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-800 dark:border-brand-border bg-slate-900/90 dark:bg-brand-surface/90 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2" id="modalTagsContainer"></div>
+        <button id="closeModalBottomBtn" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors">
+          Close
+        </button>
+      </div>
+
     </div>
   </div>
 
-  <script src="calendar_data.js?v=2.2"></script>
-  <script>
-    let calendarDb = [];
-    try {
-      calendarDb = JSON.parse(localStorage.getItem('ludarp_calendar_db')) || [];
-    } catch(e) { calendarDb = []; }
-
-    if (!Array.isArray(calendarDb) || calendarDb.length === 0) {
-      if (typeof CALENDAR_DATA_FROM_FILE !== 'undefined' && Array.isArray(CALENDAR_DATA_FROM_FILE) && CALENDAR_DATA_FROM_FILE.length > 0) {
-        calendarDb = CALENDAR_DATA_FROM_FILE;
-      } else if (typeof autocadCalendar !== 'undefined' && Array.isArray(autocadCalendar)) {
-        calendarDb = autocadCalendar;
-      }
-    }
-
-    let rawCompleted = [];
-    try {
-      rawCompleted = JSON.parse(localStorage.getItem('ludarp_completed_calendar')) || [];
-    } catch(e) { rawCompleted = []; }
-    const completedDays = new Set((Array.isArray(rawCompleted) ? rawCompleted : []).map(String));
-    const publishedPosts = (Array.isArray(calendarDb) ? calendarDb : []).filter(post => post && (post.posted || post.status === 'published' || completedDays.has(String(post.day))));
-    const feedPosts = publishedPosts.length > 0 ? publishedPosts : (Array.isArray(calendarDb) ? calendarDb : []);
-
-    // Tab Switcher
-    const navBtns = document.querySelectorAll('.pub-nav-btn[data-tab]');
-    const tabSections = document.querySelectorAll('.tab-section');
-
-    navBtns.forEach(btn => {
-      btn.onclick = () => {
-        const target = btn.getAttribute('data-tab');
-        navBtns.forEach(b => b.classList.remove('active'));
-        tabSections.forEach(s => s.classList.remove('active'));
-
-        btn.classList.add('active');
-        document.getElementById(`tab-${target}`).classList.add('active');
-      };
-    });
-
-    // 1. Render Published Feed
-    function renderPublishedFeed() {
-      const grid = document.getElementById('pub-feed-grid');
-      grid.innerHTML = '';
-
-      feedPosts.forEach(post => {
-        grid.appendChild(createCadCard(post));
-      });
-    }
-
-    // Helper Card Builder
-    function createCadCard(post) {
-      const card = document.createElement('div');
-      card.className = 'cad-card';
-      card.style.cursor = 'pointer';
-      const key = post.shortcut || post.keys || 'CAD';
-      const title = post.action || (post.title ? post.title.replace(/^[^:]+:\s*/, '') : 'Shortcut');
-      const desc = post.description || post.desc || '';
-      const lessonNum = post.day ? `Lesson ${post.day}` : 'Lesson';
-
-      card.innerHTML = `
-        <div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span class="card-key-tag">${key}</span>
-            <span style="font-size:0.7rem; font-weight:800; color:var(--accent-purple); text-transform:uppercase; background:rgba(168,85,247,0.15); padding:3px 9px; border-radius:8px; border:1px solid rgba(168,85,247,0.3);">${post.difficulty || 'Beginner'}</span>
+  <!-- ================= HOW TO LOAD PLATFORM GUIDE MODAL ================= -->
+  <div id="guideModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="modal-content relative w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[85vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-brand-cyan/15 text-brand-cyan flex items-center justify-center font-bold">
+            <i class="fa-solid fa-book-open"></i>
           </div>
-          <h3 style="font-size:1.08rem; font-weight:900; margin:0 0 6px 0; color:var(--text-primary); line-height:1.3;">${title}</h3>
-          <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.45; margin:0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${desc}</p>
-        </div>
-        <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:0.76rem; color:var(--text-muted); font-weight:600;">
-          <span>${lessonNum} • ${post.category || 'General'}</span>
-          <span style="color:var(--accent); font-weight:800;">View Steps ➔</span>
-        </div>
-      `;
-      card.onclick = () => openModal(post);
-      return card;
-    }
-
-    // Modal Details
-    function openModal(post) {
-      const modal = document.getElementById('detail-modal');
-      const content = document.getElementById('modal-content');
-      const key = post.shortcut || post.keys || 'CAD';
-      const title = post.action || (post.title ? post.title.replace(/^[^:]+:\s*/, '') : 'Shortcut');
-      const desc = post.description || post.desc || '';
-      
-      let rawSteps = post.steps || post.bullets || post.items || [];
-      if (!Array.isArray(rawSteps) || rawSteps.length === 0) {
-        rawSteps = [
-          `Type '${key}' in the AutoCAD command terminal or workspace.`,
-          `Follow prompt instructions on screen.`,
-          `Complete your drawing or editing action.`
-        ];
-      }
-
-      let stepsHtml = rawSteps.map(s => `<li style="margin-bottom:8px;">${s}</li>`).join('');
-
-      content.innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
-          <span class="card-key-tag" style="font-size:1.4rem;">${key}</span>
           <div>
-            <h2 style="margin:0; font-size:1.35rem; font-weight:900;">${title}</h2>
-            <span style="font-size:0.76rem; color:var(--accent); font-weight:700;">${post.day ? 'Lesson ' + post.day + ' • ' : ''}${post.category || 'AutoCAD'} • ${post.difficulty || 'Beginner'}</span>
+            <h3 class="text-lg font-bold text-white">How to Load Publishes</h3>
+            <div class="text-xs text-slate-400">Quick guides for AutoCAD, pyRevit, and Dynamo</div>
           </div>
         </div>
-        <p style="color:var(--text-secondary); line-height:1.6; font-size:0.92rem;">${desc}</p>
-        <h4 style="margin-top:20px; color:var(--accent); font-size:0.98rem; font-weight:800;">Execution Steps:</h4>
-        <ol style="padding-left:20px; color:var(--text-primary); line-height:1.65; font-size:0.9rem;">${stepsHtml}</ol>
-        ${post.proTip ? `<div style="background:var(--bg-tertiary); padding:14px 18px; border-left:4px solid var(--accent-orange); border-radius:10px; margin-top:20px; font-size:0.86rem; color:#fde68a;"><strong>💡 Pro Tip:</strong> ${post.proTip}</div>` : ''}
-        <button onclick="navigator.clipboard.writeText('${key}'); alert('📋 Copied shortcut key ${key} to clipboard!')" style="width:100%; margin-top:22px; padding:14px; background:var(--accent); color:#000; border:none; border-radius:14px; font-weight:900; font-size:0.92rem; cursor:pointer;">
-          📋 Copy Shortcut (${key})
+        <button id="closeGuideModalBtn" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
         </button>
-      `;
+      </div>
 
-      modal.style.display = 'flex';
-    }
+      <div class="mt-5 space-y-6 text-xs text-slate-300">
+        <!-- AutoCAD LISP Guide -->
+        <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+          <h4 class="text-sm font-bold text-orange-400 flex items-center gap-2 mb-2 font-mono">
+            <i class="fa-solid fa-code"></i> 1. AutoCAD AutoLISP (.lsp)
+          </h4>
+          <ul class="list-disc list-inside space-y-1.5 leading-relaxed">
+            <li><strong>Temporary Load:</strong> Type <code class="text-brand-cyan font-mono bg-slate-900 px-1 rounded">APPLOAD</code> in AutoCAD, select your downloaded <code class="font-mono">.lsp</code> file, and click <em>Load</em>.</li>
+            <li><strong>Permanent Autoload:</strong> In the <code class="font-mono">APPLOAD</code> dialog, click <em>Contents</em> under the <strong>Startup Suite</strong> (briefcase icon), and add the file. Now it loads every time AutoCAD starts.</li>
+            <li><strong>Auto-run:</strong> Simply type the custom command (e.g. <code class="text-brand-cyan font-mono bg-slate-900 px-1 rounded">AREACLS</code> or <code class="text-brand-cyan font-mono bg-slate-900 px-1 rounded">XYZOUT</code>) in the command line!</li>
+          </ul>
+        </div>
 
-    document.getElementById('modal-close-btn').onclick = () => {
-      document.getElementById('detail-modal').style.display = 'none';
-    };
+        <!-- pyRevit Guide -->
+        <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+          <h4 class="text-sm font-bold text-purple-400 flex items-center gap-2 mb-2 font-mono">
+            <i class="fa-solid fa-cubes-stacked"></i> 2. Revit pyRevit Extension (.extension)
+          </h4>
+          <ul class="list-disc list-inside space-y-1.5 leading-relaxed">
+            <li><strong>Why loose .py files cannot run alone:</strong> In pyRevit, buttons require the directory hierarchy (<code>.extension / .tab / .panel / .pushbutton</code>) with <code>bundle.yaml</code>, <code>icon.png</code>, and <code>ui.xaml</code> (WPF dialogs). A raw <code>.py</code> file dropped alone will not load on the ribbon.</li>
+            <li><strong>1-Click Install:</strong> Download the complete <code class="font-mono text-purple-300">Ludarp_pyRevit_Extension_Full.zip</code> package from the button above.</li>
+            <li>Extract the <code class="font-mono">Ludarp.extension</code> folder into: <code class="font-mono bg-slate-900 px-1 rounded text-purple-300">%APPDATA%\pyRevit\Extensions\</code></li>
+            <li>In Revit, click <strong>pyRevit -> Reload</strong>. The entire <strong>LUDARP</strong> tab with all 7 tools will immediately appear!</li>
+          </ul>
+        </div>
 
-    const modalBackdrop = document.getElementById('detail-modal');
-    if (modalBackdrop) {
-      modalBackdrop.onclick = (e) => {
-        if (e.target === modalBackdrop) {
-          modalBackdrop.style.display = 'none';
-        }
-      };
-    }
+        <!-- Dynamo Guide -->
+        <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
+          <h4 class="text-sm font-bold text-blue-400 flex items-center gap-2 mb-2 font-mono">
+            <i class="fa-solid fa-network-wired"></i> 3. Dynamo Visual Script (.dyn)
+          </h4>
+          <ul class="list-disc list-inside space-y-1.5 leading-relaxed">
+            <li>Save the downloaded <code class="font-mono">.dyn</code> file to your standard Dynamo scripts folder.</li>
+            <li>In Revit, go to <strong>Manage -> Dynamo Player</strong>.</li>
+            <li>Point Dynamo Player to your folder and click <strong>Play</strong> on the script.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    // 2. Render Search Hub
-    function renderHub() {
-      const grid = document.getElementById('hub-cards-grid');
-      if (!grid) return;
+  <!-- ================= TOAST NOTIFICATION ================= -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 border border-brand-cyan/40 text-slate-100 text-xs font-semibold shadow-2xl opacity-0 translate-y-4 pointer-events-none transition-all">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-brand-cyan"></i>
+    <span id="toastMessage">Success notification!</span>
+  </div>
 
-      const searchInput = document.getElementById('hub-search-input');
-      const catFilter = document.getElementById('hub-cat-filter');
-      const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
-      const catVal = catFilter ? catFilter.value : 'all';
-
-      grid.innerHTML = '';
-
-      const filtered = (Array.isArray(calendarDb) ? calendarDb : []).filter(post => {
-        if (!post) return false;
-        const matchesCat = catVal === 'all' || (post.category || 'General') === catVal;
-        const text = `${post.shortcut || ''} ${post.keys || ''} ${post.action || ''} ${post.title || ''} ${post.description || ''} ${post.desc || ''}`.toLowerCase();
-        const matchesSearch = !searchVal || text.includes(searchVal);
-        return matchesCat && matchesSearch;
-      });
-
-      filtered.forEach(post => {
-        grid.appendChild(createCadCard(post));
-      });
-    }
-
-    document.getElementById('hub-search-input').oninput = renderHub;
-    document.getElementById('hub-cat-filter').onchange = renderHub;
-
-    // 3. Level-Based 10-Question Quiz System
-    let selectedLevel = 'Beginner';
-    let currentQuizPool = [];
-    let currentQuizIndex = 0;
-    let quizScore = 0;
-
-    const btnBeg = document.getElementById('btn-level-beginner');
-    const btnInt = document.getElementById('btn-level-intermediate');
-    const btnAdv = document.getElementById('btn-level-advanced');
-
-    if (btnBeg) btnBeg.onclick = () => setQuizLevel('Beginner');
-    if (btnInt) btnInt.onclick = () => setQuizLevel('Intermediate');
-    if (btnAdv) btnAdv.onclick = () => setQuizLevel('Advanced');
-
-    function setQuizLevel(lvl) {
-      selectedLevel = lvl;
-      if (btnBeg) btnBeg.className = 'level-btn ' + (lvl === 'Beginner' ? 'active-beginner' : '');
-      if (btnInt) btnInt.className = 'level-btn ' + (lvl === 'Intermediate' ? 'active-intermediate' : '');
-      if (btnAdv) btnAdv.className = 'level-btn ' + (lvl === 'Advanced' ? 'active-advanced' : '');
-
-      startQuizSet();
-    }
-
-    function startQuizSet() {
-      const gameBody = document.getElementById('quiz-game-body');
-      const resultsScreen = document.getElementById('quiz-results-screen');
-      if (gameBody) gameBody.style.display = 'block';
-      if (resultsScreen) resultsScreen.style.display = 'none';
-
-      // Filter pool by difficulty level
-      let pool = calendarDb.filter(p => {
-        if (selectedLevel === 'Beginner') return (p.difficulty === 'Beginner');
-        if (selectedLevel === 'Intermediate') return (p.difficulty === 'Intermediate');
-        return (p.difficulty === 'Advanced' || p.difficulty === 'Expert');
-      });
-
-      if (pool.length < 10) pool = calendarDb;
-
-      // Shuffle and pick 10 questions
-      currentQuizPool = pool.sort(() => 0.5 - Math.random()).slice(0, 10);
-      currentQuizIndex = 0;
-      quizScore = 0;
-
-      renderQuizQuestion();
-    }
-
-    // ── Quiz User Data Persistence Engine ────────────────────────────────────
-    function getQuizUserData() {
-      return JSON.parse(localStorage.getItem('ludarp_quiz_user_data')) || {
-        highScores: { Beginner: 0, Intermediate: 0, Advanced: 0 },
-        totalXp: 0,
-        setsCompleted: 0
-      };
-    }
-
-    function renderScorecard() {
-      const data = getQuizUserData();
-      const begEl = document.getElementById('high-score-beginner');
-      const intEl = document.getElementById('high-score-intermediate');
-      const advEl = document.getElementById('high-score-advanced');
-      const rankEl = document.getElementById('user-rank-badge');
-
-      if (begEl) begEl.textContent = `${data.highScores.Beginner || 0} / 100`;
-      if (intEl) intEl.textContent = `${data.highScores.Intermediate || 0} / 100`;
-      if (advEl) advEl.textContent = `${data.highScores.Advanced || 0} / 100`;
-
-      let rank = '🐣 CAD Novice';
-      if (data.totalXp >= 600) rank = '🏆 AutoCAD Master';
-      else if (data.totalXp >= 300) rank = '📐 Drafting Specialist';
-      else if (data.totalXp >= 100) rank = '⚡ CAD Practitioner';
-
-      if (rankEl) rankEl.textContent = `${rank} (${data.totalXp} XP)`;
-    }
-
-    function saveQuizScore(level, score) {
-      const data = getQuizUserData();
-      data.setsCompleted += 1;
-      data.totalXp += score;
-
-      let isNewHigh = false;
-      if (score > (data.highScores[level] || 0)) {
-        data.highScores[level] = score;
-        isNewHigh = true;
-      }
-
-      localStorage.setItem('ludarp_quiz_user_data', JSON.stringify(data));
-      renderScorecard();
-      return isNewHigh;
-    }
-
-    function renderQuizQuestion() {
-      if (currentQuizIndex >= 10 || currentQuizIndex >= currentQuizPool.length) {
-        // Finish Quiz Set & Save Progress locally
-        const isNewRecord = saveQuizScore(selectedLevel, quizScore);
-        const gameBody = document.getElementById('quiz-game-body');
-        const resultsScreen = document.getElementById('quiz-results-screen');
-        const finalScoreText = document.getElementById('quiz-final-score-text');
-
-        if (gameBody) gameBody.style.display = 'none';
-        if (resultsScreen) resultsScreen.style.display = 'block';
-        if (finalScoreText) {
-          finalScoreText.innerHTML = `
-            Level: <b>${selectedLevel}</b> • Score: <b>${quizScore} / 100</b>
-            ${isNewRecord ? '<br><span style="color:var(--accent-green); font-size:1.05rem; font-weight:900; display:inline-block; margin-top:8px;">🎉 NEW PERSONAL BEST HIGH SCORE!</span>' : ''}
-          `;
-        }
-        return;
-      }
-
-      const q = currentQuizPool[currentQuizIndex] || {};
-      const targetKey = q.shortcut || q.keys || 'CAD';
-
-      const qCounter = document.getElementById('quiz-question-counter');
-      const qScoreVal = document.getElementById('quiz-score-val');
-      const qProgressFill = document.getElementById('quiz-progress-fill');
-      const qText = document.getElementById('quiz-question-text');
-      const qNextBtn = document.getElementById('quiz-next-btn');
-
-      if (qCounter) qCounter.textContent = `Question ${currentQuizIndex + 1} of 10`;
-      if (qScoreVal) qScoreVal.textContent = `${quizScore} / 100`;
-      if (qProgressFill) qProgressFill.style.width = `${((currentQuizIndex + 1) / 10) * 100}%`;
-      if (qText) qText.textContent = `What is the shortcut for "${q.action || q.title || 'this command'}"?`;
-      if (qNextBtn) qNextBtn.style.display = 'none';
-
-      // Wrong options
-      const wrongKeys = calendarDb
-        .map(p => p.shortcut || p.keys)
-        .filter(k => k && k !== targetKey);
-      
-      const shuffledWrong = wrongKeys.sort(() => 0.5 - Math.random()).slice(0, 3);
-      const options = [targetKey, ...shuffledWrong].sort(() => 0.5 - Math.random());
-
-      const optionsEl = document.getElementById('quiz-options-container');
-      optionsEl.innerHTML = '';
-
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option-btn';
-        btn.innerHTML = `<span>${opt}</span> <span style="font-family:'JetBrains Mono'; font-weight:800; font-size:0.85rem; opacity:0.6;">[Press to Select]</span>`;
-
-        btn.onclick = () => {
-          if (opt === targetKey) {
-            btn.classList.add('correct');
-            quizScore += 10;
-            document.getElementById('quiz-score-val').textContent = `${quizScore} / 100`;
-          } else {
-            btn.classList.add('wrong');
-          }
-          document.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
-          document.getElementById('quiz-next-btn').style.display = 'inline-block';
-        };
-        optionsEl.appendChild(btn);
-      });
-    }
-
-    const quizNextBtn = document.getElementById('quiz-next-btn');
-    if (quizNextBtn) {
-      quizNextBtn.onclick = () => {
-        currentQuizIndex++;
-        renderQuizQuestion();
-      };
-    }
-
-    const quizRestartBtn = document.getElementById('quiz-restart-btn');
-    if (quizRestartBtn) {
-      quizRestartBtn.onclick = () => {
-        startQuizSet();
-      };
-    }
-
-    // 4. Render Printable Master Cheat Sheet Table
-    function renderCheatSheet() {
-      const container = document.getElementById('cheatsheet-table-container');
-      let html = `<table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;">
-        <thead>
-          <tr style="border-bottom:2px solid var(--border-accent); color:var(--accent);">
-            <th style="padding:12px;">Shortcut</th>
-            <th style="padding:12px;">Action / Description</th>
-            <th style="padding:12px;">Category</th>
-            <th style="padding:12px;">Difficulty Level</th>
-          </tr>
-        </thead>
-        <tbody>`;
-
-      calendarDb.forEach(p => {
-        const key = p.shortcut || p.keys || 'CAD';
-        const action = p.action || p.title;
-        html += `
-          <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:12px; font-family:'JetBrains Mono',monospace; font-weight:900; color:var(--accent);">${key}</td>
-            <td style="padding:12px;"><strong style="color:var(--text-primary);">${action}</strong><br><span style="font-size:0.8rem; color:var(--text-secondary);">${p.description || p.desc || ''}</span></td>
-            <td style="padding:12px; color:var(--text-muted); font-weight:600;">${p.category || 'General'}</td>
-            <td style="padding:12px;"><span style="font-size:0.75rem; font-weight:800; color:var(--accent-purple); background:rgba(168,85,247,0.15); padding:3px 10px; border-radius:8px; border:1px solid rgba(168,85,247,0.3);">${p.difficulty || 'Beginner'}</span></td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table>`;
-      container.innerHTML = html;
-    }
-
-    // Safe Init
-    try { if (typeof renderScorecard === 'function') renderScorecard(); } catch (e) { console.error('Scorecard init error:', e); }
-    try { if (typeof renderPublishedFeed === 'function') renderPublishedFeed(); } catch (e) { console.error('Published feed init error:', e); }
-    try { if (typeof renderHub === 'function') renderHub(); } catch (e) { console.error('Hub init error:', e); }
-    try { if (typeof setQuizLevel === 'function') setQuizLevel('Beginner'); } catch (e) { console.error('Quiz init error:', e); }
-    try { if (typeof renderCheatSheet === 'function') renderCheatSheet(); } catch (e) { console.error('Cheatsheet init error:', e); }
-  </script>
+  <!-- Scripts -->
+  <script src="ludarp-data.js"></script>
+  <script src="tools-data.js"></script>
+  <script src="hub-app.js"></script>
 </body>
 </html>
