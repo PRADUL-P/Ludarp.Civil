@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toolsGrid = document.getElementById('toolsGrid');
   const shortcutsContainer = document.getElementById('shortcutsContainer');
   const shortcutsGrid = document.getElementById('shortcutsGrid');
+  const studioContainer = document.getElementById('studioContainer');
   const emptyState = document.getElementById('emptyState');
   const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
@@ -212,8 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderShortcuts();
   });
-
-  const studioContainer = document.getElementById('studioContainer');
 
   // ================= MAIN RENDER DISPATCHER =================
   function render() {
