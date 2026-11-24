@@ -75,6 +75,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalDownloadBtn = document.getElementById('modalDownloadBtn');
   const modalTagsContainer = document.getElementById('modalTagsContainer');
 
+  // Detailed Comparison, Use Cases, Steps, and Code Toggle elements
+  const modalComparisonSection = document.getElementById('modalComparisonSection');
+  const modalTimeSavedBadge = document.getElementById('modalTimeSavedBadge');
+  const modalManualMethod = document.getElementById('modalManualMethod');
+  const modalToolMethod = document.getElementById('modalToolMethod');
+  const modalStepsSavedRow = document.getElementById('modalStepsSavedRow');
+  const modalStepsSavedText = document.getElementById('modalStepsSavedText');
+  const modalUseCasesSection = document.getElementById('modalUseCasesSection');
+  const modalUseCasesList = document.getElementById('modalUseCasesList');
+  const modalUsageStepsSection = document.getElementById('modalUsageStepsSection');
+  const modalUsageStepsList = document.getElementById('modalUsageStepsList');
+  const modalToggleCodeBtn = document.getElementById('modalToggleCodeBtn');
+  const modalToggleCodeIcon = document.getElementById('modalToggleCodeIcon');
+  const modalCodeWrapper = document.getElementById('modalCodeWrapper');
+  const toggleCodeLabel = document.getElementById('toggleCodeLabel');
+
   // Guide Modal
   const guideModal = document.getElementById('guideModal');
   const guideBtn = document.getElementById('guideBtn');
@@ -373,8 +389,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ` : ''}
           </div>
 
+          <!-- Time Savings & Efficiency Badge -->
+          ${tool.comparison && tool.comparison.timeSavings ? `
+            <div class="mt-2 flex items-center gap-1.5 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-xl">
+              <i class="fa-solid fa-gauge-high text-[10px]"></i>
+              <span class="truncate font-semibold">${escapeHtml(tool.comparison.timeSavings)}</span>
+            </div>
+          ` : ''}
+
           <!-- Summary Description -->
-          <p class="text-xs text-slate-300 mt-3 line-clamp-3 leading-relaxed">
+          <p class="text-xs text-slate-300 mt-2.5 line-clamp-2 leading-relaxed">
             ${escapeHtml(tool.summary)}
           </p>
 
@@ -568,6 +592,49 @@ document.addEventListener('DOMContentLoaded', () => {
     modalSummary.textContent = tool.summary;
     modalCommand.textContent = tool.command || 'Planned';
 
+    // ⏱️ Workflow Comparison: Without Tool vs. With Tool
+    if (tool.comparison) {
+      if (modalComparisonSection) modalComparisonSection.classList.remove('hidden');
+      if (modalTimeSavedBadge) modalTimeSavedBadge.textContent = tool.comparison.timeSavings || 'High Efficiency';
+      if (modalManualMethod) modalManualMethod.textContent = tool.comparison.manualMethod || 'Manual clicks and repetitive input.';
+      if (modalToolMethod) modalToolMethod.textContent = tool.comparison.toolMethod || 'One-click automated execution.';
+      if (modalStepsSavedRow) {
+        if (tool.comparison.stepsSaved) {
+          modalStepsSavedRow.classList.remove('hidden');
+          if (modalStepsSavedText) modalStepsSavedText.textContent = tool.comparison.stepsSaved;
+        } else {
+          modalStepsSavedRow.classList.add('hidden');
+        }
+      }
+    } else {
+      if (modalComparisonSection) modalComparisonSection.classList.add('hidden');
+    }
+
+    // 🎯 Practical Use Cases List
+    if (tool.useCases && tool.useCases.length) {
+      if (modalUseCasesSection) modalUseCasesSection.classList.remove('hidden');
+      if (modalUseCasesList) {
+        modalUseCasesList.innerHTML = tool.useCases.map(uc => `
+          <li class="pl-1"><span class="font-semibold text-slate-200">${escapeHtml(uc)}</span></li>
+        `).join('');
+      }
+    } else {
+      if (modalUseCasesSection) modalUseCasesSection.classList.add('hidden');
+    }
+
+    // 📋 Step-by-Step How to Use (In-Software Guide)
+    if (tool.usageSteps && tool.usageSteps.length) {
+      if (modalUsageStepsSection) modalUsageStepsSection.classList.remove('hidden');
+      if (modalUsageStepsList) {
+        modalUsageStepsList.innerHTML = tool.usageSteps.map(step => `
+          <li class="pl-1 leading-relaxed"><span class="text-slate-200">${escapeHtml(step)}</span></li>
+        `).join('');
+      }
+    } else {
+      if (modalUsageStepsSection) modalUsageStepsSection.classList.add('hidden');
+    }
+
+    // ⚙️ Installation / Load Guide
     if (isUpcoming) {
       modalInstallType.textContent = "Planned Architecture & Specifications";
       modalInstallSteps.innerHTML = tool.plannedFeatures ? 
@@ -588,6 +655,10 @@ document.addEventListener('DOMContentLoaded', () => {
       modalDownloadBtn.onclick = () => downloadToolFile(tool.id);
     }
 
+    // 💻 Code Snippet (Hidden by default - Collapsed)
+    if (modalCodeWrapper) modalCodeWrapper.classList.add('hidden');
+    if (modalToggleCodeIcon) modalToggleCodeIcon.className = 'fa-solid fa-chevron-down text-slate-400 transition-transform';
+    if (toggleCodeLabel) toggleCodeLabel.textContent = 'View Source Code (Optional)';
     modalCodeSnippet.textContent = tool.codeSnippet || '// Code snippet will be available upon public release.';
 
     modalTagsContainer.innerHTML = tool.tags.map(tag => `
@@ -621,6 +692,21 @@ document.addEventListener('DOMContentLoaded', () => {
       copyToClipboard(state.activeModalTool.codeSnippet, 'Script code copied to clipboard!');
     }
   });
+
+  // Code toggle button (hidden by default, expands on demand)
+  if (modalToggleCodeBtn) {
+    modalToggleCodeBtn.addEventListener('click', () => {
+      if (!modalCodeWrapper) return;
+      const isHidden = modalCodeWrapper.classList.toggle('hidden');
+      if (isHidden) {
+        if (modalToggleCodeIcon) modalToggleCodeIcon.className = 'fa-solid fa-chevron-down text-slate-400 transition-transform';
+        if (toggleCodeLabel) toggleCodeLabel.textContent = 'View Source Code (Optional)';
+      } else {
+        if (modalToggleCodeIcon) modalToggleCodeIcon.className = 'fa-solid fa-chevron-up text-brand-cyan transition-transform';
+        if (toggleCodeLabel) toggleCodeLabel.textContent = 'Hide Source Code';
+      }
+    });
+  }
 
   // ================= GUIDE MODAL =================
   function openGuideModal() {

@@ -256,6 +256,40 @@ html.light .modal-content .bg-slate-800\/80 {
   border-color: #e2e8f0 !important;
 }
 
+html.light #modalComparisonSection,
+html.light #modalUseCasesSection,
+html.light #modalUsageStepsSection {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light #modalComparisonSection .bg-rose-950\/20 {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+}
+
+html.light #modalComparisonSection .bg-emerald-950\/20 {
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+
+html.light #modalStepsSavedRow {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+html.light #modalToggleCodeBtn {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+html.light #modalUseCasesList li span,
+html.light #modalUsageStepsList li span {
+  color: #1e293b !important;
+}
+
 html.light footer {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
