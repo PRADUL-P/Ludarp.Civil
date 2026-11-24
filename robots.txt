@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pradul-p.github.io/Ludarp.Civil/sitemap.xml
