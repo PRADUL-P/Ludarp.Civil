@@ -438,6 +438,23 @@
           <ol id="modalUsageStepsList" class="space-y-2 text-xs text-slate-300 list-decimal list-inside leading-relaxed"></ol>
         </div>
 
+        <!-- 🎥 Video Reference / Walkthrough Section -->
+        <div id="modalVideoSection" class="hidden rounded-2xl bg-slate-950/70 border border-slate-800 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-2 font-mono">
+              <i class="fa-brands fa-youtube text-red-500 text-sm"></i> Video Walkthrough & Tutorial Reference
+            </h4>
+            <a id="modalVideoExternalLink" href="#" target="_blank" rel="noopener noreferrer" 
+               class="text-[11px] font-mono text-brand-cyan hover:underline flex items-center gap-1">
+              <span>Open in YouTube</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </a>
+          </div>
+          <div class="relative w-full overflow-hidden rounded-xl aspect-video border border-slate-800 bg-black/60 shadow-xl">
+            <iframe id="modalVideoIframe" class="w-full h-full" src="" title="Video Tutorial & Walkthrough" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+
         <!-- ⚙️ Installation & Loading Guide -->
         <div class="rounded-xl bg-slate-950/50 border border-slate-800/80 p-3.5">
           <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5 font-mono">

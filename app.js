@@ -92,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalCodeWrapper = document.getElementById('modalCodeWrapper');
   const toggleCodeLabel = document.getElementById('toggleCodeLabel');
   const modalGitHubBtn = document.getElementById('modalGitHubBtn');
+  const modalVideoSection = document.getElementById('modalVideoSection');
+  const modalVideoExternalLink = document.getElementById('modalVideoExternalLink');
+  const modalVideoIframe = document.getElementById('modalVideoIframe');
 
   // Guide Modal
   const guideModal = document.getElementById('guideModal');
@@ -371,12 +374,20 @@ document.addEventListener('DOMContentLoaded', () => {
             </p>
           </div>
         </div>
-        <a href="https://github.com/PRADUL-P/Drawing-Packager" target="_blank" rel="noopener noreferrer" 
-           class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
-          <i class="fa-brands fa-github text-sm"></i>
-          <span>Drawing-Packager Repo</span>
-          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
-        </a>
+        <div class="flex items-center gap-2 flex-wrap">
+          <a href="https://youtu.be/OdTz4SFu0KI" target="_blank" rel="noopener noreferrer" 
+             class="flex-shrink-0 px-3.5 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 text-xs font-bold flex items-center gap-2 border border-red-500/40 transition-all hover:scale-105">
+            <i class="fa-brands fa-youtube text-red-400 text-sm"></i>
+            <span>Video Walkthrough</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-red-400"></i>
+          </a>
+          <a href="https://github.com/PRADUL-P/Drawing-Packager" target="_blank" rel="noopener noreferrer" 
+             class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
+            <i class="fa-brands fa-github text-sm"></i>
+            <span>Drawing-Packager Repo</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
+          </a>
+        </div>
       </div>
     ` : '';
 
@@ -467,6 +478,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <p class="text-xs text-slate-300 mt-2.5 line-clamp-2 leading-relaxed">
             ${escapeHtml(tool.summary)}
           </p>
+
+          <!-- Video Walkthrough Link if Available -->
+          ${tool.videoUrl ? `
+            <a href="${tool.videoUrl}" target="_blank" rel="noopener noreferrer" 
+               title="Watch ${escapeHtml(tool.videoTitle || 'Video Walkthrough')} on YouTube"
+               class="mt-3 flex items-center justify-between p-2 rounded-xl bg-red-950/40 hover:bg-red-950/70 border border-red-500/30 text-xs font-semibold text-red-200 transition-all group/vid">
+              <div class="flex items-center gap-2">
+                <i class="fa-brands fa-youtube text-red-400 text-sm"></i>
+                <span class="text-[11px] font-bold text-slate-200">Video Walkthrough (YouTube)</span>
+              </div>
+              <span class="text-[10px] font-mono text-red-400 flex items-center gap-1 group-hover/vid:translate-x-0.5 transition-transform">
+                Watch <i class="fa-solid fa-play text-[8px]"></i>
+              </span>
+            </a>
+          ` : ''}
 
           <!-- Planned Features if Upcoming -->
           ${isUpcoming && tool.plannedFeatures ? `
@@ -721,6 +747,20 @@ document.addEventListener('DOMContentLoaded', () => {
       if (modalUsageStepsSection) modalUsageStepsSection.classList.add('hidden');
     }
 
+    // 🎥 Video Walkthrough Section
+    if (tool.videoUrl && modalVideoSection) {
+      modalVideoSection.classList.remove('hidden');
+      if (modalVideoIframe) {
+        modalVideoIframe.src = tool.videoEmbedUrl || `https://www.youtube-nocookie.com/embed/${tool.videoUrl.split('/').pop()}`;
+      }
+      if (modalVideoExternalLink) {
+        modalVideoExternalLink.href = tool.videoUrl;
+      }
+    } else if (modalVideoSection) {
+      modalVideoSection.classList.add('hidden');
+      if (modalVideoIframe) modalVideoIframe.src = '';
+    }
+
     // ⚙️ Installation / Load Guide
     if (isUpcoming) {
       modalInstallType.textContent = "Planned Architecture & Specifications";
@@ -778,6 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeToolModal() {
     toolModal.classList.add('hidden');
     document.body.style.overflow = 'auto';
+    if (modalVideoIframe) modalVideoIframe.src = '';
   }
 
   closeModalBtn.addEventListener('click', closeToolModal);

@@ -844,6 +844,9 @@ const toolsData = [
     "isUpcoming": false,
     "featured": true,
     "downloadGithubOnly": true,
+    "videoUrl": "https://youtu.be/OdTz4SFu0KI",
+    "videoEmbedUrl": "https://www.youtube-nocookie.com/embed/OdTz4SFu0KI",
+    "videoTitle": "DRAWING PACKER 2.0 Walkthrough",
     "fileExtension": "py",
     "downloadUrl": "https://github.com/PRADUL-P/Drawing-Packager",
     "downloadFilename": "Drawing-Packager-v2.0",
@@ -889,7 +892,8 @@ const toolsData = [
       "Drag & drop your drawings folder or individual `.dwg`, `.pdf`, `.zip` files into the drop zone.",
       "Select packaging mode (`CAD + PDF`, `ZIP + PDF`, or `All in One (CAD+PDF+ZIP)`).",
       "Click `Generate Packages` (or drop a folder with `info.txt` for Zero-Click Auto-Pack).",
-      "Find your formatted and zipped client and project sets ready for transmittal in the output directory."
+      "Find your formatted and zipped client and project sets ready for transmittal in the output directory.",
+      "Watch the complete video walkthrough tutorial: https://youtu.be/OdTz4SFu0KI"
     ]
   }
 ];
