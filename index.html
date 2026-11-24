@@ -25,12 +25,12 @@
           colors: {
             brand: {
               cyan: '#38bdf8',
-              blue: '#0284c7',
+              blue: '#3b82f6',
               orange: '#f97316',
-              dark: '#0a0d14',
-              surface: '#111726',
-              surfaceLight: '#182136',
-              border: '#24324d',
+              dark: '#141417',
+              surface: '#1c1c21',
+              surfaceLight: '#24242b',
+              border: '#30303a',
             }
           },
           fontFamily: {
@@ -70,9 +70,10 @@
       <div class="flex items-center gap-3">
         <!-- Creator Studio Link -->
         <a href="studio.html" 
-           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 transition-all">
+           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/30 transition-all hover:scale-105 shadow-sm">
           <i class="fa-solid fa-paintbrush"></i>
-          <span class="hidden sm:inline">Creator Studio</span>
+          <span>Creator Studio</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-pink-500/20 text-pink-300">App</span>
         </a>
 
         <!-- How to Load Guide Modal Trigger -->
@@ -125,7 +126,7 @@
         <!-- Quick Stats Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full md:w-auto">
           <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
-            <div id="statTotalTools" class="text-xl font-extrabold text-brand-cyan">15</div>
+            <div id="statTotalTools" class="text-xl font-extrabold text-brand-cyan">16</div>
             <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Published</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
@@ -155,7 +156,7 @@
         <button data-tab="all" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-brand-cyan text-brand-cyan bg-brand-cyan/10">
           <i class="fa-solid fa-shapes"></i>
           <span>All Published</span>
-          <span id="badgeAll" class="px-2 py-0.5 text-xs rounded-full bg-brand-cyan/20 text-brand-cyan font-mono">15</span>
+          <span id="badgeAll" class="px-2 py-0.5 text-xs rounded-full bg-brand-cyan/20 text-brand-cyan font-mono">16</span>
         </button>
 
         <button data-tab="AutoLISP" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
@@ -170,6 +171,12 @@
           <span id="badgePyRevit" class="px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">7</span>
         </button>
 
+        <button data-tab="Other" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+          <i class="fa-solid fa-toolbox text-sky-400"></i>
+          <span>Other Tools</span>
+          <span id="badgeOther" class="px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">1</span>
+        </button>
+
         <button data-tab="upcoming" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
           <i class="fa-solid fa-hourglass-half text-amber-400"></i>
           <span>Upcoming & Testing</span>
@@ -180,12 +187,6 @@
           <i class="fa-solid fa-bolt text-emerald-400"></i>
           <span>Ludarp Shortcuts Hub</span>
           <span class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-400 font-mono">141</span>
-        </button>
-
-        <button data-tab="studio" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
-          <i class="fa-solid fa-palette text-pink-400"></i>
-          <span>Creator Studio</span>
-          <span class="px-2 py-0.5 text-xs rounded-full bg-pink-500/20 text-pink-400 font-mono">App</span>
         </button>
       </div>
     </div>
@@ -464,6 +465,11 @@
                 <i class="fa-solid fa-file-code"></i> Source Script
               </span>
               <div class="flex items-center gap-2">
+                <a id="modalGitHubBtn" href="#" target="_blank" rel="noopener noreferrer" 
+                   class="px-2.5 py-1 rounded text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 flex items-center gap-1.5 transition-all">
+                  <i class="fa-brands fa-github text-sm"></i>
+                  <span>GitHub Repo</span>
+                </a>
                 <button id="modalCopyCodeBtn" class="px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition-all">
                   <i class="fa-regular fa-copy"></i>
                   <span>Copy Code</span>

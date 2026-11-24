@@ -4,28 +4,28 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, monospace;
 
-  /* Dark Theme (Default) */
-  --bg-main: #0a0d14;
-  --bg-card: #111726;
-  --bg-card-hover: #162033;
-  --bg-subtle: #1c263c;
-  --border-color: #24324d;
+  /* Modern Light-Themed Dark (Soft Charcoal & Neutral Zinc - No Dark Blue) */
+  --bg-main: #141417;
+  --bg-card: #1c1c21;
+  --bg-card-hover: #24242b;
+  --bg-subtle: #2b2b33;
+  --border-color: #30303a;
   --border-highlight: #38bdf8;
   
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #f4f4f6;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
   
   --brand-cyan: #38bdf8;
-  --brand-blue: #0284c7;
+  --brand-blue: #3b82f6;
   --brand-orange: #f97316;
   --brand-emerald: #10b981;
   --brand-purple: #a855f7;
   
-  --glow-cyan: rgba(56, 189, 248, 0.2);
-  --glow-orange: rgba(249, 115, 22, 0.2);
-  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-  --header-bg: rgba(10, 13, 20, 0.85);
+  --glow-cyan: rgba(56, 189, 248, 0.15);
+  --glow-orange: rgba(249, 115, 22, 0.15);
+  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+  --header-bg: rgba(20, 20, 23, 0.92);
 }
 
 /* Light Mode Overrides */
@@ -55,11 +55,11 @@ body {
   min-height: 100vh;
 }
 
-/* Blueprint Grid Background Pattern */
+/* Neutral Charcoal Grid Background Pattern (Replaced Blue Grid) */
 .blueprint-grid-bg {
   background-image: 
-    linear-gradient(to right, rgba(56, 189, 248, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -105,7 +105,7 @@ html.light .blueprint-grid-bg {
 
 /* Code Snippet Box */
 .code-container {
-  background: #090d16;
+  background: #18181c;
   color: #e2e8f0;
   border: 1px solid var(--border-color);
   border-radius: 10px;

@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const badgeAll = document.getElementById('badgeAll');
   const badgeLisp = document.getElementById('badgeLisp');
   const badgePyRevit = document.getElementById('badgePyRevit');
+  const badgeOther = document.getElementById('badgeOther');
   const badgeUpcoming = document.getElementById('badgeUpcoming');
 
   // Modals
@@ -90,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalToggleCodeIcon = document.getElementById('modalToggleCodeIcon');
   const modalCodeWrapper = document.getElementById('modalCodeWrapper');
   const toggleCodeLabel = document.getElementById('toggleCodeLabel');
+  const modalGitHubBtn = document.getElementById('modalGitHubBtn');
 
   // Guide Modal
   const guideModal = document.getElementById('guideModal');
@@ -131,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateStats() {
     const lispCount = publishedList.filter(t => t.category === 'AutoLISP').length;
     const pyRevitCount = publishedList.filter(t => t.category === 'pyRevit').length;
+    const otherCount = publishedList.filter(t => t.category === 'Other').length;
     const totalPublished = publishedList.length;
     const totalUpcoming = upcomingList.length;
 
@@ -142,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badgeAll) badgeAll.textContent = totalPublished;
     if (badgeLisp) badgeLisp.textContent = lispCount;
     if (badgePyRevit) badgePyRevit.textContent = pyRevitCount;
+    if (badgeOther) badgeOther.textContent = otherCount;
     if (badgeUpcoming) badgeUpcoming.textContent = totalUpcoming;
   }
 
@@ -237,12 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (studioContainer) studioContainer.classList.add('hidden');
       shortcutsContainer.classList.remove('hidden');
       renderShortcuts();
-    } else if (state.activeTab === 'studio') {
-      toolsGrid.classList.add('hidden');
-      shortcutsContainer.classList.add('hidden');
-      emptyState.classList.add('hidden');
-      if (studioContainer) studioContainer.classList.remove('hidden');
-      visibleCount.textContent = '1 App';
     } else {
       if (studioContainer) studioContainer.classList.add('hidden');
       shortcutsContainer.classList.add('hidden');
@@ -297,59 +295,127 @@ document.addEventListener('DOMContentLoaded', () => {
     emptyState.classList.toggle('hidden', filtered.length > 0);
     toolsGrid.classList.toggle('hidden', filtered.length === 0);
 
-    // pyRevit Installation Notice Banner
-    const pyRevitBanner = state.activeTab === 'pyRevit' ? `
-      <div class="col-span-1 md:col-span-2 lg:col-span-3 p-4 rounded-2xl bg-purple-950/50 border border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+    // AutoCAD AutoLISP Banner with direct GitHub link
+    const cadBanner = state.activeTab === 'AutoLISP' ? `
+      <div class="col-span-1 md:col-span-2 lg:col-span-3 p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
         <div class="flex items-start gap-3">
-          <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg flex-shrink-0">
-            <i class="fa-solid fa-cubes-stacked"></i>
+          <div class="w-10 h-10 rounded-xl bg-orange-500/15 text-orange-400 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-orange-500/30">
+            <i class="fa-solid fa-code"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h4 class="text-sm font-bold text-purple-200">pyRevit Installation Architecture</h4>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/30 text-purple-300">Bundle Structure</span>
+              <h4 class="text-sm font-bold text-zinc-100">AutoCAD AutoLISP Published Tools</h4>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">Official Repo</span>
             </div>
-            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-              In pyRevit, raw loose <code>.py</code> files cannot run alone. pyRevit requires the complete extension directory hierarchy containing <code>bundle.yaml</code>, <code>icon.png</code>, and <code>ui.xaml</code>. Download the ready-to-extract ZIP bundle below to load the complete <strong>LUDARP</strong> tab into Revit!
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
+              Verified production-grade AutoLISP routines for automated drafting, grid setups, and batch renumbering.
             </p>
           </div>
         </div>
-        <a href="downloads/Ludarp_pyRevit_Extension_Full.zip" download 
-           class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg transition-all hover:scale-105">
-          <i class="fa-solid fa-file-zipper"></i>
-          <span>Download Full Extension (.zip)</span>
+        <a href="https://github.com/PRADUL-P/Tools-for-AutoCAD" target="_blank" rel="noopener noreferrer" 
+           class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
+          <i class="fa-brands fa-github text-sm"></i>
+          <span>Tools-for-AutoCAD Repo</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
         </a>
       </div>
     ` : '';
 
-    toolsGrid.innerHTML = pyRevitBanner + filtered.map(tool => createToolCardHtml(tool)).join('');
+    // pyRevit Installation Notice & GitHub Repo Banner
+    const pyRevitBanner = state.activeTab === 'pyRevit' ? `
+      <div class="col-span-1 md:col-span-2 lg:col-span-3 p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-purple-500/30">
+            <i class="fa-solid fa-cubes-stacked"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h4 class="text-sm font-bold text-zinc-100">LUDARP pyRevit Toolkit v2.0</h4>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Official Repo</span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
+              Revit ribbon extension for View Filters, Multi-Discipline Views, Levels, Grids, and Calculations.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <a href="https://github.com/PRADUL-P/Tools-for-Revit" target="_blank" rel="noopener noreferrer" 
+             class="flex-shrink-0 px-3.5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
+            <i class="fa-brands fa-github text-sm"></i>
+            <span>Tools-for-Revit Repo</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
+          </a>
+          <a href="downloads/Ludarp_pyRevit_Extension_Full.zip" download 
+             class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg transition-all hover:scale-105">
+            <i class="fa-solid fa-file-zipper"></i>
+            <span>Download Full Extension (.zip)</span>
+          </a>
+        </div>
+      </div>
+    ` : '';
+
+    // Other Tools Banner (Desktop Automation & Standalone Tools)
+    const otherBanner = state.activeTab === 'Other' ? `
+      <div class="col-span-1 md:col-span-2 lg:col-span-3 p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-sky-500/30">
+            <i class="fa-solid fa-toolbox"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h4 class="text-sm font-bold text-zinc-100">Civil & AEC Desktop Automation Tools</h4>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">Official Desktop App</span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
+              High-performance standalone desktop utilities and automated package distribution tools. Distributed exclusively through official GitHub repositories.
+            </p>
+          </div>
+        </div>
+        <a href="https://github.com/PRADUL-P/Drawing-Packager" target="_blank" rel="noopener noreferrer" 
+           class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
+          <i class="fa-brands fa-github text-sm"></i>
+          <span>Drawing-Packager Repo</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
+        </a>
+      </div>
+    ` : '';
+
+    toolsGrid.innerHTML = cadBanner + pyRevitBanner + otherBanner + filtered.map(tool => createToolCardHtml(tool)).join('');
   }
 
   // ================= TOOL CARD HTML GENERATOR =================
   function createToolCardHtml(tool) {
     const isLisp = tool.category === 'AutoLISP';
     const isPyRevit = tool.category === 'pyRevit';
+    const isOther = tool.category === 'Other';
     const isUpcoming = tool.isUpcoming === true;
 
     const platformColor = isLisp ? 'text-orange-400 bg-orange-400/10 border-orange-400/30' :
                           isPyRevit ? 'text-purple-400 bg-purple-400/10 border-purple-400/30' :
+                          isOther ? 'text-sky-400 bg-sky-400/10 border-sky-400/30' :
                           'text-blue-400 bg-blue-400/10 border-blue-400/30';
 
     const platformIcon = isLisp ? 'fa-solid fa-code' :
                          isPyRevit ? 'fa-solid fa-cubes-stacked' :
+                         isOther ? 'fa-solid fa-toolbox' :
                          'fa-solid fa-network-wired';
 
     const statusBadge = isUpcoming ?
       `<span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1 font-mono">
          <i class="fa-solid fa-hourglass-half text-[9px]"></i> Upcoming Specs
        </span>` :
-      (tool.featured ? 
-        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30 flex items-center gap-1">
-           <i class="fa-solid fa-star text-[9px]"></i> Published
-         </span>` : 
-        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-           Verified
-         </span>`
+      (tool.downloadGithubOnly ?
+        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center gap-1 font-mono">
+           <i class="fa-brands fa-github text-[9px]"></i> GitHub Only
+         </span>` :
+        (tool.featured ? 
+          `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30 flex items-center gap-1">
+             <i class="fa-solid fa-star text-[9px]"></i> Published
+           </span>` : 
+          `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+             Verified
+           </span>`
+        )
       );
 
     return `
@@ -449,12 +515,30 @@ document.addEventListener('DOMContentLoaded', () => {
               <i class="fa-solid fa-eye text-brand-cyan"></i> Details & Code
             </button>
             
-            <button onclick="downloadToolFile('${tool.id}')" 
-                    title="${isPyRevit ? 'Download Full Extension (.zip)' : 'Download .lsp'}" 
-                    class="py-2 px-3 rounded-xl ${isPyRevit ? 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border-purple-500/40' : 'bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/30'} border text-xs font-semibold flex items-center gap-1.5 transition-all">
-              <i class="${isPyRevit ? 'fa-solid fa-file-zipper' : 'fa-solid fa-download'}"></i>
-              <span class="hidden sm:inline">${isPyRevit ? 'Extension (.zip)' : 'Download .lsp'}</span>
-            </button>
+            ${tool.downloadGithubOnly ? `
+              <a href="${tool.githubUrl || 'https://github.com/PRADUL-P/Drawing-Packager'}" target="_blank" rel="noopener noreferrer" 
+                 title="Download exclusively from official GitHub repository" 
+                 class="py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105">
+                <i class="fa-brands fa-github text-sm"></i>
+                <span class="text-xs font-bold">GitHub Download</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-sky-400"></i>
+              </a>
+            ` : `
+              <a href="${tool.githubUrl || (isLisp ? 'https://github.com/PRADUL-P/Tools-for-AutoCAD' : isPyRevit ? 'https://github.com/PRADUL-P/Tools-for-Revit' : 'https://github.com/PRADUL-P')}" 
+                 target="_blank" rel="noopener noreferrer" 
+                 title="Open ${escapeHtml(tool.title)} in GitHub"
+                 class="py-2 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <i class="fa-brands fa-github text-sm"></i>
+                <span class="hidden sm:inline text-[11px]">Repo</span>
+              </a>
+
+              <button onclick="downloadToolFile('${tool.id}')" 
+                      title="${isPyRevit ? 'Download Full Extension (.zip)' : 'Download .lsp'}" 
+                      class="py-2 px-3 rounded-xl ${isPyRevit ? 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border-purple-500/40' : 'bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/30'} border text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <i class="${isPyRevit ? 'fa-solid fa-file-zipper' : 'fa-solid fa-download'}"></i>
+                <span class="hidden sm:inline">${isPyRevit ? 'Extension (.zip)' : 'Download .lsp'}</span>
+              </button>
+            `}
           `}
         </div>
 
@@ -576,13 +660,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isLisp = tool.category === 'AutoLISP';
     const isPyRevit = tool.category === 'pyRevit';
+    const isOther = tool.category === 'Other';
 
     modalIconBox.className = isLisp ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-orange-400/15 text-orange-400 border border-orange-400/30' :
                              isPyRevit ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-purple-400/15 text-purple-400 border border-purple-400/30' :
+                             isOther ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-sky-400/15 text-sky-400 border border-sky-400/30' :
                              'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-blue-400/15 text-blue-400 border border-blue-400/30';
 
     modalIconBox.innerHTML = isLisp ? '<i class="fa-solid fa-code"></i>' :
                              isPyRevit ? '<i class="fa-solid fa-cubes-stacked"></i>' :
+                             isOther ? '<i class="fa-solid fa-toolbox"></i>' :
                              '<i class="fa-solid fa-network-wired"></i>';
 
     modalCategoryBadge.textContent = tool.categoryLabel;
@@ -644,6 +731,15 @@ document.addEventListener('DOMContentLoaded', () => {
       modalDownloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
       modalDownloadBtn.innerHTML = '<i class="fa-solid fa-lock"></i> <span>In Development (Non-Downloadable)</span>';
       modalDownloadBtn.onclick = () => showToast('This upcoming tool is currently non-downloadable in active testing.', 'fa-lock');
+    } else if (tool.downloadGithubOnly) {
+      modalInstallType.textContent = `${tool.installGuide ? tool.installGuide.type : 'Installation'} Steps`;
+      modalInstallSteps.innerHTML = tool.installGuide && tool.installGuide.steps ? 
+        tool.installGuide.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('') :
+        `<li>Download and clone from official GitHub repository.</li>`;
+      
+      modalDownloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      modalDownloadBtn.innerHTML = '<i class="fa-brands fa-github text-sm"></i> <span>Download from GitHub Repository</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>';
+      modalDownloadBtn.onclick = () => window.open(tool.githubUrl || 'https://github.com/PRADUL-P/Drawing-Packager', '_blank');
     } else {
       modalInstallType.textContent = `${tool.installGuide ? tool.installGuide.type : 'Installation'} Steps`;
       modalInstallSteps.innerHTML = tool.installGuide && tool.installGuide.steps ? 
@@ -660,6 +756,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalToggleCodeIcon) modalToggleCodeIcon.className = 'fa-solid fa-chevron-down text-slate-400 transition-transform';
     if (toggleCodeLabel) toggleCodeLabel.textContent = 'View Source Code (Optional)';
     modalCodeSnippet.textContent = tool.codeSnippet || '// Code snippet will be available upon public release.';
+
+    // 🐙 GitHub Repo Link
+    if (modalGitHubBtn) {
+      const fallbackRepo = isLisp ? 'https://github.com/PRADUL-P/Tools-for-AutoCAD' : 
+                           isPyRevit ? 'https://github.com/PRADUL-P/Tools-for-Revit' : 
+                           isOther ? 'https://github.com/PRADUL-P/Drawing-Packager' :
+                           'https://github.com/PRADUL-P';
+      modalGitHubBtn.href = tool.githubUrl || fallbackRepo;
+      modalGitHubBtn.title = `Open ${tool.title} in GitHub Repository`;
+    }
 
     modalTagsContainer.innerHTML = tool.tags.map(tag => `
       <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">#${escapeHtml(tag)}</span>
@@ -740,6 +846,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (tool.isUpcoming) {
       showToast('This tool is currently in the upcoming development roadmap.', 'fa-lock');
+      return;
+    }
+
+    if (tool.downloadGithubOnly) {
+      window.open(tool.githubUrl || 'https://github.com/PRADUL-P/Drawing-Packager', '_blank');
+      showToast('Redirecting to official GitHub repository download', 'fa-brands fa-github');
       return;
     }
 

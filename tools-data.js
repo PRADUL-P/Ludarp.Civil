@@ -434,7 +434,7 @@ const toolsData = [
   },
   {
     "id": "pyrevit-filter-copy-between",
-    "title": "LUDARP Filter Override — Copy Between Views",
+    "title": "Filter Override — Copy Between Views",
     "category": "pyRevit",
     "categoryLabel": "Revit pyRevit",
     "version": "v2.0",
@@ -491,7 +491,7 @@ const toolsData = [
   },
   {
     "id": "pyrevit-filter-copy-bytype",
-    "title": "LUDARP Filter Override — Copy Specific Overrides by Type",
+    "title": "Filter Override — Copy Specific Overrides by Type",
     "category": "pyRevit",
     "categoryLabel": "Revit pyRevit",
     "version": "v2.0",
@@ -548,7 +548,7 @@ const toolsData = [
   },
   {
     "id": "pyrevit-views-generator",
-    "title": "LUDARP Views Generator (ISO 19650 Multi-Discipline)",
+    "title": "Views Generator (ISO 19650 Multi-Discipline)",
     "category": "pyRevit",
     "categoryLabel": "Revit pyRevit",
     "version": "v2.0",
@@ -606,7 +606,7 @@ const toolsData = [
   },
   {
     "id": "pyrevit-views-renamer",
-    "title": "LUDARP Views Renamer with Natural Alphanumeric Sorting",
+    "title": "Views Renamer with Natural Alphanumeric Sorting",
     "category": "pyRevit",
     "categoryLabel": "Revit pyRevit",
     "version": "v2.0",
@@ -663,7 +663,7 @@ const toolsData = [
   },
   {
     "id": "pyrevit-level-creator",
-    "title": "LUDARP Level Creator (Batch Spacing & Elevations)",
+    "title": "Level Creator (Batch Spacing & Elevations)",
     "category": "pyRevit",
     "categoryLabel": "Revit pyRevit",
     "version": "v2.0",
@@ -721,7 +721,7 @@ const toolsData = [
   },
   {
     "id": "pyrevit-grid-rename",
-    "title": "LUDARP Grid Rename (Geometric Directional Sorter)",
+    "title": "Grid Rename (Geometric Directional Sorter)",
     "category": "pyRevit",
     "categoryLabel": "Revit pyRevit",
     "version": "v2.0",
@@ -777,7 +777,7 @@ const toolsData = [
   },
   {
     "id": "pyrevit-calculator-history",
-    "title": "LUDARP Revit Calculator & History Logger",
+    "title": "Revit Calculator & History Logger",
     "category": "pyRevit",
     "categoryLabel": "Revit pyRevit",
     "version": "v2.0",
@@ -829,6 +829,67 @@ const toolsData = [
       "Pick dimension elements, spot elevations, or pick two points on screen.",
       "The calculator displays converted units and calculations in real time.",
       "Click 'Copy' to copy result to clipboard, or click 'History' to review previous measurements or export to CSV."
+    ]
+  },
+  {
+    "id": "desktop-drawing-packager",
+    "title": "Drawing Packager (Automated CAD, PDF & ZIP Distribution)",
+    "category": "Other",
+    "categoryLabel": "Desktop / Automation",
+    "version": "v2.0",
+    "date": "2024-11-24",
+    "compatibility": "Windows 10 / 11 (Python 3.10+ / Standalone .exe)",
+    "command": "python app.py or Run Packager.exe",
+    "status": "Production",
+    "isUpcoming": false,
+    "featured": true,
+    "downloadGithubOnly": true,
+    "fileExtension": "py",
+    "downloadUrl": "https://github.com/PRADUL-P/Drawing-Packager",
+    "downloadFilename": "Drawing-Packager-v2.0",
+    "githubUrl": "https://github.com/PRADUL-P/Drawing-Packager",
+    "summary": "High-performance desktop application for civil engineers and BIM managers to automate drawing package distribution (CAD + PDF + ZIP) with standardized naming, batch pair detection, and zero-click info.txt auto-packing.",
+    "tags": [
+      "Desktop App",
+      "Python",
+      "Drawing Distribution",
+      "DWG & PDF",
+      "Packaging",
+      "Auto-Pack",
+      "BIM Deliverables"
+    ],
+    "author": "PRADUL-P",
+    "installGuide": {
+      "type": "GitHub Repository Download (Desktop App)",
+      "steps": [
+        "Distributed exclusively through the official GitHub repository: `https://github.com/PRADUL-P/Drawing-Packager`.",
+        "Click the 'Download via GitHub Repo' button or clone with `git clone https://github.com/PRADUL-P/Drawing-Packager.git`.",
+        "Install required libraries: `pip install customtkinter darkdetect tkinterdnd2 tkcalendar pillow`.",
+        "Launch the GUI with `python app.py` (or rename to `app.pyw` for silent background launch).",
+        "Optional: Compile into a single standalone executable using PyInstaller: `pyinstaller 'LUDARP Drawing Packager.spec' --clean`."
+      ]
+    },
+    "codeSnippet": "# =============================================================================\n# LUDARP Drawing Packager v2.0 - Core File Pairing & Manifest Generator\n# Author: PRADUL P | Repository: https://github.com/PRADUL-P/Drawing-Packager\n# =============================================================================\n\nimport os, sys, shutil, zipfile, json\nfrom datetime import datetime\nimport customtkinter as ctk\n\ndef generate_drawing_packages(input_folder, output_folder, client_name, project_name, revision_tag, package_mode=\"All in One\"):\n    \"\"\"\n    Core packaging pipeline: scans input directory, identifies DWG + PDF pairs,\n    applies client and project naming conventions, and creates zip archives.\n    \"\"\"\n    if not os.path.exists(output_folder):\n        os.makedirs(output_folder)\n        \n    date_stamp = datetime.now().strftime(\"%Y%m%d\")\n    detected_pairs = []\n    \n    # Scan folder for drawing pairs\n    for root, _, files in os.walk(input_folder):\n        dwgs = {os.path.splitext(f)[0]: os.path.join(root, f) for f in files if f.lower().endswith('.dwg')}\n        pdfs = {os.path.splitext(f)[0]: os.path.join(root, f) for f in files if f.lower().endswith('.pdf')}\n        \n        for base_name in dwgs:\n            pair = {\"dwg\": dwgs[base_name], \"pdf\": pdfs.get(base_name, None)}\n            detected_pairs.append(pair)\n            \n    # Package 6-File Deliverables: Client Set + Project Set\n    for item in detected_pairs:\n        base = os.path.splitext(os.path.basename(item[\"dwg\"]))[0]\n        proj = project_name or base\n        client_base = f\"{client_name}_{proj}_{revision_tag}_{date_stamp}\"\n        project_base = f\"{proj}_{revision_tag}\"\n        \n        # Standardized file copies\n        shutil.copy2(item[\"dwg\"], os.path.join(output_folder, f\"{client_base}.dwg\"))\n        if item[\"pdf\"]:\n            shutil.copy2(item[\"pdf\"], os.path.join(output_folder, f\"{client_base}.pdf\"))\n            \n        # Build ZIP transmittal archive\n        zip_path = os.path.join(output_folder, f\"{client_base}.zip\")\n        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:\n            zf.write(item[\"dwg\"], arcname=f\"{client_base}.dwg\")\n            if item[\"pdf\"]:\n                zf.write(item[\"pdf\"], arcname=f\"{client_base}.pdf\")\n                \n    return len(detected_pairs)",
+    "useCases": [
+      "Milestone and tender transmittal packaging: bundle 20+ DWG drawings with matched plotted PDFs and transmittal ZIPs in under 10 seconds.",
+      "Strict separation of Client distribution files ({client}_{date}.pdf/dwg/zip) and internal project archive sets.",
+      "Zero-Click Auto-Pack: simply drop any folder containing an info.txt file into the drop zone for instantaneous batch processing.",
+      "Multi-disciplinary engineering consultant drawing packages (Structural, Civil, Architectural, MEP)."
+    ],
+    "comparison": {
+      "manualMethod": "Manually opening each CAD drawing, exporting PDF, renaming PDF to client naming format (Client_Project_Rev_Date), renaming DWG to project standard, creating a ZIP archive, and moving files into subfolders. For a 20-drawing set, this manual process takes 45 to 60 minutes and often results in naming mistakes.",
+      "toolMethod": "Drag & drop the drawings folder into Drawing Packager (or drop a folder with info.txt). The app auto-detects drawing pairs, applies client & revision metadata, generates the 6-file manifest (Client PDF, DWG, ZIP + Project PDF, DWG, ZIP), and archives the deliverables in 1 click.",
+      "timeSavings": "From ~45-60 minutes down to 10 seconds (~99% faster)",
+      "stepsSaved": "Eliminates 50+ manual file rename, copy, paste, and zipping operations per issue package."
+    },
+    "usageSteps": [
+      "Download or clone from the official GitHub repository: `https://github.com/PRADUL-P/Drawing-Packager`.",
+      "Launch Drawing Packager by running `python app.py` or double-clicking the compiled `.exe`.",
+      "Enter Client Name, Project Name, and select Revision tag (e.g. `R0`, `R1`) and Date.",
+      "Drag & drop your drawings folder or individual `.dwg`, `.pdf`, `.zip` files into the drop zone.",
+      "Select packaging mode (`CAD + PDF`, `ZIP + PDF`, or `All in One (CAD+PDF+ZIP)`).",
+      "Click `Generate Packages` (or drop a folder with `info.txt` for Zero-Click Auto-Pack).",
+      "Find your formatted and zipped client and project sets ready for transmittal in the output directory."
     ]
   }
 ];
