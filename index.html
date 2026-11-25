@@ -708,26 +708,26 @@
     </div>
   </div>
 
-  <!-- ================= DOWNLOAD VERIFICATION MODAL ================= -->
+  <!-- ================= DOWNLOAD ACCESS & VERIFICATION MODAL ================= -->
   <div id="downloadVerifyModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-    <div class="modal-content relative w-full max-w-md bg-slate-900 border border-slate-700 dark:border-brand-border rounded-2xl shadow-2xl p-6 overflow-hidden">
+    <div class="modal-content relative w-full max-w-lg bg-slate-900 border border-slate-700 dark:border-brand-border rounded-2xl shadow-2xl p-6 sm:p-7 overflow-hidden">
       <!-- Glow background accent -->
-      <div class="absolute -top-20 -right-20 w-44 h-44 bg-brand-cyan/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -top-24 -right-24 w-52 h-52 bg-brand-cyan/15 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- Header -->
       <div class="flex items-start justify-between gap-3 pb-4 border-b border-slate-800">
         <div class="flex items-center gap-3">
           <div id="verifyModalIcon" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30">
-            <i class="fa-solid fa-shield-halved"></i>
+            <i class="fa-solid fa-lock"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                <i class="fa-solid fa-check-circle text-[9px]"></i> Verified Safe
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                <i class="fa-solid fa-shield-halved text-[9px]"></i> Access Verification
               </span>
               <span id="verifyModalCategory" class="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-800">AutoCAD</span>
             </div>
-            <h3 id="verifyModalTitle" class="text-base font-bold text-white mt-1 leading-snug">Tool Title</h3>
+            <h3 id="verifyModalTitle" class="text-base sm:text-lg font-bold text-white mt-1 leading-snug">Tool Title</h3>
           </div>
         </div>
         <button onclick="closeDownloadVerification()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
@@ -735,73 +735,106 @@
         </button>
       </div>
 
-      <!-- File details & safety check -->
-      <div class="mt-4 p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
-        <div class="flex items-center justify-between">
-          <span class="text-slate-400 font-mono">File:</span>
-          <span id="verifyModalFileName" class="font-mono font-bold text-brand-cyan text-[11px] truncate max-w-[210px]">filename.exe</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-slate-400 font-mono">Release:</span>
-          <span id="verifyModalVersion" class="font-mono text-slate-300">v2.0</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-slate-400 font-mono">Source:</span>
-          <span class="font-mono text-emerald-400 flex items-center gap-1">
-            <i class="fa-brands fa-github text-xs"></i> Official GitHub Release
-          </span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-slate-400 font-mono">Security Check:</span>
-          <span class="font-mono text-slate-300">Malware-Free &amp; Verified</span>
-        </div>
-      </div>
-
       <!-- Notice -->
-      <div class="mt-3.5 p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-200 flex items-start gap-2">
-        <i class="fa-solid fa-circle-info text-sky-400 mt-0.5 flex-shrink-0"></i>
-        <p class="leading-relaxed text-[11px]">
-          Direct download confirmation required. You can confirm download to this device now, or share the verified download link via WhatsApp or Email.
-        </p>
+      <div class="mt-4 p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-200 flex items-start gap-2.5">
+        <i class="fa-solid fa-circle-info text-sky-400 mt-0.5 flex-shrink-0 text-sm"></i>
+        <div class="leading-relaxed text-[11px]">
+          <strong class="text-sky-300 font-semibold block mb-0.5">Automated Download Access:</strong>
+          Submit your Name and Email or Phone (WhatsApp) below to unlock instant automated download, or ask Pradul directly on WhatsApp.
+        </div>
       </div>
 
-      <!-- Actions -->
-      <div class="mt-5 space-y-3">
-        <!-- Confirm Button -->
-        <button id="verifyConfirmDownloadBtn" 
-                class="w-full py-3 px-4 rounded-xl bg-brand-cyan hover:bg-sky-400 text-brand-dark font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-brand-cyan/20 transition-all hover:scale-[1.02] active:scale-95">
-          <i class="fa-solid fa-download text-sm"></i>
-          <span id="verifyConfirmBtnLabel">Confirm &amp; Download Now</span>
+      <!-- Lead Capture Form for Automated Download -->
+      <form id="downloadAccessForm" onsubmit="handleDownloadAccessSubmit(event)" class="mt-4 space-y-3.5">
+        
+        <!-- Name Field -->
+        <div>
+          <label class="block text-slate-300 font-semibold text-xs mb-1 font-mono">
+            Full Name <span class="text-rose-400">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-regular fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="leadNameInput" required placeholder="e.g. Rahul Sharma / John Doe" 
+                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan transition-all" />
+          </div>
+        </div>
+
+        <!-- Email or Phone Field -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold text-xs mb-1 font-mono">
+              Email Address
+            </label>
+            <div class="relative">
+              <i class="fa-regular fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+              <input type="email" id="leadEmailInput" placeholder="name@company.com" 
+                     class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan transition-all" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold text-xs mb-1 font-mono">
+              Phone / WhatsApp
+            </label>
+            <div class="relative">
+              <i class="fa-brands fa-whatsapp absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-500 text-xs"></i>
+              <input type="tel" id="leadPhoneInput" placeholder="+91 98765 43210" 
+                     class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all" />
+            </div>
+          </div>
+        </div>
+        <div class="text-[10px] text-slate-400 font-mono -mt-1">
+          * Enter at least an Email or Phone/WhatsApp to receive or unlock the file.
+        </div>
+
+        <!-- Company / Role (Optional) -->
+        <div>
+          <label class="block text-slate-400 font-medium text-xs mb-1 font-mono">
+            Company / Role (Optional)
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-briefcase absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="leadOrgInput" placeholder="e.g. Civil Engineer, BIM Modeler, L&T, Student" 
+                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan transition-all" />
+          </div>
+        </div>
+
+        <!-- Primary Action: Automated Instant Unlock & Download -->
+        <button type="submit" id="submitLeadDownloadBtn" 
+                class="w-full mt-2 py-3 px-4 rounded-xl bg-brand-cyan hover:bg-sky-400 text-brand-dark font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-brand-cyan/20 transition-all hover:scale-[1.02] active:scale-95">
+          <i class="fa-solid fa-unlock-keyhole text-sm"></i>
+          <span id="submitLeadBtnLabel">Submit Details &amp; Unlock Download</span>
+        </button>
+      </form>
+
+      <!-- Direct Ask Options Divider -->
+      <div class="relative flex items-center justify-center my-4">
+        <div class="border-t border-slate-800 w-full"></div>
+        <span class="bg-slate-900 px-3 text-[10px] font-mono text-slate-500 uppercase tracking-wider">or ask me directly for file / link</span>
+      </div>
+
+      <!-- Ask Pradul on WhatsApp or Email Buttons -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" onclick="askPradulOnWhatsApp()" 
+                class="py-2.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-sm">
+          <i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i>
+          <span>Ask on WhatsApp</span>
         </button>
 
-        <!-- Divider -->
-        <div class="relative flex items-center justify-center my-1">
-          <div class="border-t border-slate-800 w-full"></div>
-          <span class="bg-slate-900 px-3 text-[10px] font-mono text-slate-500 uppercase tracking-wider">or share download link</span>
-        </div>
+        <button type="button" onclick="askPradulViaEmail()" 
+                class="py-2.5 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-semibold flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-sm">
+          <i class="fa-solid fa-envelope text-blue-400 text-sm"></i>
+          <span>Ask via Email</span>
+        </button>
+      </div>
 
-        <!-- WhatsApp / Email / Copy row -->
-        <div class="grid grid-cols-3 gap-2">
-          <button id="verifyShareWhatsAppBtn" 
-                  class="py-2.5 px-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm">
-            <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i>
-            <span>WhatsApp</span>
-          </button>
-
-          <button id="verifyShareEmailBtn" 
-                  class="py-2.5 px-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm">
-            <i class="fa-solid fa-envelope text-blue-400 text-xs"></i>
-            <span>Email</span>
-          </button>
-
-          <button id="verifyCopyLinkBtn" 
-                  class="py-2.5 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105">
-            <i class="fa-regular fa-copy text-xs"></i>
-            <span>Copy Link</span>
-          </button>
-        </div>
-
-        <button onclick="closeDownloadVerification()" class="w-full text-center text-xs text-slate-400 hover:text-slate-200 py-1 transition-colors">
+      <!-- File Details Footer -->
+      <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+        <span class="flex items-center gap-1.5 truncate max-w-[220px]">
+          <i class="fa-solid fa-file-code text-brand-cyan"></i>
+          <span id="verifyModalFileName">filename.exe</span>
+        </span>
+        <button onclick="closeDownloadVerification()" class="text-slate-400 hover:text-slate-200">
           Cancel
         </button>
       </div>
@@ -898,12 +931,44 @@
           </div>
         </div>
 
+        <!-- Registered Leads & Contact Requests Table -->
+        <div class="rounded-xl border border-slate-800 overflow-hidden bg-slate-950/60">
+          <div class="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+            <span class="font-bold text-emerald-400 font-mono flex items-center gap-2">
+              <i class="fa-solid fa-address-book text-emerald-400"></i> Registered User Leads &amp; Download Requests
+            </span>
+            <span id="statLeadCountBadge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              0 Registered
+            </span>
+          </div>
+          <div class="overflow-x-auto max-h-64">
+            <table class="w-full text-left border-collapse text-[11px]">
+              <thead class="bg-slate-900/80 text-slate-400 font-mono border-b border-slate-800 sticky top-0">
+                <tr>
+                  <th class="p-2.5">Date &amp; Time</th>
+                  <th class="p-2.5">Full Name</th>
+                  <th class="p-2.5">Contact (Email / WhatsApp)</th>
+                  <th class="p-2.5">Tool Requested</th>
+                  <th class="p-2.5 text-right">Method</th>
+                </tr>
+              </thead>
+              <tbody id="analyticsLeadsTableBody" class="divide-y divide-slate-800/60 font-mono">
+                <!-- Dynamically populated leads -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Export & Reset Controls -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="analyticsExportLeadsCsvBtn" class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center gap-2 transition-all hover:scale-105">
+              <i class="fa-solid fa-file-csv text-emerald-400 text-sm"></i>
+              <span>Export Leads (.csv)</span>
+            </button>
             <button id="analyticsExportBtn" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-2 transition-all hover:scale-105">
               <i class="fa-solid fa-file-export text-brand-cyan"></i>
-              <span>Export Telemetry Report (.json)</span>
+              <span>Export Telemetry (.json)</span>
             </button>
             <button id="analyticsRefreshBtn" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
               <i class="fa-solid fa-rotate text-xs"></i>

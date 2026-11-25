@@ -1113,6 +1113,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ================= LEAD CAPTURE & DOWNLOAD ACCESS =================
+  const LEADS_KEY = 'ludarp_civil_leads_v1';
+  const USER_KEY = 'ludarp_saved_user_profile';
+
+  function getSavedUser() {
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return { name: '', email: '', phone: '', org: '' };
+  }
+
+  function saveUser(user) {
+    try {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } catch (e) {}
+  }
+
+  function getLeads() {
+    try {
+      const raw = localStorage.getItem(LEADS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return [];
+  }
+
+  function saveLead(lead) {
+    const leads = getLeads();
+    leads.unshift(lead);
+    if (leads.length > 300) leads.length = 300;
+    try {
+      localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+    } catch (e) {}
+  }
+
   // ================= VERIFIED DOWNLOAD MODAL & ACTIONS =================
   window.requestDownloadVerification = function(toolId) {
     const list = [...publishedList, ...upcomingList];
@@ -1130,21 +1165,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleEl = document.getElementById('verifyModalTitle');
     const catEl = document.getElementById('verifyModalCategory');
     const fileEl = document.getElementById('verifyModalFileName');
-    const verEl = document.getElementById('verifyModalVersion');
     const iconBox = document.getElementById('verifyModalIcon');
-    const confirmBtn = document.getElementById('verifyConfirmDownloadBtn');
-    const confirmLabel = document.getElementById('verifyConfirmBtnLabel');
-    const waBtn = document.getElementById('verifyShareWhatsAppBtn');
-    const emailBtn = document.getElementById('verifyShareEmailBtn');
-    const copyBtn = document.getElementById('verifyCopyLinkBtn');
 
     if (titleEl) titleEl.textContent = tool.title;
     if (catEl) catEl.textContent = tool.categoryLabel || tool.category;
-    if (verEl) verEl.textContent = tool.version || 'v1.0';
 
     const isOther = tool.category === 'Other';
     const isPyRevit = tool.category === 'pyRevit';
-    const isLisp = tool.category === 'AutoLISP';
 
     let defaultFileName = isOther ? 'LUDARP.Drawing.Packager.exe' :
                           isPyRevit ? 'Ludarp_pyRevit_Extension_Full.zip' :
@@ -1161,67 +1188,17 @@ document.addEventListener('DOMContentLoaded', () => {
                           '<i class="fa-solid fa-code"></i>';
     }
 
-    if (confirmLabel) {
-      confirmLabel.textContent = `Confirm & Download (${isOther ? '.exe' : isPyRevit ? '.zip' : '.lsp'})`;
-    }
+    // Pre-fill previously saved user details if available
+    const savedUser = getSavedUser();
+    const nameInput = document.getElementById('leadNameInput');
+    const emailInput = document.getElementById('leadEmailInput');
+    const phoneInput = document.getElementById('leadPhoneInput');
+    const orgInput = document.getElementById('leadOrgInput');
 
-    // Direct download handler when confirmed
-    confirmBtn.onclick = function() {
-      logTelemetryEvent('download', tool.id, { title: tool.title, file: defaultFileName });
-
-      if (tool.downloadGithubOnly) {
-        window.open(tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe', '_blank');
-      } else if (tool.downloadUrl) {
-        const link = document.createElement('a');
-        link.href = tool.downloadUrl;
-        link.download = defaultFileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        const blob = new Blob([tool.codeSnippet || '; LUDARP Civil Tool'], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = defaultFileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }
-
-      closeDownloadVerification();
-      showToast(`Download confirmed & started: ${defaultFileName}`, 'fa-circle-check');
-    };
-
-    const toolHubUrl = `${window.location.origin}${window.location.pathname}?tool=${encodeURIComponent(tool.id)}`;
-    const directDlUrl = tool.downloadUrl || (tool.downloadGithubOnly ? 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe' : toolHubUrl);
-
-    if (waBtn) {
-      waBtn.onclick = function() {
-        logTelemetryEvent('share', tool.id, { channel: 'whatsapp', title: tool.title });
-        const msg = `🚀 *Download ${tool.title}* (${tool.version || 'Latest'}) — Ludarp Civil\n${tool.summary}\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Specs & Web Hub:*\n${toolHubUrl}`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
-        showToast('Opening WhatsApp to share...', 'fa-brands fa-whatsapp');
-      };
-    }
-
-    if (emailBtn) {
-      emailBtn.onclick = function() {
-        logTelemetryEvent('share', tool.id, { channel: 'email', title: tool.title });
-        const subject = `Download ${tool.title} - Ludarp Civil`;
-        const body = `Hi,\n\nHere is the verified download link for ${tool.title} (${tool.version || 'Latest'}) from Ludarp Civil:\n\n${tool.summary}\n\nDownload Link:\n${directDlUrl}\n\nTool Details & Documentation:\n${toolHubUrl}\n\nBest regards,\nLudarp Civil`;
-        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        showToast('Opening email client...', 'fa-envelope');
-      };
-    }
-
-    if (copyBtn) {
-      copyBtn.onclick = function() {
-        logTelemetryEvent('share', tool.id, { channel: 'copy', title: tool.title });
-        copyToClipboard(directDlUrl, `Verified download link for "${tool.title}" copied!`);
-      };
-    }
+    if (nameInput && savedUser.name) nameInput.value = savedUser.name;
+    if (emailInput && savedUser.email) emailInput.value = savedUser.email;
+    if (phoneInput && savedUser.phone) phoneInput.value = savedUser.phone;
+    if (orgInput && savedUser.org) orgInput.value = savedUser.org;
 
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -1231,6 +1208,162 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('downloadVerifyModal');
     if (modal) modal.classList.add('hidden');
     document.body.style.overflow = 'auto';
+  };
+
+  // Submit Details & Instant Automated Download
+  window.handleDownloadAccessSubmit = function(event) {
+    if (event) event.preventDefault();
+    const tool = state.verifyingTool;
+    if (!tool) return;
+
+    const nameInput = document.getElementById('leadNameInput');
+    const emailInput = document.getElementById('leadEmailInput');
+    const phoneInput = document.getElementById('leadPhoneInput');
+    const orgInput = document.getElementById('leadOrgInput');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const org = orgInput ? orgInput.value.trim() : '';
+
+    if (!name) {
+      showToast('Please enter your full name.', 'fa-circle-exclamation');
+      if (nameInput) nameInput.focus();
+      return;
+    }
+
+    if (!email && !phone) {
+      showToast('Please provide either an Email or Phone (WhatsApp) to receive or unlock the file.', 'fa-circle-exclamation');
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    // Save lead record
+    const now = new Date().toISOString();
+    const leadRecord = {
+      name,
+      email: email || 'N/A',
+      phone: phone || 'N/A',
+      org: org || 'Independent',
+      toolId: tool.id,
+      toolTitle: tool.title,
+      timestamp: now,
+      method: 'Automated Unlock'
+    };
+    saveLead(leadRecord);
+    saveUser({ name, email, phone, org });
+    logTelemetryEvent('download', tool.id, { title: tool.title, leadName: name, contact: email || phone });
+
+    // Determine filename
+    const isOther = tool.category === 'Other';
+    const isPyRevit = tool.category === 'pyRevit';
+    let defaultFileName = isOther ? 'LUDARP.Drawing.Packager.exe' :
+                          isPyRevit ? 'Ludarp_pyRevit_Extension_Full.zip' :
+                          `${tool.id}.lsp`;
+    if (tool.downloadFilename) defaultFileName = tool.downloadFilename;
+
+    // Trigger instant automated download
+    if (tool.downloadGithubOnly) {
+      window.open(tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe', '_blank');
+    } else if (tool.downloadUrl) {
+      const link = document.createElement('a');
+      link.href = tool.downloadUrl;
+      link.download = defaultFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      const blob = new Blob([tool.codeSnippet || '; LUDARP Civil Tool'], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = defaultFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    closeDownloadVerification();
+    showToast(`Access granted! Downloading ${defaultFileName}...`, 'fa-circle-check');
+  };
+
+  // Ask Pradul on WhatsApp for the file or link
+  window.askPradulOnWhatsApp = function() {
+    const tool = state.verifyingTool;
+    if (!tool) return;
+
+    const nameInput = document.getElementById('leadNameInput');
+    const emailInput = document.getElementById('leadEmailInput');
+    const phoneInput = document.getElementById('leadPhoneInput');
+    const orgInput = document.getElementById('leadOrgInput');
+
+    const name = nameInput && nameInput.value.trim() ? nameInput.value.trim() : 'Prospective User';
+    const email = emailInput && emailInput.value.trim() ? emailInput.value.trim() : '';
+    const phone = phoneInput && phoneInput.value.trim() ? phoneInput.value.trim() : '';
+    const org = orgInput && orgInput.value.trim() ? orgInput.value.trim() : '';
+
+    const contact = [phone, email].filter(Boolean).join(' / ') || 'WhatsApp';
+
+    // Save lead record
+    saveLead({
+      name,
+      email: email || 'N/A',
+      phone: phone || 'N/A',
+      org: org || 'N/A',
+      toolId: tool.id,
+      toolTitle: tool.title,
+      timestamp: new Date().toISOString(),
+      method: 'WhatsApp Request'
+    });
+    if (name !== 'Prospective User') {
+      saveUser({ name, email, phone, org });
+    }
+    logTelemetryEvent('share', tool.id, { channel: 'whatsapp_request', name });
+
+    const toolHubUrl = `${window.location.origin}${window.location.pathname}?tool=${encodeURIComponent(tool.id)}`;
+    const msg = `Hello Pradul, I would like to request the download file / link for *${tool.title}* (${tool.version || 'v2.0'}).\n\n*My Details:*\n• Name: ${name}\n• Contact (WhatsApp/Email): ${contact}\n• Company/Role: ${org || 'Civil Engineering'}\n\n🌐 Tool Reference:\n${toolHubUrl}`;
+
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    showToast('Opening WhatsApp to send request to Pradul...', 'fa-brands fa-whatsapp');
+  };
+
+  // Ask Pradul via Email for the file or link
+  window.askPradulViaEmail = function() {
+    const tool = state.verifyingTool;
+    if (!tool) return;
+
+    const nameInput = document.getElementById('leadNameInput');
+    const emailInput = document.getElementById('leadEmailInput');
+    const phoneInput = document.getElementById('leadPhoneInput');
+    const orgInput = document.getElementById('leadOrgInput');
+
+    const name = nameInput && nameInput.value.trim() ? nameInput.value.trim() : 'User';
+    const email = emailInput && emailInput.value.trim() ? emailInput.value.trim() : '';
+    const phone = phoneInput && phoneInput.value.trim() ? phoneInput.value.trim() : '';
+    const org = orgInput && orgInput.value.trim() ? orgInput.value.trim() : '';
+
+    saveLead({
+      name,
+      email: email || 'N/A',
+      phone: phone || 'N/A',
+      org: org || 'N/A',
+      toolId: tool.id,
+      toolTitle: tool.title,
+      timestamp: new Date().toISOString(),
+      method: 'Email Request'
+    });
+    if (name !== 'User') {
+      saveUser({ name, email, phone, org });
+    }
+    logTelemetryEvent('share', tool.id, { channel: 'email_request', name });
+
+    const toolHubUrl = `${window.location.origin}${window.location.pathname}?tool=${encodeURIComponent(tool.id)}`;
+    const subject = `Download Access Request for ${tool.title} - ${name}`;
+    const body = `Hello Pradul,\n\nI would like to request the download file / link for ${tool.title} (${tool.version || 'Latest'}).\n\nMy Details:\n• Name: ${name}\n• Email: ${email}\n• Phone / WhatsApp: ${phone}\n• Company / Role: ${org}\n\nTool Page:\n${toolHubUrl}\n\nThank you!`;
+
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    showToast('Opening Email client to send request...', 'fa-envelope');
   };
 
   // Legacy downloadToolFile routes directly through verification modal
@@ -1291,6 +1424,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (statPackagerDls) statPackagerDls.textContent = state.githubPackagerDownloads || 3;
     if (statShares) statShares.textContent = data.shares ? (data.shares.total || 0) : 0;
 
+    // Per-Tool Table
     if (tableBody) {
       const allTools = [...publishedList, ...upcomingList];
       tableBody.innerHTML = allTools.map(tool => {
@@ -1322,6 +1456,28 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }).join('');
     }
+
+    // Registered Leads Table
+    const leads = getLeads();
+    const leadsBadge = document.getElementById('statLeadCountBadge');
+    if (leadsBadge) leadsBadge.textContent = `${leads.length} Registered`;
+
+    const leadsBody = document.getElementById('analyticsLeadsTableBody');
+    if (leadsBody) {
+      if (leads.length === 0) {
+        leadsBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 font-mono">No download leads registered yet. User submissions will appear here live.</td></tr>`;
+      } else {
+        leadsBody.innerHTML = leads.map(lead => `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="p-2.5 text-slate-400 whitespace-nowrap">${new Date(lead.timestamp).toLocaleDateString()} ${new Date(lead.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+            <td class="p-2.5 font-bold text-white">${escapeHtml(lead.name)}</td>
+            <td class="p-2.5 text-emerald-400">${escapeHtml(lead.phone !== 'N/A' ? lead.phone : lead.email)}</td>
+            <td class="p-2.5 text-slate-200 truncate max-w-[150px]">${escapeHtml(lead.toolTitle || lead.toolId)}</td>
+            <td class="p-2.5 text-right"><span class="px-2 py-0.5 rounded text-[10px] font-mono ${lead.method === 'WhatsApp Request' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-brand-cyan/20 text-brand-cyan'}">${escapeHtml(lead.method)}</span></td>
+          </tr>
+        `).join('');
+      }
+    }
   }
 
   function openAnalyticsModal() {
@@ -1351,13 +1507,42 @@ document.addEventListener('DOMContentLoaded', () => {
     analyticsRefreshBtn.addEventListener('click', async () => {
       await fetchGitHubReleaseStats();
       renderAnalyticsModal();
-      showToast('Analytics refreshed with live GitHub data', 'fa-rotate');
+      showToast('Analytics refreshed with live data', 'fa-rotate');
     });
   }
 
+  // Export Leads to CSV
+  const analyticsExportLeadsCsvBtn = document.getElementById('analyticsExportLeadsCsvBtn');
+  if (analyticsExportLeadsCsvBtn) {
+    analyticsExportLeadsCsvBtn.addEventListener('click', () => {
+      const leads = getLeads();
+      if (leads.length === 0) {
+        showToast('No leads registered yet to export.', 'fa-circle-exclamation');
+        return;
+      }
+      let csv = 'Timestamp,Full Name,Email,Phone,Organization,Tool Requested,Method\n';
+      leads.forEach(l => {
+        csv += `"${l.timestamp}","${(l.name||'').replace(/"/g, '""')}","${(l.email||'').replace(/"/g, '""')}","${(l.phone||'').replace(/"/g, '""')}","${(l.org||'').replace(/"/g, '""')}","${(l.toolTitle||l.toolId||'').replace(/"/g, '""')}","${(l.method||'').replace(/"/g, '""')}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ludarp_civil_leads_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Exported leads list as CSV', 'fa-file-csv');
+    });
+  }
+
+  // Export full Telemetry Report as JSON
   if (analyticsExportBtn) {
     analyticsExportBtn.addEventListener('click', () => {
       const data = getTelemetry();
+      data.leads = getLeads();
       data.githubReleaseDownloads = {
         'drawing-packager-v2': state.githubPackagerDownloads
       };
@@ -1372,17 +1557,18 @@ document.addEventListener('DOMContentLoaded', () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Telemetry report exported as JSON', 'fa-file-export');
+      showToast('Full telemetry report exported as JSON', 'fa-file-export');
     });
   }
 
   if (analyticsResetBtn) {
     analyticsResetBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to reset local counter telemetry? (GitHub live release stats will NOT be affected).')) {
+      if (confirm('Are you sure you want to reset local counter & leads telemetry? (GitHub live release stats will NOT be affected).')) {
         localStorage.removeItem(TELEMETRY_KEY);
+        localStorage.removeItem(LEADS_KEY);
         sessionStorage.removeItem('ludarp_session_logged');
         renderAnalyticsModal();
-        showToast('Local telemetry data reset', 'fa-trash-can');
+        showToast('Local telemetry & leads data reset', 'fa-trash-can');
       }
     });
   }
