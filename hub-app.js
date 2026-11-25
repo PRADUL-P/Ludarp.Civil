@@ -1139,6 +1139,68 @@ document.addEventListener('DOMContentLoaded', () => {
     return [];
   }
 
+  // ================= GOOGLE SHEETS LIVE SYNC =================
+  const GOOGLE_SHEET_KEY = 'ludarp_google_sheet_webhook';
+
+  function getGoogleSheetUrl() {
+    return localStorage.getItem(GOOGLE_SHEET_KEY) || '';
+  }
+
+  window.handleSaveGoogleSheetUrl = function() {
+    const input = document.getElementById('googleSheetWebhookInput');
+    if (!input) return;
+    const url = input.value.trim();
+    if (url) {
+      localStorage.setItem(GOOGLE_SHEET_KEY, url);
+      showToast('Google Sheet Web App URL connected!', 'fa-table');
+      renderAnalyticsModal();
+    } else {
+      localStorage.removeItem(GOOGLE_SHEET_KEY);
+      showToast('Google Sheet disconnected', 'fa-trash-can');
+      renderAnalyticsModal();
+    }
+  };
+
+  async function postLeadToGoogleSheet(lead) {
+    const url = getGoogleSheetUrl();
+    if (!url) return;
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(lead)
+      });
+      console.log('Lead synced to Google Sheet:', lead.name);
+    } catch (err) {
+      console.warn('Google Sheet sync error:', err);
+    }
+  }
+
+  window.syncAllLeadsToGoogleSheet = async function() {
+    const url = getGoogleSheetUrl();
+    if (!url) {
+      showToast('Please enter your Google Sheet Web App URL first.', 'fa-circle-exclamation');
+      const input = document.getElementById('googleSheetWebhookInput');
+      if (input) input.focus();
+      return;
+    }
+    const leads = getLeads();
+    if (leads.length === 0) {
+      showToast('No leads registered yet to sync.', 'fa-circle-info');
+      return;
+    }
+    showToast(`Syncing ${leads.length} lead(s) to Google Sheet...`, 'fa-rotate');
+    let count = 0;
+    for (const lead of leads) {
+      await postLeadToGoogleSheet(lead);
+      count++;
+    }
+    showToast(`Synced ${count} lead(s) to Google Sheet!`, 'fa-circle-check');
+  };
+
   function saveLead(lead) {
     const leads = getLeads();
     leads.unshift(lead);
@@ -1146,6 +1208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
     } catch (e) {}
+    postLeadToGoogleSheet(lead);
   }
 
   // ================= VERIFIED DOWNLOAD MODAL & ACTIONS =================
@@ -1608,6 +1671,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (authBadge) {
       authBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Admin: Pradul (Unlocked)';
       authBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1';
+    }
+
+    // Google Sheets UI status in modal
+    const sheetInput = document.getElementById('googleSheetWebhookInput');
+    const sheetBadge = document.getElementById('googleSheetStatusBadge');
+    const currentSheetUrl = getGoogleSheetUrl();
+    if (sheetInput && !sheetInput.value && currentSheetUrl) {
+      sheetInput.value = currentSheetUrl;
+    }
+    if (sheetBadge) {
+      if (currentSheetUrl) {
+        sheetBadge.textContent = 'Live Connected';
+        sheetBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+      } else {
+        sheetBadge.textContent = 'Not Connected';
+        sheetBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30';
+      }
     }
 
     const data = getTelemetry();

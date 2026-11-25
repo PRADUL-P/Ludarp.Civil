@@ -985,6 +985,46 @@
           </div>
         </div>
 
+        <!-- Google Sheets Live Integration Card -->
+        <div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-emerald-400 font-mono flex items-center gap-2 text-xs">
+              <i class="fa-solid fa-file-excel text-emerald-400 text-sm"></i> Google Sheets Live Lead Sync
+            </span>
+            <span id="googleSheetStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              Not Connected
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Connect your Google Sheet to receive live lead submissions (Name, Phone/WhatsApp, Email, Tool Requested, Timestamp) directly into your spreadsheet automatically.
+          </p>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <input type="url" id="googleSheetWebhookInput" placeholder="Paste your Google Apps Script Web App URL (ends in /exec)" 
+                   class="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs font-mono focus:outline-none focus:border-emerald-400 transition-all" />
+            <div class="flex items-center gap-2">
+              <button onclick="handleSaveGoogleSheetUrl()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md">
+                <i class="fa-solid fa-floppy-disk text-xs"></i>
+                <span>Save</span>
+              </button>
+              <button onclick="syncAllLeadsToGoogleSheet()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all" title="Push all registered leads to your connected Google Sheet">
+                <i class="fa-solid fa-cloud-arrow-up text-brand-cyan text-xs"></i>
+                <span>Sync All</span>
+              </button>
+            </div>
+          </div>
+          <details class="text-[10px] text-slate-400 font-mono">
+            <summary class="cursor-pointer hover:text-emerald-300 transition-colors">Setup Google Apps Script Web App in 1 Minute &dtrif;</summary>
+            <div class="mt-2 p-3 rounded-xl bg-slate-950/90 border border-slate-800 space-y-1.5 text-slate-300 leading-relaxed">
+              <p>1. Open <a href="https://sheets.new" target="_blank" class="text-brand-cyan underline">sheets.new</a> to create a new spreadsheet named <strong>Ludarp Civil Leads</strong>.</p>
+              <p>2. In your spreadsheet, click <strong>Extensions &gt; Apps Script</strong>.</p>
+              <p>3. Replace the code in <code>Code.gs</code> with the <code>google-apps-script.js</code> snippet included in this repo.</p>
+              <p>4. Click <strong>Deploy &gt; New deployment &gt; Select type: Web app</strong>.</p>
+              <p>5. Set <em>Execute as: Me</em> and <em>Who has access: Anyone</em>, then click <strong>Deploy</strong>.</p>
+              <p>6. Copy the generated <strong>Web app URL</strong> (ending in <code>/exec</code>) and paste it into the field above!</p>
+            </div>
+          </details>
+        </div>
+
         <!-- Registered Leads & Contact Requests Table -->
         <div class="rounded-xl border border-slate-800 overflow-hidden bg-slate-950/60">
           <div class="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
