@@ -1334,27 +1334,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const now = new Date().toISOString();
 
+    const leadRecord = {
+      name,
+      email: email || 'N/A',
+      phone: phone || 'N/A',
+      org: org || 'Independent',
+      toolId: tool.id,
+      toolTitle: tool.title,
+      version: tool.version || 'v2.0',
+      command: tool.command || 'N/A',
+      downloadUrl: directDlUrl,
+      toolUrl: toolHubUrl,
+      timestamp: now,
+      method: deliveryMode === 'whatsapp' ? 'WhatsApp Delivery' : deliveryMode === 'email' ? 'Email Delivery' : 'Instant Device Download'
+    };
+
+    saveLead(leadRecord);
+    saveUser({ name, email, phone, org });
+    logTelemetryEvent('download', tool.id, { title: tool.title, method: deliveryMode, leadName: name, contact: email || phone });
+
     if (deliveryMode === 'whatsapp') {
       let cleanPhone = phone.replace(/[^0-9]/g, '');
       if (cleanPhone.length === 10 && /^[6-9]/.test(cleanPhone)) {
         cleanPhone = '91' + cleanPhone;
       }
 
-      const leadRecord = {
-        name,
-        email: email || 'N/A',
-        phone: phone || 'N/A',
-        org: org || 'Independent',
-        toolId: tool.id,
-        toolTitle: tool.title,
-        timestamp: now,
-        method: 'WhatsApp Delivery'
-      };
-      saveLead(leadRecord);
-      saveUser({ name, email, phone, org });
-      logTelemetryEvent('download', tool.id, { title: tool.title, method: 'whatsapp', leadName: name, contact: phone });
-
-      const msg = `👋 Hello ${name}!\n\nHere is your verified download link for *${tool.title}* (${tool.version || 'v2.0'}):\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Documentation & Web Hub:*\n${toolHubUrl}\n\nNeed help or custom civil tools? Feel free to contact Pradul.\n— *Ludarp Civil Tools*`;
+      const msg = `👋 Hello ${name}!\n\nHere is your verified download link for *${tool.title}* (${tool.version || 'v2.0'}):\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Documentation & Web Hub:*\n${toolHubUrl}\n\nNeed help or custom civil tools? Feel free to reply directly to this message.\n— *Ludarp Civil Tools*`;
 
       const waUrl = cleanPhone 
         ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`
@@ -1372,66 +1377,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 300);
 
       closeDownloadVerification();
-      showToast(`Opening WhatsApp with download link for ${phone}!`, 'fa-brands fa-whatsapp');
+      showToast(email && email !== 'N/A' 
+        ? `Link sent to ${email} & opening WhatsApp!` 
+        : `Opening WhatsApp with download link for ${phone}!`, 'fa-brands fa-whatsapp');
       return;
     }
 
     if (deliveryMode === 'email') {
-      const leadRecord = {
-        name,
-        email: email || 'N/A',
-        phone: phone || 'N/A',
-        org: org || 'Independent',
-        toolId: tool.id,
-        toolTitle: tool.title,
-        timestamp: now,
-        method: 'Email Delivery'
-      };
-      saveLead(leadRecord);
-      saveUser({ name, email, phone, org });
-      logTelemetryEvent('download', tool.id, { title: tool.title, method: 'email', leadName: name, contact: email });
-
-      const subject = `Download Link: ${tool.title} (${tool.version || 'v2.0'}) - Ludarp Civil`;
-      const body = `Hello ${name},\n\nThank you for requesting access to ${tool.title} (${tool.version || 'v2.0'}) from Ludarp Civil Tools Hub.\n\nHere are your verified download link and resources:\n\n• Verified Download Link:\n${directDlUrl}\n\n• Tool Overview & Documentation:\n${toolHubUrl}\n\n• Command Trigger:\n${tool.command || 'See documentation'}\n\nIf you have any questions or require custom AEC automation tools, feel free to contact Pradul.\n\nBest regards,\nPradul P\nLudarp Civil Tools Hub`;
-
-      const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-      // 1. Try mailto: via anchor click
-      const mailAnchor = document.createElement('a');
-      mailAnchor.href = mailtoUrl;
-      document.body.appendChild(mailAnchor);
-      mailAnchor.click();
-      setTimeout(() => {
-        if (mailAnchor.parentNode) mailAnchor.parentNode.removeChild(mailAnchor);
-      }, 300);
-
-      // 2. Also open Gmail compose in new tab as guaranteed webmail fallback
-      setTimeout(() => {
-        window.open(gmailUrl, '_blank');
-      }, 300);
-
       closeDownloadVerification();
-      showToast(`Opening email draft with download link for ${email}!`, 'fa-regular fa-envelope');
+      showToast(`Automated download email dispatched to ${email}!`, 'fa-envelope-circle-check');
       return;
     }
 
     // Default: 'device' (Instant Download to This Device)
-    const leadRecord = {
-      name,
-      email: email || 'N/A',
-      phone: phone || 'N/A',
-      org: org || 'Independent',
-      toolId: tool.id,
-      toolTitle: tool.title,
-      timestamp: now,
-      method: 'Instant Device Download'
-    };
-    saveLead(leadRecord);
-    saveUser({ name, email, phone, org });
-    logTelemetryEvent('download', tool.id, { title: tool.title, method: 'device', leadName: name, contact: email || phone });
-
-    // Trigger instant automated download
     if (tool.downloadGithubOnly) {
       window.open(tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe', '_blank');
     } else if (tool.downloadUrl) {
