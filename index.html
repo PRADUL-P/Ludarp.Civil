@@ -156,6 +156,12 @@
           <span class="hidden sm:inline">Load Guides</span>
         </button>
 
+        <!-- Site & Download Analytics Modal Trigger -->
+        <button id="analyticsBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all hover:scale-105 shadow-sm" title="View Site Visits & Download Analytics">
+          <i class="fa-solid fa-chart-line"></i>
+          <span class="hidden sm:inline">Analytics</span>
+        </button>
+
         <!-- Dark / Light Theme Toggle -->
         <button id="themeToggleBtn" aria-label="Toggle Theme" 
                 class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-amber-400 transition-colors">
@@ -260,7 +266,7 @@
         <button data-tab="shortcuts" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
           <i class="fa-solid fa-bolt text-emerald-400"></i>
           <span>Ludarp Shortcuts Hub</span>
-          <span class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-400 font-mono">141</span>
+          <span id="badgeShortcuts" class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-400 font-mono">201</span>
         </button>
       </div>
     </div>
@@ -321,13 +327,34 @@
 
     <!-- Ludarp Shortcuts Grid (Visible when Shortcuts tab is active) -->
     <div id="shortcutsContainer" class="hidden">
-      <!-- Phase Filter Pills for Shortcuts -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6" id="shortcutPhaseFilters">
-        <button data-phase="all" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-cyan text-brand-dark">All (141)</button>
-        <button data-phase="Basics" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Basics (32)</button>
-        <button data-phase="Intermediate" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Intermediate (58)</button>
-        <button data-phase="Advanced" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Advanced (15)</button>
-        <button data-phase="Expert" class="phase-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Expert (36)</button>
+      <!-- Software & Phase Filter Controls for Shortcuts -->
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-800">
+        <!-- Software Selection Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full" id="shortcutSoftwareFilters">
+          <button data-software="all" class="software-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-cyan text-brand-dark transition-all flex items-center gap-1.5 shadow-sm">
+            <span>All Software</span>
+            <span id="countAllShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900/40 text-[10px] font-mono">201</span>
+          </button>
+          <button data-software="AutoCAD" class="software-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-code text-orange-400"></i>
+            <span>AutoCAD</span>
+            <span id="countAutoCadShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900 text-slate-400 text-[10px] font-mono">141</span>
+          </button>
+          <button data-software="Revit" class="software-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-cubes-stacked text-purple-400"></i>
+            <span>Revit BIM</span>
+            <span id="countRevitShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900 text-purple-300 text-[10px] font-mono">60</span>
+          </button>
+        </div>
+
+        <!-- Phase Filter Pills for Shortcuts -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full" id="shortcutPhaseFilters">
+          <button data-phase="all" class="phase-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-cyan text-brand-dark">All Phases</button>
+          <button data-phase="Basics" class="phase-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Basics</button>
+          <button data-phase="Intermediate" class="phase-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Intermediate</button>
+          <button data-phase="Advanced" class="phase-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Advanced</button>
+          <button data-phase="Expert" class="phase-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Expert</button>
+        </div>
       </div>
 
       <div id="shortcutsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -600,13 +627,21 @@
       <!-- Modal Footer -->
       <div class="p-4 border-t border-slate-800 dark:border-brand-border bg-slate-900/90 dark:bg-brand-surface/90 flex items-center justify-between gap-4">
         <div class="flex items-center gap-2" id="modalTagsContainer"></div>
-        <div class="flex items-center gap-2">
-          <button id="modalShareBottomBtn" class="px-3.5 py-2 rounded-lg bg-brand-cyan/15 hover:bg-brand-cyan/25 text-brand-cyan text-xs font-semibold flex items-center gap-1.5 transition-colors border border-brand-cyan/30">
-            <i class="fa-solid fa-share-nodes"></i>
-            <span>Share Link</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button id="modalShareWhatsAppBtn" class="px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-all border border-emerald-500/40 hover:scale-105 shadow-sm" title="Share via WhatsApp">
+            <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i>
+            <span class="hidden sm:inline">WhatsApp</span>
+          </button>
+          <button id="modalShareEmailBtn" class="px-3 py-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-all border border-blue-500/40 hover:scale-105 shadow-sm" title="Share via Email">
+            <i class="fa-solid fa-envelope text-blue-400 text-xs"></i>
+            <span class="hidden sm:inline">Email</span>
+          </button>
+          <button id="modalShareBottomBtn" class="px-3 py-2 rounded-lg bg-brand-cyan/15 hover:bg-brand-cyan/25 text-brand-cyan text-xs font-semibold flex items-center gap-1.5 transition-colors border border-brand-cyan/30" title="Copy Tool Direct Link">
+            <i class="fa-solid fa-link"></i>
+            <span>Copy Link</span>
           </button>
           <button id="closeModalBottomBtn" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors">
-            Close & Explore Hub
+            Close
           </button>
         </div>
       </div>
@@ -673,6 +708,218 @@
     </div>
   </div>
 
+  <!-- ================= DOWNLOAD VERIFICATION MODAL ================= -->
+  <div id="downloadVerifyModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="modal-content relative w-full max-w-md bg-slate-900 border border-slate-700 dark:border-brand-border rounded-2xl shadow-2xl p-6 overflow-hidden">
+      <!-- Glow background accent -->
+      <div class="absolute -top-20 -right-20 w-44 h-44 bg-brand-cyan/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Header -->
+      <div class="flex items-start justify-between gap-3 pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div id="verifyModalIcon" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <i class="fa-solid fa-check-circle text-[9px]"></i> Verified Safe
+              </span>
+              <span id="verifyModalCategory" class="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-800">AutoCAD</span>
+            </div>
+            <h3 id="verifyModalTitle" class="text-base font-bold text-white mt-1 leading-snug">Tool Title</h3>
+          </div>
+        </div>
+        <button onclick="closeDownloadVerification()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- File details & safety check -->
+      <div class="mt-4 p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400 font-mono">File:</span>
+          <span id="verifyModalFileName" class="font-mono font-bold text-brand-cyan text-[11px] truncate max-w-[210px]">filename.exe</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400 font-mono">Release:</span>
+          <span id="verifyModalVersion" class="font-mono text-slate-300">v2.0</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400 font-mono">Source:</span>
+          <span class="font-mono text-emerald-400 flex items-center gap-1">
+            <i class="fa-brands fa-github text-xs"></i> Official GitHub Release
+          </span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400 font-mono">Security Check:</span>
+          <span class="font-mono text-slate-300">Malware-Free &amp; Verified</span>
+        </div>
+      </div>
+
+      <!-- Notice -->
+      <div class="mt-3.5 p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-200 flex items-start gap-2">
+        <i class="fa-solid fa-circle-info text-sky-400 mt-0.5 flex-shrink-0"></i>
+        <p class="leading-relaxed text-[11px]">
+          Direct download confirmation required. You can confirm download to this device now, or share the verified download link via WhatsApp or Email.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-5 space-y-3">
+        <!-- Confirm Button -->
+        <button id="verifyConfirmDownloadBtn" 
+                class="w-full py-3 px-4 rounded-xl bg-brand-cyan hover:bg-sky-400 text-brand-dark font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-brand-cyan/20 transition-all hover:scale-[1.02] active:scale-95">
+          <i class="fa-solid fa-download text-sm"></i>
+          <span id="verifyConfirmBtnLabel">Confirm &amp; Download Now</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="relative flex items-center justify-center my-1">
+          <div class="border-t border-slate-800 w-full"></div>
+          <span class="bg-slate-900 px-3 text-[10px] font-mono text-slate-500 uppercase tracking-wider">or share download link</span>
+        </div>
+
+        <!-- WhatsApp / Email / Copy row -->
+        <div class="grid grid-cols-3 gap-2">
+          <button id="verifyShareWhatsAppBtn" 
+                  class="py-2.5 px-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm">
+            <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i>
+            <span>WhatsApp</span>
+          </button>
+
+          <button id="verifyShareEmailBtn" 
+                  class="py-2.5 px-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm">
+            <i class="fa-solid fa-envelope text-blue-400 text-xs"></i>
+            <span>Email</span>
+          </button>
+
+          <button id="verifyCopyLinkBtn" 
+                  class="py-2.5 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105">
+            <i class="fa-regular fa-copy text-xs"></i>
+            <span>Copy Link</span>
+          </button>
+        </div>
+
+        <button onclick="closeDownloadVerification()" class="w-full text-center text-xs text-slate-400 hover:text-slate-200 py-1 transition-colors">
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= SITE & DOWNLOAD ANALYTICS MODAL ================= -->
+  <div id="analyticsModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="modal-content relative w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-slate-700 dark:border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between gap-3 bg-slate-900/90">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-bold text-white">Site Traffic &amp; Downloads Analytics</h3>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live Telemetry
+              </span>
+            </div>
+            <p class="text-xs text-slate-400">Track site visitors, downloads per tool, and GitHub release metrics.</p>
+          </div>
+        </div>
+        <button id="closeAnalyticsModalBtn" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-300">
+        
+        <!-- Summary Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+            <div class="text-[10px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1">
+              <i class="fa-solid fa-eye text-brand-cyan"></i> Site Visits
+            </div>
+            <div id="statTotalPageviews" class="text-xl sm:text-2xl font-bold font-mono text-white mt-1.5">1</div>
+            <div class="text-[10px] text-slate-500 font-mono mt-0.5">Total page sessions</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+            <div class="text-[10px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1">
+              <i class="fa-solid fa-download text-emerald-400"></i> Total Downloads
+            </div>
+            <div id="statTotalDownloads" class="text-xl sm:text-2xl font-bold font-mono text-emerald-400 mt-1.5">0</div>
+            <div class="text-[10px] text-slate-500 font-mono mt-0.5">All tools combined</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+            <div class="text-[10px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1">
+              <i class="fa-brands fa-github text-purple-400"></i> GitHub Releases
+            </div>
+            <div id="statPackagerGithubDownloads" class="text-xl sm:text-2xl font-bold font-mono text-purple-300 mt-1.5">3</div>
+            <div class="text-[10px] text-slate-500 font-mono mt-0.5">Drawing Packager .exe</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+            <div class="text-[10px] uppercase font-bold text-slate-400 font-mono flex items-center gap-1">
+              <i class="fa-solid fa-share-nodes text-amber-400"></i> Tool Shares
+            </div>
+            <div id="statTotalShares" class="text-xl sm:text-2xl font-bold font-mono text-amber-300 mt-1.5">0</div>
+            <div class="text-[10px] text-slate-500 font-mono mt-0.5">WhatsApp, Email &amp; Links</div>
+          </div>
+        </div>
+
+        <!-- Tool Breakdown Table -->
+        <div class="rounded-xl border border-slate-800 overflow-hidden bg-slate-950/60">
+          <div class="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+            <span class="font-bold text-slate-200 font-mono flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-brand-cyan"></i> Per-Tool Download &amp; View Activity
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">Updated Real-Time</span>
+          </div>
+          <div class="overflow-x-auto max-h-72">
+            <table class="w-full text-left border-collapse text-[11px]">
+              <thead class="bg-slate-900/80 text-slate-400 font-mono border-b border-slate-800 sticky top-0">
+                <tr>
+                  <th class="p-2.5">Tool Name</th>
+                  <th class="p-2.5">Platform</th>
+                  <th class="p-2.5 text-center">Downloads</th>
+                  <th class="p-2.5 text-center">Detail Views</th>
+                  <th class="p-2.5 text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody id="analyticsTableBody" class="divide-y divide-slate-800/60 font-mono">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Export & Reset Controls -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <div class="flex items-center gap-2">
+            <button id="analyticsExportBtn" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-2 transition-all hover:scale-105">
+              <i class="fa-solid fa-file-export text-brand-cyan"></i>
+              <span>Export Telemetry Report (.json)</span>
+            </button>
+            <button id="analyticsRefreshBtn" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
+              <i class="fa-solid fa-rotate text-xs"></i>
+              <span>Refresh</span>
+            </button>
+          </div>
+          <button id="analyticsResetBtn" class="text-xs text-red-400 hover:text-red-300 underline font-mono">
+            Reset Local Counter Data
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- ================= TOAST NOTIFICATION ================= -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 border border-brand-cyan/40 text-slate-100 text-xs font-semibold shadow-2xl opacity-0 translate-y-4 pointer-events-none transition-all">
     <i id="toastIcon" class="fa-solid fa-circle-check text-brand-cyan"></i>
@@ -681,6 +928,7 @@
 
   <!-- Scripts -->
   <script src="ludarp-data.js"></script>
+  <script src="revit-shortcuts-data.js"></script>
   <script src="tools-data.js"></script>
   <script src="hub-app.js"></script>
 </body>

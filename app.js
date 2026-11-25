@@ -6,21 +6,119 @@
 document.addEventListener('DOMContentLoaded', () => {
   // ================= STATE =================
   const state = {
-    activeTab: 'all',          // 'all' | 'AutoLISP' | 'pyRevit' | 'upcoming' | 'shortcuts'
+    activeTab: 'all',          // 'all' | 'AutoLISP' | 'pyRevit' | 'Other' | 'upcoming' | 'shortcuts'
     searchQuery: '',
     subFilter: 'all',
     sortBy: 'featured',        // 'featured' | 'newest' | 'name'
     shortcutPhase: 'all',      // 'all' | 'Basics' | 'Intermediate' | 'Advanced' | 'Expert'
+    shortcutSoftware: 'all',   // 'all' | 'AutoCAD' | 'Revit'
     shortcutPage: 1,
     shortcutsPerPage: 9,
     theme: localStorage.getItem('theme') || 'dark',
-    activeModalTool: null
+    activeModalTool: null,
+    verifyingTool: null,
+    githubPackagerDownloads: 3
   };
 
   // Safely grab datasets
   const publishedList = typeof toolsData !== 'undefined' ? toolsData : [];
   const upcomingList = typeof upcomingData !== 'undefined' ? upcomingData : [];
   const shortcutsData = (window.ludarpDatabase && window.ludarpDatabase.shortcuts) ? window.ludarpDatabase.shortcuts : [];
+
+  // ================= TELEMETRY & ANALYTICS ENGINE =================
+  const TELEMETRY_KEY = 'ludarp_civil_telemetry_v1';
+
+  function getTelemetry() {
+    try {
+      const raw = localStorage.getItem(TELEMETRY_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return {
+      pageviews: 0,
+      uniqueSessions: 0,
+      downloads: {},
+      views: {},
+      shares: { total: 0, whatsapp: 0, email: 0, copy: 0 },
+      events: []
+    };
+  }
+
+  function saveTelemetry(data) {
+    try {
+      localStorage.setItem(TELEMETRY_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function logTelemetryEvent(type, toolId = null, extra = {}) {
+    const data = getTelemetry();
+    const now = new Date().toISOString();
+
+    if (type === 'pageview') {
+      data.pageviews = (data.pageviews || 0) + 1;
+      if (!sessionStorage.getItem('ludarp_session_logged')) {
+        sessionStorage.setItem('ludarp_session_logged', '1');
+        data.uniqueSessions = (data.uniqueSessions || 0) + 1;
+      }
+    } else if (type === 'download' && toolId) {
+      data.downloads = data.downloads || {};
+      data.downloads[toolId] = (data.downloads[toolId] || 0) + 1;
+    } else if (type === 'view' && toolId) {
+      data.views = data.views || {};
+      data.views[toolId] = (data.views[toolId] || 0) + 1;
+    } else if (type === 'share') {
+      data.shares = data.shares || { total: 0, whatsapp: 0, email: 0, copy: 0 };
+      data.shares.total = (data.shares.total || 0) + 1;
+      if (extra.channel && data.shares[extra.channel] !== undefined) {
+        data.shares[extra.channel] = (data.shares[extra.channel] || 0) + 1;
+      }
+    }
+
+    data.events = data.events || [];
+    data.events.unshift({
+      type,
+      toolId,
+      timestamp: now,
+      ...extra
+    });
+    if (data.events.length > 100) data.events.length = 100;
+
+    saveTelemetry(data);
+  }
+
+  // Live GitHub Releases API download counter fetcher for Drawing Packager
+  async function fetchGitHubReleaseStats() {
+    try {
+      const res = await fetch('https://api.github.com/repos/PRADUL-P/Drawing-Packager/releases');
+      if (res.ok) {
+        const releases = await res.json();
+        if (Array.isArray(releases) && releases.length > 0) {
+          let count = 0;
+          releases.forEach(rel => {
+            if (Array.isArray(rel.assets)) {
+              rel.assets.forEach(asset => {
+                if (asset.name && asset.name.includes('Drawing.Packager.exe')) {
+                  count += (asset.download_count || 0);
+                }
+              });
+            }
+          });
+          if (count > 0) {
+            state.githubPackagerDownloads = count;
+            const el = document.getElementById('statPackagerGithubDownloads');
+            if (el) el.textContent = count;
+            const cardBadge = document.getElementById('badgeGithubDownloads-drawing-packager-v2');
+            if (cardBadge) cardBadge.innerHTML = `<i class="fa-brands fa-github text-[9px]"></i> ${count} Downloads`;
+          }
+        }
+      }
+    } catch (e) {
+      // Quiet fallback
+    }
+  }
+
+  // Log initial pageview
+  logTelemetryEvent('pageview');
+  fetchGitHubReleaseStats();
 
   // ================= DOM REFS =================
   const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -155,6 +253,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badgePyRevit) badgePyRevit.textContent = pyRevitCount;
     if (badgeOther) badgeOther.textContent = otherCount;
     if (badgeUpcoming) badgeUpcoming.textContent = totalUpcoming;
+
+    const totalShortcuts = shortcutsData.length;
+    const autocadShortcuts = shortcutsData.filter(s => (s.software || 'AutoCAD') === 'AutoCAD').length;
+    const revitShortcuts = shortcutsData.filter(s => s.software === 'Revit').length;
+
+    const badgeShortcuts = document.getElementById('badgeShortcuts');
+    if (badgeShortcuts) badgeShortcuts.textContent = totalShortcuts;
+
+    const countAllEl = document.getElementById('countAllShortcuts');
+    if (countAllEl) countAllEl.textContent = totalShortcuts;
+
+    const countAcadEl = document.getElementById('countAutoCadShortcuts');
+    if (countAcadEl) countAcadEl.textContent = autocadShortcuts;
+
+    const countRevitEl = document.getElementById('countRevitShortcuts');
+    if (countRevitEl) countRevitEl.textContent = revitShortcuts;
   }
 
   // ================= PLATFORM TABS =================
@@ -353,11 +467,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <span>Tools-for-Revit Repo</span>
             <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
           </a>
-          <a href="downloads/Ludarp_pyRevit_Extension_Full.zip" download 
+          <button onclick="requestDownloadVerification('filter-override')" 
              class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg transition-all hover:scale-105">
             <i class="fa-solid fa-file-zipper"></i>
             <span>Download Full Extension (.zip)</span>
-          </a>
+          </button>
         </div>
       </div>
     ` : '';
@@ -380,11 +494,11 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <a href="https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe" target="_blank" rel="noopener noreferrer" 
+          <button onclick="requestDownloadVerification('drawing-packager-v2')" 
              class="flex-shrink-0 px-3.5 py-2.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-xs font-bold flex items-center gap-2 border border-sky-500/40 transition-all hover:scale-105 shadow-lg">
             <i class="fa-solid fa-bolt text-amber-400"></i>
-            <span>Direct Download (.exe)</span>
-          </a>
+            <span>Download .exe (Verified)</span>
+          </button>
           <a href="https://github.com/PRADUL-P/Drawing-Packager/releases/tag/v2.0" target="_blank" rel="noopener noreferrer" 
              class="flex-shrink-0 px-3 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
             <i class="fa-solid fa-box-archive text-purple-400"></i>
@@ -455,7 +569,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${tool.version}
               </span>
             </div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              ${tool.id === 'drawing-packager-v2' ? `
+                <span id="badgeGithubDownloads-drawing-packager-v2" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1" title="Real-time releases downloads from GitHub">
+                  <i class="fa-brands fa-github text-[9px]"></i> ${state.githubPackagerDownloads}+ Downloads
+                </span>
+              ` : ''}
               ${statusBadge}
               <button onclick="shareTool('${tool.id}', event)" 
                       title="Share direct link to ${escapeHtml(tool.title)}" 
@@ -576,13 +695,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
             
             ${tool.downloadGithubOnly ? `
-              <a href="${tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe'}" target="_blank" rel="noopener noreferrer" 
-                 title="⚡ Direct Download (1-Click .exe)" 
+              <button onclick="requestDownloadVerification('${tool.id}')" 
+                 title="Verified Download (1-Click .exe)" 
                  class="py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 border border-sky-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 shadow-sm">
                 <i class="fa-solid fa-bolt text-amber-400"></i>
                 <span class="text-xs font-bold">1-Click .exe</span>
                 <i class="fa-solid fa-download text-[10px]"></i>
-              </a>
+              </button>
 
               <a href="${tool.releasePageUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/tag/v2.0'}" target="_blank" rel="noopener noreferrer" 
                  title="📦 GitHub Release Page (v2.0)"
@@ -606,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="hidden sm:inline text-[11px]">Repo</span>
               </a>
 
-              <button onclick="downloadToolFile('${tool.id}')" 
+              <button onclick="requestDownloadVerification('${tool.id}')" 
                       title="${isPyRevit ? 'Download Full Extension (.zip)' : 'Download .lsp'}" 
                       class="py-2 px-3 rounded-xl ${isPyRevit ? 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border-purple-500/40' : 'bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/30'} border text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <i class="${isPyRevit ? 'fa-solid fa-file-zipper' : 'fa-solid fa-download'}"></i>
@@ -623,6 +742,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================= RENDER SHORTCUTS =================
   function renderShortcuts() {
     let filtered = shortcutsData.filter(item => {
+      if (state.shortcutSoftware !== 'all') {
+        const itemSoft = item.software || 'AutoCAD';
+        if (itemSoft.toLowerCase() !== state.shortcutSoftware.toLowerCase()) return false;
+      }
       if (state.shortcutPhase !== 'all' && item.phase !== state.shortcutPhase) {
         return false;
       }
@@ -631,8 +754,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const matchesShortcut = item.shortcut.toLowerCase().includes(q);
         const matchesAction = item.action.toLowerCase().includes(q);
         const matchesDesc = item.description.toLowerCase().includes(q);
+        const matchesSoft = (item.software || '').toLowerCase().includes(q);
         const matchesProTip = (item.proTip || '').toLowerCase().includes(q);
-        if (!matchesShortcut && !matchesAction && !matchesDesc && !matchesProTip) {
+        if (!matchesShortcut && !matchesAction && !matchesDesc && !matchesSoft && !matchesProTip) {
           return false;
         }
       }
@@ -647,66 +771,93 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.shortcutPage > totalPages) state.shortcutPage = totalPages;
     if (state.shortcutPage < 1) state.shortcutPage = 1;
 
-    pageIndicator.textContent = `Page ${state.shortcutPage} of ${totalPages} (${filtered.length} tips)`;
+    pageIndicator.textContent = `Page ${state.shortcutPage} of ${totalPages} (${filtered.length} shortcuts)`;
     prevShortcutPage.disabled = state.shortcutPage <= 1;
     nextShortcutPage.disabled = state.shortcutPage >= totalPages;
 
     const startIdx = (state.shortcutPage - 1) * state.shortcutsPerPage;
     const pageItems = filtered.slice(startIdx, startIdx + state.shortcutsPerPage);
 
-    shortcutsGrid.innerHTML = pageItems.map(item => `
-      <div class="tool-card group bg-slate-900 dark:bg-brand-surface border border-slate-800 dark:border-brand-border rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:border-brand-cyan transition-all">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                Day ${item.day || item.id}
-              </span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-800">
-                ${escapeHtml(item.phase || 'AutoCAD')}
+    shortcutsGrid.innerHTML = pageItems.map(item => {
+      const isRevit = (item.software || '').toLowerCase() === 'revit';
+      const softBadge = isRevit ?
+        `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+           <i class="fa-solid fa-cubes-stacked text-[9px]"></i> Revit BIM
+         </span>` :
+        `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center gap-1">
+           <i class="fa-solid fa-code text-[9px]"></i> AutoCAD
+         </span>`;
+
+      return `
+        <div class="tool-card group bg-slate-900 dark:bg-brand-surface border border-slate-800 dark:border-brand-border rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:border-brand-cyan transition-all">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-2">
+                ${softBadge}
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-800">
+                  ${escapeHtml(item.phase || 'Essential')}
+                </span>
+              </div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+                ${escapeHtml(item.difficulty || 'Essential')}
               </span>
             </div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
-              ${escapeHtml(item.difficulty || 'Essential')}
-            </span>
+
+            <div class="my-2.5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+              <code class="text-sm font-mono font-extrabold text-brand-cyan tracking-wide select-all">${escapeHtml(item.shortcut)}</code>
+              <button onclick="copyToClipboard('${escapeJs(item.shortcut)}', 'Shortcut copied!')" 
+                      class="text-xs text-slate-400 hover:text-white p-1">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+
+            <h4 class="text-base font-bold text-slate-100">${escapeHtml(item.action)}</h4>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">${escapeHtml(item.description)}</p>
+
+            ${item.steps && item.steps.length ? `
+              <div class="mt-3 pt-3 border-t border-slate-800/80">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">How To:</div>
+                <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+                  ${item.steps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            ${item.proTip ? `
+              <div class="mt-3 p-2.5 rounded-lg bg-brand-cyan/10 border border-brand-cyan/20 text-xs text-brand-cyan">
+                <strong class="font-bold flex items-center gap-1 mb-0.5">
+                  <i class="fa-regular fa-lightbulb"></i> Pro Tip:
+                </strong>
+                <span class="text-slate-300">${escapeHtml(item.proTip)}</span>
+              </div>
+            ` : ''}
           </div>
 
-          <div class="my-2.5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-            <code class="text-sm font-mono font-extrabold text-brand-cyan tracking-wide select-all">${escapeHtml(item.shortcut)}</code>
-            <button onclick="copyToClipboard('${escapeJs(item.shortcut)}', 'Shortcut copied!')" 
-                    class="text-xs text-slate-400 hover:text-white p-1">
-              <i class="fa-regular fa-copy"></i>
-            </button>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+            <span>Ludarp Civil Studio</span>
+            <span>${item.hashtags ? escapeHtml(item.hashtags[0] || '') : ''}</span>
           </div>
-
-          <h4 class="text-base font-bold text-slate-100">${escapeHtml(item.action)}</h4>
-          <p class="text-xs text-slate-300 mt-2 leading-relaxed">${escapeHtml(item.description)}</p>
-
-          ${item.steps && item.steps.length ? `
-            <div class="mt-3 pt-3 border-t border-slate-800/80">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono mb-1.5">How To:</div>
-              <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
-                ${item.steps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
-
-          ${item.proTip ? `
-            <div class="mt-3 p-2.5 rounded-lg bg-brand-cyan/10 border border-brand-cyan/20 text-xs text-brand-cyan">
-              <strong class="font-bold flex items-center gap-1 mb-0.5">
-                <i class="fa-regular fa-lightbulb"></i> Pro Tip:
-              </strong>
-              <span class="text-slate-300">${escapeHtml(item.proTip)}</span>
-            </div>
-          ` : ''}
         </div>
+      `;
+    }).join('');
+  }
 
-        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-          <span>Ludarp Civil Studio</span>
-          <span>${item.hashtags ? escapeHtml(item.hashtags[0] || '') : ''}</span>
-        </div>
-      </div>
-    `).join('');
+  // Software filter listener
+  const shortcutSoftwareFilters = document.getElementById('shortcutSoftwareFilters');
+  if (shortcutSoftwareFilters) {
+    shortcutSoftwareFilters.addEventListener('click', (e) => {
+      const btn = e.target.closest('.software-btn');
+      if (!btn) return;
+      state.shortcutSoftware = btn.getAttribute('data-software');
+      state.shortcutPage = 1;
+
+      document.querySelectorAll('.software-btn').forEach(b => {
+        b.className = 'software-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all flex items-center gap-1.5';
+      });
+      btn.className = 'software-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-cyan text-brand-dark transition-all flex items-center gap-1.5 shadow-sm';
+
+      renderShortcuts();
+    });
   }
 
   // Pagination clicks
@@ -731,6 +882,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!tool) return;
 
     state.activeModalTool = tool;
+
+    // Log telemetry event for tool view
+    logTelemetryEvent('view', tool.id, { title: tool.title });
 
     // Update URL query param to reflect this active tool for easy direct sharing
     try {
@@ -836,8 +990,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `<li>Download standalone executable directly from GitHub Releases.</li>`;
       
       modalDownloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-      modalDownloadBtn.innerHTML = '<i class="fa-solid fa-bolt text-amber-400 text-sm"></i> <span>⚡ Direct Download (1-Click .exe)</span> <i class="fa-solid fa-download text-[10px] ml-1"></i>';
-      modalDownloadBtn.onclick = () => window.open(tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe', '_blank');
+      modalDownloadBtn.innerHTML = '<i class="fa-solid fa-bolt text-amber-400 text-sm"></i> <span>⚡ Verified Download (.exe)</span> <i class="fa-solid fa-download text-[10px] ml-1"></i>';
+      modalDownloadBtn.onclick = () => requestDownloadVerification(tool.id);
     } else {
       modalInstallType.textContent = `${tool.installGuide ? tool.installGuide.type : 'Installation'} Steps`;
       modalInstallSteps.innerHTML = tool.installGuide && tool.installGuide.steps ? 
@@ -846,8 +1000,14 @@ document.addEventListener('DOMContentLoaded', () => {
       
       modalDownloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
       modalDownloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> <span>Download File</span>';
-      modalDownloadBtn.onclick = () => downloadToolFile(tool.id);
+      modalDownloadBtn.onclick = () => requestDownloadVerification(tool.id);
     }
+
+    // Modal WhatsApp & Email share buttons
+    const modalShareWhatsAppBtn = document.getElementById('modalShareWhatsAppBtn');
+    if (modalShareWhatsAppBtn) modalShareWhatsAppBtn.onclick = () => shareWhatsApp(tool.id);
+    const modalShareEmailBtn = document.getElementById('modalShareEmailBtn');
+    if (modalShareEmailBtn) modalShareEmailBtn.onclick = () => shareEmail(tool.id);
 
     // 💻 Code Snippet (Hidden by default - Collapsed)
     if (modalCodeWrapper) modalCodeWrapper.classList.add('hidden');
@@ -953,47 +1113,279 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ================= DOWNLOAD HANDLER =================
-  window.downloadToolFile = function(toolId) {
-    const tool = publishedList.find(t => t.id === toolId);
+  // ================= VERIFIED DOWNLOAD MODAL & ACTIONS =================
+  window.requestDownloadVerification = function(toolId) {
+    const list = [...publishedList, ...upcomingList];
+    const tool = list.find(t => t.id === toolId);
     if (!tool) return;
 
     if (tool.isUpcoming) {
-      showToast('This tool is currently in the upcoming development roadmap.', 'fa-lock');
+      showToast('This tool is currently in the upcoming roadmap.', 'fa-lock');
       return;
     }
 
-    if (tool.downloadGithubOnly) {
-      window.open(tool.githubUrl || 'https://github.com/PRADUL-P/Drawing-Packager', '_blank');
-      showToast('Redirecting to official GitHub repository download', 'fa-brands fa-github');
-      return;
+    state.verifyingTool = tool;
+
+    const modal = document.getElementById('downloadVerifyModal');
+    const titleEl = document.getElementById('verifyModalTitle');
+    const catEl = document.getElementById('verifyModalCategory');
+    const fileEl = document.getElementById('verifyModalFileName');
+    const verEl = document.getElementById('verifyModalVersion');
+    const iconBox = document.getElementById('verifyModalIcon');
+    const confirmBtn = document.getElementById('verifyConfirmDownloadBtn');
+    const confirmLabel = document.getElementById('verifyConfirmBtnLabel');
+    const waBtn = document.getElementById('verifyShareWhatsAppBtn');
+    const emailBtn = document.getElementById('verifyShareEmailBtn');
+    const copyBtn = document.getElementById('verifyCopyLinkBtn');
+
+    if (titleEl) titleEl.textContent = tool.title;
+    if (catEl) catEl.textContent = tool.categoryLabel || tool.category;
+    if (verEl) verEl.textContent = tool.version || 'v1.0';
+
+    const isOther = tool.category === 'Other';
+    const isPyRevit = tool.category === 'pyRevit';
+    const isLisp = tool.category === 'AutoLISP';
+
+    let defaultFileName = isOther ? 'LUDARP.Drawing.Packager.exe' :
+                          isPyRevit ? 'Ludarp_pyRevit_Extension_Full.zip' :
+                          `${tool.id}.lsp`;
+    if (tool.downloadFilename) defaultFileName = tool.downloadFilename;
+    if (fileEl) fileEl.textContent = defaultFileName;
+
+    if (iconBox) {
+      iconBox.className = isOther ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-sky-500/15 text-sky-400 border border-sky-500/30' :
+                          isPyRevit ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-purple-500/15 text-purple-400 border border-purple-500/30' :
+                          'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-orange-500/15 text-orange-400 border border-orange-500/30';
+      iconBox.innerHTML = isOther ? '<i class="fa-solid fa-toolbox"></i>' :
+                          isPyRevit ? '<i class="fa-solid fa-cubes-stacked"></i>' :
+                          '<i class="fa-solid fa-code"></i>';
     }
 
-    // If a direct packaged file exists in downloads/
-    if (tool.downloadUrl) {
-      const link = document.createElement('a');
-      link.href = tool.downloadUrl;
-      link.download = tool.downloadFilename || `${tool.id}.${tool.fileExtension || 'zip'}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showToast(`Downloaded ${link.download}`, 'fa-circle-down');
-      return;
+    if (confirmLabel) {
+      confirmLabel.textContent = `Confirm & Download (${isOther ? '.exe' : isPyRevit ? '.zip' : '.lsp'})`;
     }
 
-    const filename = tool.downloadFilename || `${tool.id}.${tool.fileExtension || 'txt'}`;
-    const blob = new Blob([tool.codeSnippet], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Direct download handler when confirmed
+    confirmBtn.onclick = function() {
+      logTelemetryEvent('download', tool.id, { title: tool.title, file: defaultFileName });
 
-    showToast(`Downloaded ${filename}`, 'fa-circle-down');
+      if (tool.downloadGithubOnly) {
+        window.open(tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe', '_blank');
+      } else if (tool.downloadUrl) {
+        const link = document.createElement('a');
+        link.href = tool.downloadUrl;
+        link.download = defaultFileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        const blob = new Blob([tool.codeSnippet || '; LUDARP Civil Tool'], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = defaultFileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      closeDownloadVerification();
+      showToast(`Download confirmed & started: ${defaultFileName}`, 'fa-circle-check');
+    };
+
+    const toolHubUrl = `${window.location.origin}${window.location.pathname}?tool=${encodeURIComponent(tool.id)}`;
+    const directDlUrl = tool.downloadUrl || (tool.downloadGithubOnly ? 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe' : toolHubUrl);
+
+    if (waBtn) {
+      waBtn.onclick = function() {
+        logTelemetryEvent('share', tool.id, { channel: 'whatsapp', title: tool.title });
+        const msg = `🚀 *Download ${tool.title}* (${tool.version || 'Latest'}) — Ludarp Civil\n${tool.summary}\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Specs & Web Hub:*\n${toolHubUrl}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        showToast('Opening WhatsApp to share...', 'fa-brands fa-whatsapp');
+      };
+    }
+
+    if (emailBtn) {
+      emailBtn.onclick = function() {
+        logTelemetryEvent('share', tool.id, { channel: 'email', title: tool.title });
+        const subject = `Download ${tool.title} - Ludarp Civil`;
+        const body = `Hi,\n\nHere is the verified download link for ${tool.title} (${tool.version || 'Latest'}) from Ludarp Civil:\n\n${tool.summary}\n\nDownload Link:\n${directDlUrl}\n\nTool Details & Documentation:\n${toolHubUrl}\n\nBest regards,\nLudarp Civil`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        showToast('Opening email client...', 'fa-envelope');
+      };
+    }
+
+    if (copyBtn) {
+      copyBtn.onclick = function() {
+        logTelemetryEvent('share', tool.id, { channel: 'copy', title: tool.title });
+        copyToClipboard(directDlUrl, `Verified download link for "${tool.title}" copied!`);
+      };
+    }
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
   };
+
+  window.closeDownloadVerification = function() {
+    const modal = document.getElementById('downloadVerifyModal');
+    if (modal) modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  };
+
+  // Legacy downloadToolFile routes directly through verification modal
+  window.downloadToolFile = function(toolId) {
+    requestDownloadVerification(toolId);
+  };
+
+  // Direct WhatsApp & Email sharing helpers
+  window.shareWhatsApp = function(toolId) {
+    const list = [...publishedList, ...upcomingList];
+    const tool = list.find(t => t.id === toolId);
+    if (!tool) return;
+    logTelemetryEvent('share', tool.id, { channel: 'whatsapp', title: tool.title });
+    const toolHubUrl = `${window.location.origin}${window.location.pathname}?tool=${encodeURIComponent(tool.id)}`;
+    const directDlUrl = tool.downloadUrl || (tool.downloadGithubOnly ? 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe' : toolHubUrl);
+    const msg = `🚀 *Download ${tool.title}* (${tool.version || 'Latest'}) — Ludarp Civil\n${tool.summary}\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Specs & Web Hub:*\n${toolHubUrl}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    showToast('Opening WhatsApp to share...', 'fa-brands fa-whatsapp');
+  };
+
+  window.shareEmail = function(toolId) {
+    const list = [...publishedList, ...upcomingList];
+    const tool = list.find(t => t.id === toolId);
+    if (!tool) return;
+    logTelemetryEvent('share', tool.id, { channel: 'email', title: tool.title });
+    const toolHubUrl = `${window.location.origin}${window.location.pathname}?tool=${encodeURIComponent(tool.id)}`;
+    const directDlUrl = tool.downloadUrl || (tool.downloadGithubOnly ? 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe' : toolHubUrl);
+    const subject = `Download ${tool.title} - Ludarp Civil`;
+    const body = `Hi,\n\nHere is the verified download link for ${tool.title} (${tool.version || 'Latest'}) from Ludarp Civil:\n\n${tool.summary}\n\nDownload Link:\n${directDlUrl}\n\nTool Details & Documentation:\n${toolHubUrl}\n\nBest regards,\nLudarp Civil`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    showToast('Opening email client...', 'fa-envelope');
+  };
+
+  // ================= ANALYTICS MODAL LOGIC =================
+  const analyticsModal = document.getElementById('analyticsModal');
+  const analyticsBtn = document.getElementById('analyticsBtn');
+  const closeAnalyticsModalBtn = document.getElementById('closeAnalyticsModalBtn');
+  const analyticsExportBtn = document.getElementById('analyticsExportBtn');
+  const analyticsRefreshBtn = document.getElementById('analyticsRefreshBtn');
+  const analyticsResetBtn = document.getElementById('analyticsResetBtn');
+
+  function renderAnalyticsModal() {
+    const data = getTelemetry();
+
+    const statViews = document.getElementById('statTotalPageviews');
+    const statDls = document.getElementById('statTotalDownloads');
+    const statPackagerDls = document.getElementById('statPackagerGithubDownloads');
+    const statShares = document.getElementById('statTotalShares');
+    const tableBody = document.getElementById('analyticsTableBody');
+
+    if (statViews) statViews.textContent = data.pageviews || 1;
+
+    let totalLocalDls = 0;
+    if (data.downloads) {
+      totalLocalDls = Object.values(data.downloads).reduce((a, b) => a + b, 0);
+    }
+    if (statDls) statDls.textContent = totalLocalDls;
+    if (statPackagerDls) statPackagerDls.textContent = state.githubPackagerDownloads || 3;
+    if (statShares) statShares.textContent = data.shares ? (data.shares.total || 0) : 0;
+
+    if (tableBody) {
+      const allTools = [...publishedList, ...upcomingList];
+      tableBody.innerHTML = allTools.map(tool => {
+        const dls = data.downloads ? (data.downloads[tool.id] || 0) : 0;
+        const views = data.views ? (data.views[tool.id] || 0) : 0;
+        const isUpcoming = tool.isUpcoming === true;
+        const extraNote = tool.id === 'drawing-packager-v2' ? ` (GH: ${state.githubPackagerDownloads})` : '';
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="p-2.5 font-bold text-slate-200">
+              ${escapeHtml(tool.title)}
+            </td>
+            <td class="p-2.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono ${tool.category === 'pyRevit' ? 'text-purple-400 bg-purple-500/10' : tool.category === 'Other' ? 'text-sky-400 bg-sky-500/10' : 'text-orange-400 bg-orange-500/10'}">
+                ${escapeHtml(tool.categoryLabel || tool.category)}
+              </span>
+            </td>
+            <td class="p-2.5 text-center font-bold text-emerald-400">
+              ${dls}${extraNote}
+            </td>
+            <td class="p-2.5 text-center text-slate-300">
+              ${views}
+            </td>
+            <td class="p-2.5 text-right font-mono text-[10px]">
+              ${isUpcoming ? '<span class="text-amber-400">Roadmap</span>' : '<span class="text-emerald-400">Active</span>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  function openAnalyticsModal() {
+    if (analyticsModal) {
+      renderAnalyticsModal();
+      analyticsModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeAnalyticsModal() {
+    if (analyticsModal) {
+      analyticsModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  if (analyticsBtn) analyticsBtn.addEventListener('click', openAnalyticsModal);
+  if (closeAnalyticsModalBtn) closeAnalyticsModalBtn.addEventListener('click', closeAnalyticsModal);
+  if (analyticsModal) {
+    analyticsModal.addEventListener('click', (e) => {
+      if (e.target === analyticsModal) closeAnalyticsModal();
+    });
+  }
+
+  if (analyticsRefreshBtn) {
+    analyticsRefreshBtn.addEventListener('click', async () => {
+      await fetchGitHubReleaseStats();
+      renderAnalyticsModal();
+      showToast('Analytics refreshed with live GitHub data', 'fa-rotate');
+    });
+  }
+
+  if (analyticsExportBtn) {
+    analyticsExportBtn.addEventListener('click', () => {
+      const data = getTelemetry();
+      data.githubReleaseDownloads = {
+        'drawing-packager-v2': state.githubPackagerDownloads
+      };
+      data.exportTimestamp = new Date().toISOString();
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ludarp_civil_telemetry_report_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Telemetry report exported as JSON', 'fa-file-export');
+    });
+  }
+
+  if (analyticsResetBtn) {
+    analyticsResetBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to reset local counter telemetry? (GitHub live release stats will NOT be affected).')) {
+        localStorage.removeItem(TELEMETRY_KEY);
+        sessionStorage.removeItem('ludarp_session_logged');
+        renderAnalyticsModal();
+        showToast('Local telemetry data reset', 'fa-trash-can');
+      }
+    });
+  }
 
   // ================= GLOBAL HELPERS =================
   window.copyToClipboard = function(text, successMsg = 'Copied to clipboard!') {
