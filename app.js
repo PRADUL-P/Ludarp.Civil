@@ -375,17 +375,25 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
+          <a href="https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe" target="_blank" rel="noopener noreferrer" 
+             class="flex-shrink-0 px-3.5 py-2.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-xs font-bold flex items-center gap-2 border border-sky-500/40 transition-all hover:scale-105 shadow-lg">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>Direct Download (.exe)</span>
+          </a>
+          <a href="https://github.com/PRADUL-P/Drawing-Packager/releases/tag/v2.0" target="_blank" rel="noopener noreferrer" 
+             class="flex-shrink-0 px-3 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
+            <i class="fa-solid fa-box-archive text-purple-400"></i>
+            <span>v2.0 Release</span>
+          </a>
           <a href="https://youtu.be/OdTz4SFu0KI" target="_blank" rel="noopener noreferrer" 
-             class="flex-shrink-0 px-3.5 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 text-xs font-bold flex items-center gap-2 border border-red-500/40 transition-all hover:scale-105">
+             class="flex-shrink-0 px-3 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 text-xs font-bold flex items-center gap-2 border border-red-500/40 transition-all hover:scale-105">
             <i class="fa-brands fa-youtube text-red-400 text-sm"></i>
-            <span>Video Walkthrough</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-red-400"></i>
+            <span>Video Demo</span>
           </a>
           <a href="https://github.com/PRADUL-P/Drawing-Packager" target="_blank" rel="noopener noreferrer" 
-             class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
+             class="flex-shrink-0 px-3.5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold flex items-center gap-2 border border-zinc-700 transition-all hover:scale-105">
             <i class="fa-brands fa-github text-sm"></i>
-            <span>Drawing-Packager Repo</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
+            <span>Repo</span>
           </a>
         </div>
       </div>
@@ -542,12 +550,26 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
             
             ${tool.downloadGithubOnly ? `
+              <a href="${tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe'}" target="_blank" rel="noopener noreferrer" 
+                 title="⚡ Direct Download (1-Click .exe)" 
+                 class="py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 border border-sky-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 shadow-sm">
+                <i class="fa-solid fa-bolt text-amber-400"></i>
+                <span class="text-xs font-bold">1-Click .exe</span>
+                <i class="fa-solid fa-download text-[10px]"></i>
+              </a>
+
+              <a href="${tool.releasePageUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/tag/v2.0'}" target="_blank" rel="noopener noreferrer" 
+                 title="📦 GitHub Release Page (v2.0)"
+                 class="py-2 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-box-archive text-purple-400 text-xs"></i>
+                <span class="hidden sm:inline text-[11px]">v2.0</span>
+              </a>
+
               <a href="${tool.githubUrl || 'https://github.com/PRADUL-P/Drawing-Packager'}" target="_blank" rel="noopener noreferrer" 
-                 title="Download exclusively from official GitHub repository" 
-                 class="py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105">
+                 title="📄 Main Repository"
+                 class="py-2 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500 text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <i class="fa-brands fa-github text-sm"></i>
-                <span class="text-xs font-bold">GitHub Download</span>
-                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-sky-400"></i>
+                <span class="hidden sm:inline text-[11px]">Repo</span>
               </a>
             ` : `
               <a href="${tool.githubUrl || (isLisp ? 'https://github.com/PRADUL-P/Tools-for-AutoCAD' : isPyRevit ? 'https://github.com/PRADUL-P/Tools-for-Revit' : 'https://github.com/PRADUL-P')}" 
@@ -775,11 +797,11 @@ document.addEventListener('DOMContentLoaded', () => {
       modalInstallType.textContent = `${tool.installGuide ? tool.installGuide.type : 'Installation'} Steps`;
       modalInstallSteps.innerHTML = tool.installGuide && tool.installGuide.steps ? 
         tool.installGuide.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('') :
-        `<li>Download and clone from official GitHub repository.</li>`;
+        `<li>Download standalone executable directly from GitHub Releases.</li>`;
       
       modalDownloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-      modalDownloadBtn.innerHTML = '<i class="fa-brands fa-github text-sm"></i> <span>Download from GitHub Repository</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>';
-      modalDownloadBtn.onclick = () => window.open(tool.githubUrl || 'https://github.com/PRADUL-P/Drawing-Packager', '_blank');
+      modalDownloadBtn.innerHTML = '<i class="fa-solid fa-bolt text-amber-400 text-sm"></i> <span>⚡ Direct Download (1-Click .exe)</span> <i class="fa-solid fa-download text-[10px] ml-1"></i>';
+      modalDownloadBtn.onclick = () => window.open(tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe', '_blank');
     } else {
       modalInstallType.textContent = `${tool.installGuide ? tool.installGuide.type : 'Installation'} Steps`;
       modalInstallSteps.innerHTML = tool.installGuide && tool.installGuide.steps ? 

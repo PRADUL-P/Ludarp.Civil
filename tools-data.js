@@ -847,9 +847,11 @@ const toolsData = [
     "videoUrl": "https://youtu.be/OdTz4SFu0KI",
     "videoEmbedUrl": "https://www.youtube-nocookie.com/embed/OdTz4SFu0KI",
     "videoTitle": "DRAWING PACKER 2.0 Walkthrough",
-    "fileExtension": "py",
-    "downloadUrl": "https://github.com/PRADUL-P/Drawing-Packager",
-    "downloadFilename": "Drawing-Packager-v2.0",
+    "fileExtension": "exe",
+    "downloadUrl": "https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe",
+    "downloadFilename": "LUDARP.Drawing.Packager.exe",
+    "githubReleaseUrl": "https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe",
+    "releasePageUrl": "https://github.com/PRADUL-P/Drawing-Packager/releases/tag/v2.0",
     "githubUrl": "https://github.com/PRADUL-P/Drawing-Packager",
     "summary": "High-performance desktop application for civil engineers and BIM managers to automate drawing package distribution (CAD + PDF + ZIP) with standardized naming, batch pair detection, and zero-click info.txt auto-packing.",
     "tags": [
@@ -863,13 +865,13 @@ const toolsData = [
     ],
     "author": "PRADUL-P",
     "installGuide": {
-      "type": "GitHub Repository Download (Desktop App)",
+      "type": "Standalone Windows Executable (.exe) & GitHub Release",
       "steps": [
-        "Distributed exclusively through the official GitHub repository: `https://github.com/PRADUL-P/Drawing-Packager`.",
-        "Click the 'Download via GitHub Repo' button or clone with `git clone https://github.com/PRADUL-P/Drawing-Packager.git`.",
-        "Install required libraries: `pip install customtkinter darkdetect tkinterdnd2 tkcalendar pillow`.",
-        "Launch the GUI with `python app.py` (or rename to `app.pyw` for silent background launch).",
-        "Optional: Compile into a single standalone executable using PyInstaller: `pyinstaller 'LUDARP Drawing Packager.spec' --clean`."
+        "⚡ Direct Download (1-Click .exe): Download `LUDARP.Drawing.Packager.exe` directly via GitHub Releases (No Python or installation required).",
+        "📦 GitHub Release Page: Check out v2.0 release assets, checksums, and notes at: `https://github.com/PRADUL-P/Drawing-Packager/releases/tag/v2.0`.",
+        "📄 Main Repository: View source code, contribute, and report issues at: `https://github.com/PRADUL-P/Drawing-Packager`.",
+        "Double-click `LUDARP.Drawing.Packager.exe` to run immediately on Windows 10/11.",
+        "Optional Python Source: Clone repo and launch with `python app.py` (requires `customtkinter`, `darkdetect`, `tkinterdnd2`, `tkcalendar`, `pillow`)."
       ]
     },
     "codeSnippet": "# =============================================================================\n# LUDARP Drawing Packager v2.0 - Core File Pairing & Manifest Generator\n# Author: PRADUL P | Repository: https://github.com/PRADUL-P/Drawing-Packager\n# =============================================================================\n\nimport os, sys, shutil, zipfile, json\nfrom datetime import datetime\nimport customtkinter as ctk\n\ndef generate_drawing_packages(input_folder, output_folder, client_name, project_name, revision_tag, package_mode=\"All in One\"):\n    \"\"\"\n    Core packaging pipeline: scans input directory, identifies DWG + PDF pairs,\n    applies client and project naming conventions, and creates zip archives.\n    \"\"\"\n    if not os.path.exists(output_folder):\n        os.makedirs(output_folder)\n        \n    date_stamp = datetime.now().strftime(\"%Y%m%d\")\n    detected_pairs = []\n    \n    # Scan folder for drawing pairs\n    for root, _, files in os.walk(input_folder):\n        dwgs = {os.path.splitext(f)[0]: os.path.join(root, f) for f in files if f.lower().endswith('.dwg')}\n        pdfs = {os.path.splitext(f)[0]: os.path.join(root, f) for f in files if f.lower().endswith('.pdf')}\n        \n        for base_name in dwgs:\n            pair = {\"dwg\": dwgs[base_name], \"pdf\": pdfs.get(base_name, None)}\n            detected_pairs.append(pair)\n            \n    # Package 6-File Deliverables: Client Set + Project Set\n    for item in detected_pairs:\n        base = os.path.splitext(os.path.basename(item[\"dwg\"]))[0]\n        proj = project_name or base\n        client_base = f\"{client_name}_{proj}_{revision_tag}_{date_stamp}\"\n        project_base = f\"{proj}_{revision_tag}\"\n        \n        # Standardized file copies\n        shutil.copy2(item[\"dwg\"], os.path.join(output_folder, f\"{client_base}.dwg\"))\n        if item[\"pdf\"]:\n            shutil.copy2(item[\"pdf\"], os.path.join(output_folder, f\"{client_base}.pdf\"))\n            \n        # Build ZIP transmittal archive\n        zip_path = os.path.join(output_folder, f\"{client_base}.zip\")\n        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:\n            zf.write(item[\"dwg\"], arcname=f\"{client_base}.dwg\")\n            if item[\"pdf\"]:\n                zf.write(item[\"pdf\"], arcname=f\"{client_base}.pdf\")\n                \n    return len(detected_pairs)",
