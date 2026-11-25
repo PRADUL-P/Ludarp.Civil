@@ -95,6 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalVideoSection = document.getElementById('modalVideoSection');
   const modalVideoExternalLink = document.getElementById('modalVideoExternalLink');
   const modalVideoIframe = document.getElementById('modalVideoIframe');
+  const modalShareBtn = document.getElementById('modalShareBtn');
+  const modalShareBottomBtn = document.getElementById('modalShareBottomBtn');
+  const modalSharedNotice = document.getElementById('modalSharedNotice');
+  const modalSharedCopyBtn = document.getElementById('modalSharedCopyBtn');
 
   // Guide Modal
   const guideModal = document.getElementById('guideModal');
@@ -111,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updateStats();
   render();
+  checkUrlDeepLink();
 
   // ================= THEME TOGGLE =================
   function initTheme() {
@@ -438,9 +443,9 @@ document.addEventListener('DOMContentLoaded', () => {
       );
 
     return `
-      <div class="tool-card group relative flex flex-col justify-between bg-slate-900/90 dark:bg-brand-surface border border-slate-800 dark:border-brand-border rounded-2xl p-5 shadow-lg hover:border-brand-cyan transition-all">
+      <div id="tool-card-${tool.id}" class="tool-card group relative flex flex-col justify-between bg-slate-900/90 dark:bg-brand-surface border border-slate-800 dark:border-brand-border rounded-2xl p-5 shadow-lg hover:border-brand-cyan transition-all">
         <div>
-          <!-- Top Row: Category, Version, Status -->
+          <!-- Top Row: Category, Version, Status & Share -->
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="px-2.5 py-1 rounded-lg text-xs font-bold font-mono border ${platformColor} flex items-center gap-1.5">
@@ -450,7 +455,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${tool.version}
               </span>
             </div>
-            ${statusBadge}
+            <div class="flex items-center gap-1.5">
+              ${statusBadge}
+              <button onclick="shareTool('${tool.id}', event)" 
+                      title="Share direct link to ${escapeHtml(tool.title)}" 
+                      class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-brand-cyan/20 text-slate-400 hover:text-brand-cyan border border-slate-700 hover:border-brand-cyan/40 flex items-center justify-center text-xs transition-all hover:scale-110"
+                      aria-label="Share tool">
+                <i class="fa-solid fa-share-nodes text-[11px]"></i>
+              </button>
+            </div>
           </div>
 
           <!-- Title -->
@@ -539,6 +552,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     class="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 border border-slate-700 hover:border-slate-600 transition-all">
               <i class="fa-solid fa-book-open text-amber-400"></i> View Specs & Architecture
             </button>
+            <button onclick="shareTool('${tool.id}', event)" 
+                    title="Share direct link to ${escapeHtml(tool.title)}" 
+                    class="py-2 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-brand-cyan border border-zinc-700 hover:border-brand-cyan/40 text-xs font-semibold flex items-center justify-center transition-all hover:scale-105"
+                    aria-label="Share tool">
+              <i class="fa-solid fa-share-nodes text-xs"></i>
+            </button>
             <span class="py-2 px-3 rounded-xl bg-slate-800/50 text-slate-500 border border-slate-700/50 text-xs font-mono font-semibold flex items-center gap-1.5 cursor-not-allowed" title="Non-downloadable: In active development">
               <i class="fa-solid fa-lock text-[10px]"></i> In Pipeline
             </span>
@@ -547,6 +566,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <button onclick="openToolModal('${tool.id}', false)" 
                     class="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 border border-slate-700 hover:border-slate-600 transition-all">
               <i class="fa-solid fa-eye text-brand-cyan"></i> Details & Code
+            </button>
+            
+            <button onclick="shareTool('${tool.id}', event)" 
+                    title="Share direct link to ${escapeHtml(tool.title)}" 
+                    class="py-2 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-brand-cyan border border-zinc-700 hover:border-brand-cyan/40 text-xs font-semibold flex items-center justify-center transition-all hover:scale-105"
+                    aria-label="Share tool">
+              <i class="fa-solid fa-share-nodes text-xs"></i>
             </button>
             
             ${tool.downloadGithubOnly ? `
@@ -699,12 +725,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ================= MODAL LOGIC =================
-  window.openToolModal = function(toolId, isUpcoming = false) {
+  window.openToolModal = function(toolId, isUpcoming = false, isFromUrl = false) {
     const list = isUpcoming ? upcomingList : publishedList;
     const tool = list.find(t => t.id === toolId);
     if (!tool) return;
 
     state.activeModalTool = tool;
+
+    // Update URL query param to reflect this active tool for easy direct sharing
+    try {
+      history.replaceState({ toolId: tool.id }, '', `?tool=${encodeURIComponent(tool.id)}`);
+    } catch (e) {}
+
+    // Show shared direct link notice banner if opened from an external shared link
+    if (modalSharedNotice) {
+      modalSharedNotice.classList.toggle('hidden', !isFromUrl);
+    }
 
     const isLisp = tool.category === 'AutoLISP';
     const isPyRevit = tool.category === 'pyRevit';
@@ -833,6 +869,17 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">#${escapeHtml(tag)}</span>
     `).join('');
 
+    // Wire up modal share buttons
+    if (modalShareBtn) {
+      modalShareBtn.onclick = () => shareTool(tool.id);
+    }
+    if (modalShareBottomBtn) {
+      modalShareBottomBtn.onclick = () => shareTool(tool.id);
+    }
+    if (modalSharedCopyBtn) {
+      modalSharedCopyBtn.onclick = () => shareTool(tool.id);
+    }
+
     toolModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
   };
@@ -841,6 +888,10 @@ document.addEventListener('DOMContentLoaded', () => {
     toolModal.classList.add('hidden');
     document.body.style.overflow = 'auto';
     if (modalVideoIframe) modalVideoIframe.src = '';
+    if (modalSharedNotice) modalSharedNotice.classList.add('hidden');
+    try {
+      history.replaceState({}, '', window.location.pathname);
+    } catch (e) {}
   }
 
   closeModalBtn.addEventListener('click', closeToolModal);
@@ -991,6 +1042,99 @@ document.addEventListener('DOMContentLoaded', () => {
   function escapeJs(str) {
     if (!str) return '';
     return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+  }
+
+  // ================= SHARE TOOL DEEP-LINKING =================
+  window.shareTool = function(toolId, event) {
+    if (event) event.stopPropagation();
+    const list = [...publishedList, ...upcomingList];
+    const tool = list.find(t => t.id === toolId);
+    if (!tool) return;
+
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('tool', tool.id);
+    const shareUrl = url.toString();
+
+    if (navigator.share) {
+      navigator.share({
+        title: `${tool.title} | Ludarp Civil`,
+        text: `Check out ${tool.title} on Ludarp Civil Tools Hub:\n${tool.summary}`,
+        url: shareUrl
+      }).catch((err) => {
+        if (err.name !== 'AbortError') {
+          copyToClipboard(shareUrl, `Direct share link for "${tool.title}" copied!`);
+        }
+      });
+    } else {
+      copyToClipboard(shareUrl, `Direct share link for "${tool.title}" copied!`);
+    }
+  };
+
+  window.shareActiveModalTool = function() {
+    if (state.activeModalTool) {
+      shareTool(state.activeModalTool.id);
+    }
+  };
+
+  window.copyCurrentShareLink = function() {
+    if (state.activeModalTool) {
+      shareTool(state.activeModalTool.id);
+    }
+  };
+
+  function checkUrlDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    let toolId = params.get('tool') || params.get('id');
+    if (!toolId && window.location.hash) {
+      const cleanHash = window.location.hash.replace('#', '').replace('tool=', '');
+      if (publishedList.some(t => t.id === cleanHash) || upcomingList.some(t => t.id === cleanHash)) {
+        toolId = cleanHash;
+      }
+    }
+    if (!toolId) return;
+
+    const isUpcoming = upcomingList.some(t => t.id === toolId);
+    const tool = (isUpcoming ? upcomingList : publishedList).find(t => t.id === toolId);
+    if (!tool) return;
+
+    // Automatically switch to the tool's tab
+    if (isUpcoming) {
+      state.activeTab = 'upcoming';
+    } else if (tool.category === 'AutoLISP') {
+      state.activeTab = 'AutoLISP';
+    } else if (tool.category === 'pyRevit') {
+      state.activeTab = 'pyRevit';
+    } else if (tool.category === 'Other') {
+      state.activeTab = 'Other';
+    } else {
+      state.activeTab = 'all';
+    }
+
+    // Sync tab button active classes
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      const isCurrent = b.getAttribute('data-tab') === state.activeTab;
+      b.classList.toggle('border-brand-cyan', isCurrent);
+      b.classList.toggle('text-brand-cyan', isCurrent);
+      b.classList.toggle('bg-brand-cyan/10', isCurrent);
+      b.classList.toggle('border-transparent', !isCurrent);
+      b.classList.toggle('text-slate-400', !isCurrent);
+    });
+
+    render();
+
+    // Open modal directly for this tool
+    setTimeout(() => {
+      openToolModal(toolId, isUpcoming, true);
+      const card = document.getElementById(`tool-card-${toolId}`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('ring-2', 'ring-brand-cyan', 'ring-offset-2', 'ring-offset-slate-900');
+        setTimeout(() => {
+          card.classList.remove('ring-2', 'ring-brand-cyan', 'ring-offset-2', 'ring-offset-slate-900');
+        }, 3500);
+      }
+      showToast(`Viewing shared tool: ${tool.title}`, 'fa-share-nodes');
+    }, 150);
   }
 
 });
