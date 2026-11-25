@@ -156,10 +156,10 @@
           <span class="hidden sm:inline">Load Guides</span>
         </button>
 
-        <!-- Site & Download Analytics Modal Trigger -->
-        <button id="analyticsBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all hover:scale-105 shadow-sm" title="View Site Visits & Download Analytics">
-          <i class="fa-solid fa-chart-line"></i>
-          <span class="hidden sm:inline">Analytics</span>
+        <!-- Private Admin Leads & Analytics Modal Trigger -->
+        <button id="analyticsBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all hover:scale-105 shadow-sm" title="Private Admin Leads & Analytics">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span class="hidden sm:inline">Admin</span>
         </button>
 
         <!-- Dark / Light Theme Toggle -->
@@ -191,11 +191,11 @@
               </span>
             </div>
             <p class="text-sm sm:text-base text-slate-300 mt-1.5 max-w-2xl font-normal leading-relaxed">
-              Official catalog of published <strong class="text-brand-cyan">AutoCAD AutoLISP</strong> scripts, <strong class="text-orange-400">Revit pyRevit</strong> extensions, and the <strong class="text-emerald-400">Ludarp.Civil</strong> automation & shortcut library. Built for civil engineers, BIM managers, and computational drafters.
+              Official catalog of published <strong class="text-red-400">AutoCAD AutoLISP</strong> scripts, <strong class="text-blue-400">Revit pyRevit</strong> extensions, and the <strong class="text-emerald-400">Ludarp.Civil</strong> automation & shortcut library. Built for civil engineers, BIM managers, and computational drafters.
             </p>
             <div class="flex items-center gap-3 mt-3 text-xs text-slate-400 flex-wrap">
               <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-brand-cyan"></i> AEC & Civil Engineering</span>
-              <span class="flex items-center gap-1.5"><i class="fa-solid fa-code text-orange-400"></i> AutoLISP • Python • pyRevit • Dynamo</span>
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-code text-red-400"></i> AutoLISP • Python • pyRevit • Dynamo</span>
               <a href="https://github.com/PRADUL-P" target="_blank" class="flex items-center gap-1 text-brand-cyan hover:underline">
                 <i class="fa-brands fa-github"></i> @PRADUL-P
               </a>
@@ -210,11 +210,11 @@
             <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Published</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
-            <div id="statLispCount" class="text-xl font-extrabold text-orange-400">8</div>
+            <div id="statLispCount" class="text-xl font-extrabold text-red-400">8</div>
             <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">CAD LISPs</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
-            <div id="statPyRevitCount" class="text-xl font-extrabold text-purple-400">7</div>
+            <div id="statPyRevitCount" class="text-xl font-extrabold text-blue-400">7</div>
             <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">pyRevit Tools</div>
           </div>
           <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-center">
@@ -240,13 +240,13 @@
         </button>
 
         <button data-tab="AutoLISP" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
-          <i class="fa-solid fa-code text-orange-400"></i>
+          <i class="fa-solid fa-code text-red-400"></i>
           <span>AutoCAD LISPs</span>
           <span id="badgeLisp" class="px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">8</span>
         </button>
 
         <button data-tab="pyRevit" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
-          <i class="fa-solid fa-cubes-stacked text-purple-400"></i>
+          <i class="fa-solid fa-cubes-stacked text-blue-400"></i>
           <span>Revit pyRevit</span>
           <span id="badgePyRevit" class="px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">7</span>
         </button>
@@ -336,14 +336,14 @@
             <span id="countAllShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900/40 text-[10px] font-mono">201</span>
           </button>
           <button data-software="AutoCAD" class="software-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-code text-orange-400"></i>
+            <i class="fa-solid fa-code text-red-400"></i>
             <span>AutoCAD</span>
-            <span id="countAutoCadShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900 text-slate-400 text-[10px] font-mono">141</span>
+            <span id="countAutoCadShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900 text-red-300 text-[10px] font-mono">141</span>
           </button>
           <button data-software="Revit" class="software-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-cubes-stacked text-purple-400"></i>
+            <i class="fa-solid fa-cubes-stacked text-blue-400"></i>
             <span>Revit BIM</span>
-            <span id="countRevitShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900 text-purple-300 text-[10px] font-mono">60</span>
+            <span id="countRevitShortcuts" class="px-1.5 py-0.2 rounded-full bg-slate-900 text-blue-300 text-[10px] font-mono">60</span>
           </button>
         </div>
 
@@ -670,7 +670,7 @@
       <div class="mt-5 space-y-6 text-xs text-slate-300">
         <!-- AutoCAD LISP Guide -->
         <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-          <h4 class="text-sm font-bold text-orange-400 flex items-center gap-2 mb-2 font-mono">
+          <h4 class="text-sm font-bold text-red-400 flex items-center gap-2 mb-2 font-mono">
             <i class="fa-solid fa-code"></i> 1. AutoCAD AutoLISP (.lsp)
           </h4>
           <ul class="list-disc list-inside space-y-1.5 leading-relaxed">
@@ -682,13 +682,13 @@
 
         <!-- pyRevit Guide -->
         <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-          <h4 class="text-sm font-bold text-purple-400 flex items-center gap-2 mb-2 font-mono">
+          <h4 class="text-sm font-bold text-blue-400 flex items-center gap-2 mb-2 font-mono">
             <i class="fa-solid fa-cubes-stacked"></i> 2. Revit pyRevit Extension (.extension)
           </h4>
           <ul class="list-disc list-inside space-y-1.5 leading-relaxed">
             <li><strong>Why loose .py files cannot run alone:</strong> In pyRevit, buttons require the directory hierarchy (<code>.extension / .tab / .panel / .pushbutton</code>) with <code>bundle.yaml</code>, <code>icon.png</code>, and <code>ui.xaml</code> (WPF dialogs). A raw <code>.py</code> file dropped alone will not load on the ribbon.</li>
-            <li><strong>1-Click Install:</strong> Download the complete <code class="font-mono text-purple-300">Ludarp_pyRevit_Extension_Full.zip</code> package from the button above.</li>
-            <li>Extract the <code class="font-mono">Ludarp.extension</code> folder into: <code class="font-mono bg-slate-900 px-1 rounded text-purple-300">%APPDATA%\pyRevit\Extensions\</code></li>
+            <li><strong>1-Click Install:</strong> Download the complete <code class="font-mono text-blue-300">Ludarp_pyRevit_Extension_Full.zip</code> package from the button above.</li>
+            <li>Extract the <code class="font-mono">Ludarp.extension</code> folder into: <code class="font-mono bg-slate-900 px-1 rounded text-blue-300">%APPDATA%\pyRevit\Extensions\</code></li>
             <li>In Revit, click <strong>pyRevit -> Reload</strong>. The entire <strong>LUDARP</strong> tab with all 7 tools will immediately appear!</li>
           </ul>
         </div>
@@ -745,7 +745,7 @@
       </div>
 
       <!-- Lead Capture Form for Automated Download -->
-      <form id="downloadAccessForm" onsubmit="handleDownloadAccessSubmit(event)" class="mt-4 space-y-3.5">
+      <form id="downloadAccessForm" onsubmit="handleDownloadAccessSubmit(event, 'whatsapp')" class="mt-4 space-y-3.5">
         
         <!-- Name Field -->
         <div>
@@ -799,37 +799,35 @@
           </div>
         </div>
 
-        <!-- Delivery Options -->
+        <!-- Choose Delivery Method -->
         <div class="mt-4 pt-3 border-t border-slate-800 space-y-2.5">
-          <div class="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <i class="fa-solid fa-arrow-down-to-bracket text-brand-cyan"></i> Choose How to Receive Download Link:
-            </span>
-          </div>
-
-          <!-- 1. Instant Download to this device -->
-          <button type="button" onclick="handleDownloadAccessSubmit(event, 'device')" id="submitLeadDownloadBtn" 
-                  class="w-full py-2.5 px-4 rounded-xl bg-brand-cyan hover:bg-sky-400 text-brand-dark font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-brand-cyan/20 transition-all hover:scale-[1.01] active:scale-95">
-            <i class="fa-solid fa-download text-sm"></i>
-            <span>Instant Download to This Device</span>
-          </button>
-
-          <!-- 2. Send via WhatsApp / Email Buttons -->
+          <label class="block text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider">
+            Choose Delivery Option:
+          </label>
           <div class="grid grid-cols-2 gap-2">
+            <!-- 1. Send via WhatsApp -->
             <button type="button" onclick="handleDownloadAccessSubmit(event, 'whatsapp')" 
-                    class="py-2.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm"
-                    title="Send download link to your WhatsApp">
-              <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i>
-              <span>Send Link to WhatsApp</span>
+                    class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-emerald-600/20 hover:scale-[1.02] active:scale-95"
+                    title="Send verified download link directly to your WhatsApp">
+              <i class="fa-brands fa-whatsapp text-base"></i>
+              <span>Send to WhatsApp</span>
             </button>
 
+            <!-- 2. Send via Email -->
             <button type="button" onclick="handleDownloadAccessSubmit(event, 'email')" 
-                    class="py-2.5 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm"
-                    title="Send download link to your Email">
-              <i class="fa-solid fa-envelope text-blue-400 text-xs"></i>
-              <span>Send Link to Email</span>
+                    class="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95"
+                    title="Send verified download link directly to your Email">
+              <i class="fa-solid fa-envelope text-sm"></i>
+              <span>Send to Email</span>
             </button>
           </div>
+
+          <!-- 3. Direct Download to this device -->
+          <button type="button" onclick="handleDownloadAccessSubmit(event, 'device')" id="submitLeadDownloadBtn" 
+                  class="w-full mt-1.5 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-brand-cyan font-semibold text-xs border border-slate-700 hover:border-brand-cyan/40 flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-download text-xs text-brand-cyan"></i>
+            <span>or Download Instantly to this Device</span>
+          </button>
         </div>
       </form>
 
@@ -860,7 +858,7 @@
     </div>
   </div>
 
-  <!-- ================= SITE & DOWNLOAD ANALYTICS MODAL ================= -->
+  <!-- ================= PRIVATE ADMIN & DOWNLOAD ANALYTICS MODAL ================= -->
   <div id="analyticsModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
     <div class="modal-content relative w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-slate-700 dark:border-brand-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
       
@@ -868,25 +866,63 @@
       <div class="p-5 border-b border-slate-800 flex items-center justify-between gap-3 bg-slate-900/90">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-lg">
-            <i class="fa-solid fa-chart-line"></i>
+            <i class="fa-solid fa-shield-halved"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="text-base sm:text-lg font-bold text-white">Site Traffic &amp; Downloads Analytics</h3>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live Telemetry
+              <h3 class="text-base sm:text-lg font-bold text-white">Private Admin Leads &amp; Telemetry</h3>
+              <span id="adminAuthBadge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <i class="fa-solid fa-lock text-[9px]"></i> Private Admin
               </span>
             </div>
-            <p class="text-xs text-slate-400">Track site visitors, downloads per tool, and GitHub release metrics.</p>
+            <p class="text-xs text-slate-400">Restricted access portal for Pradul to manage leads and download activity.</p>
           </div>
         </div>
-        <button id="closeAnalyticsModalBtn" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <div class="flex items-center gap-2">
+          <button id="adminLogoutBtn" onclick="handleAdminLogout()" class="hidden px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-mono transition-all flex items-center gap-1.5" title="Lock and log out of admin session">
+            <i class="fa-solid fa-lock text-[10px]"></i>
+            <span>Lock</span>
+          </button>
+          <button id="closeAnalyticsModalBtn" class="text-slate-400 hover:text-white p-2">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
       </div>
 
-      <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-300">
+      <!-- ================= 1. ADMIN PIN LOGIN GATE (VISIBLE TO VISITORS) ================= -->
+      <div id="adminAuthGate" class="p-8 sm:p-12 flex flex-col items-center justify-center text-center space-y-5">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-3xl shadow-xl">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="max-w-md space-y-1.5">
+          <h3 class="text-lg sm:text-xl font-bold text-white">Admin Authentication Required</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Live user lead contacts (names, WhatsApp numbers, emails) and detailed download telemetry are strictly private. Please enter your Admin PIN to unlock.
+          </p>
+        </div>
+        <form id="adminAuthForm" onsubmit="handleAdminAuth(event)" class="w-full max-w-sm space-y-3.5">
+          <div class="relative">
+            <i class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="password" id="adminPinInput" autocomplete="current-password" placeholder="Enter Admin PIN or Password" 
+                   class="w-full pl-9 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 font-mono transition-all" />
+            <button type="button" onclick="toggleAdminPinVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs">
+              <i id="adminPinEyeIcon" class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <div id="adminAuthError" class="hidden text-xs text-rose-400 font-mono text-center"></div>
+          <button type="submit" 
+                  class="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-95">
+            <i class="fa-solid fa-lock-open text-xs"></i>
+            <span>Unlock Admin Dashboard</span>
+          </button>
+        </form>
+        <div class="text-[10px] text-slate-500 font-mono">
+          Confidential • Ludarp Civil Admin Portal
+        </div>
+      </div>
+
+      <!-- ================= 2. PROTECTED ADMIN DASHBOARD BODY (UNLOCKED) ================= -->
+      <div id="adminProtectedContent" class="hidden p-6 overflow-y-auto space-y-6 text-xs text-slate-300">
         
         <!-- Summary Cards Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
@@ -993,9 +1029,14 @@
               <span>Refresh</span>
             </button>
           </div>
-          <button id="analyticsResetBtn" class="text-xs text-red-400 hover:text-red-300 underline font-mono">
-            Reset Local Counter Data
-          </button>
+          <div class="flex items-center gap-3">
+            <button onclick="handleChangeAdminPin()" class="text-xs text-slate-400 hover:text-emerald-400 underline font-mono">
+              Change PIN
+            </button>
+            <button id="analyticsResetBtn" class="text-xs text-red-400 hover:text-red-300 underline font-mono">
+              Reset Counter Data
+            </button>
+          </div>
         </div>
 
       </div>
@@ -1009,10 +1050,10 @@
     <span id="toastMessage">Success notification!</span>
   </div>
 
-  <!-- Scripts -->
-  <script src="ludarp-data.js"></script>
-  <script src="revit-shortcuts-data.js"></script>
-  <script src="tools-data.js"></script>
-  <script src="hub-app.js"></script>
+  <!-- Scripts (Versioned for cache-busting) -->
+  <script src="ludarp-data.js?v=2.2"></script>
+  <script src="revit-shortcuts-data.js?v=2.2"></script>
+  <script src="tools-data.js?v=2.2"></script>
+  <script src="hub-app.js?v=2.2"></script>
 </body>
 </html>

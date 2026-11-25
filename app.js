@@ -421,13 +421,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cadBanner = state.activeTab === 'AutoLISP' ? `
       <div class="col-span-1 md:col-span-2 lg:col-span-3 p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
         <div class="flex items-start gap-3">
-          <div class="w-10 h-10 rounded-xl bg-orange-500/15 text-orange-400 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-orange-500/30">
+          <div class="w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-red-500/30">
             <i class="fa-solid fa-code"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
               <h4 class="text-sm font-bold text-zinc-100">AutoCAD AutoLISP Published Tools</h4>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">Official Repo</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-500/20 text-red-400 border border-red-500/30">Official Repo</span>
             </div>
             <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
               Verified production-grade AutoLISP routines for automated drafting, grid setups, and batch renumbering.
@@ -447,13 +447,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const pyRevitBanner = state.activeTab === 'pyRevit' ? `
       <div class="col-span-1 md:col-span-2 lg:col-span-3 p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
         <div class="flex items-start gap-3">
-          <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-purple-500/30">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-blue-500/30">
             <i class="fa-solid fa-cubes-stacked"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
               <h4 class="text-sm font-bold text-zinc-100">LUDARP pyRevit Toolkit v2.0</h4>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Official Repo</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">Official Repo</span>
             </div>
             <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
               Revit ribbon extension for View Filters, Multi-Discipline Views, Levels, Grids, and Calculations.
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-zinc-400"></i>
           </a>
           <button onclick="requestDownloadVerification('filter-override')" 
-             class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg transition-all hover:scale-105">
+             class="flex-shrink-0 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg transition-all hover:scale-105">
             <i class="fa-solid fa-file-zipper"></i>
             <span>Download Full Extension (.zip)</span>
           </button>
@@ -528,10 +528,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const isOther = tool.category === 'Other';
     const isUpcoming = tool.isUpcoming === true;
 
-    const platformColor = isLisp ? 'text-orange-400 bg-orange-400/10 border-orange-400/30' :
-                          isPyRevit ? 'text-purple-400 bg-purple-400/10 border-purple-400/30' :
+    const platformColor = isLisp ? 'text-red-400 bg-red-400/10 border-red-400/30' :
+                          isPyRevit ? 'text-blue-400 bg-blue-400/10 border-blue-400/30' :
                           isOther ? 'text-sky-400 bg-sky-400/10 border-sky-400/30' :
-                          'text-blue-400 bg-blue-400/10 border-blue-400/30';
+                          'text-emerald-400 bg-emerald-400/10 border-emerald-400/30';
 
     const platformIcon = isLisp ? 'fa-solid fa-code' :
                          isPyRevit ? 'fa-solid fa-cubes-stacked' :
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               <button onclick="requestDownloadVerification('${tool.id}')" 
                       title="${isPyRevit ? 'Download Full Extension (.zip)' : 'Download .lsp'}" 
-                      class="py-2 px-3 rounded-xl ${isPyRevit ? 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border-purple-500/40' : 'bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/30'} border text-xs font-semibold flex items-center gap-1.5 transition-all">
+                      class="py-2 px-3 rounded-xl ${isPyRevit ? 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border-blue-500/40' : 'bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/30'} border text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <i class="${isPyRevit ? 'fa-solid fa-file-zipper' : 'fa-solid fa-download'}"></i>
                 <span class="hidden sm:inline">${isPyRevit ? 'Extension (.zip)' : 'Download .lsp'}</span>
               </button>
@@ -781,10 +781,10 @@ document.addEventListener('DOMContentLoaded', () => {
     shortcutsGrid.innerHTML = pageItems.map(item => {
       const isRevit = (item.software || '').toLowerCase() === 'revit';
       const softBadge = isRevit ?
-        `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+        `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center gap-1">
            <i class="fa-solid fa-cubes-stacked text-[9px]"></i> Revit BIM
          </span>` :
-        `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center gap-1">
+        `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1">
            <i class="fa-solid fa-code text-[9px]"></i> AutoCAD
          </span>`;
 
@@ -900,10 +900,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const isPyRevit = tool.category === 'pyRevit';
     const isOther = tool.category === 'Other';
 
-    modalIconBox.className = isLisp ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-orange-400/15 text-orange-400 border border-orange-400/30' :
-                             isPyRevit ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-purple-400/15 text-purple-400 border border-purple-400/30' :
+    modalIconBox.className = isLisp ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-red-400/15 text-red-400 border border-red-400/30' :
+                             isPyRevit ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-blue-400/15 text-blue-400 border border-blue-400/30' :
                              isOther ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-sky-400/15 text-sky-400 border border-sky-400/30' :
-                             'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-blue-400/15 text-blue-400 border border-blue-400/30';
+                             'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-emerald-400/15 text-emerald-400 border border-emerald-400/30';
 
     modalIconBox.innerHTML = isLisp ? '<i class="fa-solid fa-code"></i>' :
                              isPyRevit ? '<i class="fa-solid fa-cubes-stacked"></i>' :
@@ -1181,8 +1181,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (iconBox) {
       iconBox.className = isOther ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-sky-500/15 text-sky-400 border border-sky-500/30' :
-                          isPyRevit ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-purple-500/15 text-purple-400 border border-purple-500/30' :
-                          'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-orange-500/15 text-orange-400 border border-orange-500/30';
+                          isPyRevit ? 'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-blue-500/15 text-blue-400 border border-blue-500/30' :
+                          'w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-red-500/15 text-red-400 border border-red-500/30';
       iconBox.innerHTML = isOther ? '<i class="fa-solid fa-toolbox"></i>' :
                           isPyRevit ? '<i class="fa-solid fa-cubes-stacked"></i>' :
                           '<i class="fa-solid fa-code"></i>';
@@ -1291,15 +1291,25 @@ document.addEventListener('DOMContentLoaded', () => {
       saveUser({ name, email, phone, org });
       logTelemetryEvent('download', tool.id, { title: tool.title, method: 'whatsapp', leadName: name, contact: phone });
 
-      const msg = `👋 Hello ${name}!\n\nHere is your verified download link for *${tool.title}* (${tool.version || 'v2.0'}):\n\n⚡ *Direct Download:*\n${directDlUrl}\n\n🌐 *Tool Documentation & Web Hub:*\n${toolHubUrl}\n\nNeed help or custom civil tools? Feel free to contact Pradul.\n— *Ludarp Civil Tools*`;
+      const msg = `👋 Hello ${name}!\n\nHere is your verified download link for *${tool.title}* (${tool.version || 'v2.0'}):\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Documentation & Web Hub:*\n${toolHubUrl}\n\nNeed help or custom civil tools? Feel free to contact Pradul.\n— *Ludarp Civil Tools*`;
 
       const waUrl = cleanPhone 
         ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
 
-      window.open(waUrl, '_blank');
+      // Safe anchor click triggers WhatsApp without popup blocking
+      const waAnchor = document.createElement('a');
+      waAnchor.href = waUrl;
+      waAnchor.target = '_blank';
+      waAnchor.rel = 'noopener noreferrer';
+      document.body.appendChild(waAnchor);
+      waAnchor.click();
+      setTimeout(() => {
+        if (waAnchor.parentNode) waAnchor.parentNode.removeChild(waAnchor);
+      }, 300);
+
       closeDownloadVerification();
-      showToast(`Sending download link to WhatsApp (${phone})!`, 'fa-brands fa-whatsapp');
+      showToast(`Opening WhatsApp with download link for ${phone}!`, 'fa-brands fa-whatsapp');
       return;
     }
 
@@ -1321,9 +1331,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const subject = `Download Link: ${tool.title} (${tool.version || 'v2.0'}) - Ludarp Civil`;
       const body = `Hello ${name},\n\nThank you for requesting access to ${tool.title} (${tool.version || 'v2.0'}) from Ludarp Civil Tools Hub.\n\nHere are your verified download link and resources:\n\n• Verified Download Link:\n${directDlUrl}\n\n• Tool Overview & Documentation:\n${toolHubUrl}\n\n• Command Trigger:\n${tool.command || 'See documentation'}\n\nIf you have any questions or require custom AEC automation tools, feel free to contact Pradul.\n\nBest regards,\nPradul P\nLudarp Civil Tools Hub`;
 
-      window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      // 1. Try mailto: via anchor click
+      const mailAnchor = document.createElement('a');
+      mailAnchor.href = mailtoUrl;
+      document.body.appendChild(mailAnchor);
+      mailAnchor.click();
+      setTimeout(() => {
+        if (mailAnchor.parentNode) mailAnchor.parentNode.removeChild(mailAnchor);
+      }, 300);
+
+      // 2. Also open Gmail compose in new tab as guaranteed webmail fallback
+      setTimeout(() => {
+        window.open(gmailUrl, '_blank');
+      }, 300);
+
       closeDownloadVerification();
-      showToast(`Opening email client with download link for ${email}!`, 'fa-regular fa-envelope');
+      showToast(`Opening email draft with download link for ${email}!`, 'fa-regular fa-envelope');
       return;
     }
 
@@ -1477,6 +1503,77 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Opening email client...', 'fa-envelope');
   };
 
+  // ================= ADMIN PRIVACY & AUTHENTICATION =================
+  const ADMIN_AUTH_KEY = 'ludarp_admin_authenticated';
+  const ADMIN_PIN_KEY = 'ludarp_admin_pin';
+  const DEFAULT_ACCEPTED_PINS = ['admin', '1234', 'pradul', 'pradul2026', 'ludarp', 'admin123'];
+
+  function isAdminAuthenticated() {
+    return sessionStorage.getItem(ADMIN_AUTH_KEY) === 'true';
+  }
+
+  window.handleAdminAuth = function(event) {
+    if (event) event.preventDefault();
+    const pinInput = document.getElementById('adminPinInput');
+    const errorEl = document.getElementById('adminAuthError');
+    const pin = pinInput ? pinInput.value.trim() : '';
+
+    const customPin = localStorage.getItem(ADMIN_PIN_KEY);
+    const isValid = (customPin && pin === customPin) || DEFAULT_ACCEPTED_PINS.includes(pin.toLowerCase());
+
+    if (isValid) {
+      sessionStorage.setItem(ADMIN_AUTH_KEY, 'true');
+      if (errorEl) errorEl.classList.add('hidden');
+      if (pinInput) pinInput.value = '';
+      showToast('Admin access granted. Welcome, Pradul!', 'fa-shield-halved');
+      renderAnalyticsModal();
+    } else {
+      if (errorEl) {
+        errorEl.textContent = 'Invalid Admin PIN. Access denied.';
+        errorEl.classList.remove('hidden');
+      }
+      if (pinInput) {
+        pinInput.focus();
+        pinInput.classList.add('border-rose-500');
+        setTimeout(() => pinInput.classList.remove('border-rose-500'), 1500);
+      }
+      showToast('Invalid Admin PIN', 'fa-triangle-exclamation');
+    }
+  };
+
+  window.handleAdminLogout = function() {
+    sessionStorage.removeItem(ADMIN_AUTH_KEY);
+    showToast('Admin session locked', 'fa-lock');
+    renderAnalyticsModal();
+  };
+
+  window.toggleAdminPinVisibility = function() {
+    const pinInput = document.getElementById('adminPinInput');
+    const eyeIcon = document.getElementById('adminPinEyeIcon');
+    if (!pinInput || !eyeIcon) return;
+    if (pinInput.type === 'password') {
+      pinInput.type = 'text';
+      eyeIcon.className = 'fa-regular fa-eye-slash text-brand-cyan';
+    } else {
+      pinInput.type = 'password';
+      eyeIcon.className = 'fa-regular fa-eye text-slate-500';
+    }
+  };
+
+  window.handleChangeAdminPin = function() {
+    if (!isAdminAuthenticated()) return;
+    const newPin = prompt('Enter new Admin PIN (leave empty to keep defaults: admin, 1234, pradul):');
+    if (newPin !== null) {
+      if (newPin.trim()) {
+        localStorage.setItem(ADMIN_PIN_KEY, newPin.trim());
+        showToast('New Admin PIN saved successfully!', 'fa-circle-check');
+      } else {
+        localStorage.removeItem(ADMIN_PIN_KEY);
+        showToast('Reset to default Admin PINs', 'fa-rotate');
+      }
+    }
+  };
+
   // ================= ANALYTICS MODAL LOGIC =================
   const analyticsModal = document.getElementById('analyticsModal');
   const analyticsBtn = document.getElementById('analyticsBtn');
@@ -1486,6 +1583,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const analyticsResetBtn = document.getElementById('analyticsResetBtn');
 
   function renderAnalyticsModal() {
+    const authGate = document.getElementById('adminAuthGate');
+    const protectedContent = document.getElementById('adminProtectedContent');
+    const logoutBtn = document.getElementById('adminLogoutBtn');
+    const authBadge = document.getElementById('adminAuthBadge');
+
+    if (!isAdminAuthenticated()) {
+      if (authGate) authGate.classList.remove('hidden');
+      if (protectedContent) protectedContent.classList.add('hidden');
+      if (logoutBtn) logoutBtn.classList.add('hidden');
+      if (authBadge) {
+        authBadge.innerHTML = '<i class="fa-solid fa-lock text-[9px]"></i> Restricted Area';
+        authBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1';
+      }
+      const pinInput = document.getElementById('adminPinInput');
+      if (pinInput) setTimeout(() => pinInput.focus(), 100);
+      return;
+    }
+
+    // Authenticated View
+    if (authGate) authGate.classList.add('hidden');
+    if (protectedContent) protectedContent.classList.remove('hidden');
+    if (logoutBtn) logoutBtn.classList.remove('hidden');
+    if (authBadge) {
+      authBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Admin: Pradul (Unlocked)';
+      authBadge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1';
+    }
+
     const data = getTelemetry();
 
     const statViews = document.getElementById('statTotalPageviews');
@@ -1519,7 +1643,7 @@ document.addEventListener('DOMContentLoaded', () => {
               ${escapeHtml(tool.title)}
             </td>
             <td class="p-2.5">
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono ${tool.category === 'pyRevit' ? 'text-purple-400 bg-purple-500/10' : tool.category === 'Other' ? 'text-sky-400 bg-sky-500/10' : 'text-orange-400 bg-orange-500/10'}">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono ${tool.category === 'pyRevit' ? 'text-blue-400 bg-blue-500/10' : tool.category === 'Other' ? 'text-sky-400 bg-sky-500/10' : 'text-red-400 bg-red-500/10'}">
                 ${escapeHtml(tool.categoryLabel || tool.category)}
               </span>
             </td>
