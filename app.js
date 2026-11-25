@@ -1212,6 +1212,75 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ================= VERIFIED DOWNLOAD MODAL & ACTIONS =================
+  window.resetVerificationModalView = function() {
+    const form = document.getElementById('downloadAccessForm');
+    const successView = document.getElementById('verifySuccessView');
+    if (form) form.classList.remove('hidden');
+    if (successView) successView.classList.add('hidden');
+  };
+
+  // Force actual file download to local disk (never view as raw text code in browser)
+  window.triggerRealFileDownload = function(tool, defaultFileName) {
+    if (!tool) return;
+
+    // For tools with codeSnippet (AutoLISP .lsp, Python, etc.), use application/octet-stream Blob.
+    // This strictly forces the browser to download the file directly to disk,
+    // completely preventing the browser from opening/rendering the code as a text page!
+    if (tool.codeSnippet) {
+      try {
+        const blob = new Blob([tool.codeSnippet], { type: 'application/octet-stream' });
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = defaultFileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          if (a.parentNode) a.parentNode.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        }, 300);
+        return;
+      } catch (err) {
+        console.warn('Blob download error:', err);
+      }
+    }
+
+    // For tools with standalone executable releases (e.g. Drawing Packager)
+    if (tool.downloadGithubOnly) {
+      const url = tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe';
+      window.open(url, '_blank');
+      return;
+    }
+
+    // Direct download link fallback
+    if (tool.downloadUrl) {
+      const a = document.createElement('a');
+      a.href = tool.downloadUrl;
+      a.download = defaultFileName;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        if (a.parentNode) a.parentNode.removeChild(a);
+      }, 300);
+      return;
+    }
+  };
+
+  // Re-trigger download from success view
+  window.handleRedownload = function() {
+    const tool = state.verifyingTool;
+    if (!tool) return;
+    const isOther = tool.category === 'Other';
+    const isPyRevit = tool.category === 'pyRevit';
+    let defaultFileName = isOther ? 'LUDARP.Drawing.Packager.exe' :
+                          isPyRevit ? 'Ludarp_pyRevit_Extension_Full.zip' :
+                          `${tool.id}.lsp`;
+    if (tool.downloadFilename) defaultFileName = tool.downloadFilename;
+    triggerRealFileDownload(tool, defaultFileName);
+    showToast(`Downloading ${defaultFileName}...`, 'fa-solid fa-download');
+  };
+
   window.requestDownloadVerification = function(toolId) {
     const list = [...publishedList, ...upcomingList];
     const tool = list.find(t => t.id === toolId);
@@ -1223,6 +1292,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     state.verifyingTool = tool;
+
+    // Reset view so form is visible
+    resetVerificationModalView();
 
     const modal = document.getElementById('downloadVerifyModal');
     const titleEl = document.getElementById('verifyModalTitle');
@@ -1273,8 +1345,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = 'auto';
   };
 
-  // Submit Details & Instant Automated Download or Delivery via WhatsApp / Email
-  window.handleDownloadAccessSubmit = function(event, deliveryMode = 'device') {
+  // Submit Details & Instant Automated Download with Verification & Backup Links
+  window.handleDownloadAccessSubmit = function(event) {
     if (event) event.preventDefault();
     const tool = state.verifyingTool;
     if (!tool) return;
@@ -1295,25 +1367,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (deliveryMode === 'whatsapp') {
-      if (!phone) {
-        showToast('Please enter your Phone / WhatsApp number to receive the link.', 'fa-brands fa-whatsapp');
-        if (phoneInput) phoneInput.focus();
-        return;
-      }
-    } else if (deliveryMode === 'email') {
-      if (!email) {
-        showToast('Please enter your Email address to receive the link.', 'fa-regular fa-envelope');
-        if (emailInput) emailInput.focus();
-        return;
-      }
-    } else {
-      // mode === 'device'
-      if (!email && !phone) {
-        showToast('Please provide either an Email or Phone (WhatsApp) to unlock download.', 'fa-circle-exclamation');
-        if (emailInput) emailInput.focus();
-        return;
-      }
+    if (!email && !phone) {
+      showToast('Please provide an Email or Phone (WhatsApp) to unlock download.', 'fa-circle-exclamation');
+      if (emailInput) emailInput.focus();
+      return;
     }
 
     // Determine filename and URLs
@@ -1346,73 +1403,51 @@ document.addEventListener('DOMContentLoaded', () => {
       downloadUrl: directDlUrl,
       toolUrl: toolHubUrl,
       timestamp: now,
-      method: deliveryMode === 'whatsapp' ? 'WhatsApp Delivery' : deliveryMode === 'email' ? 'Email Delivery' : 'Instant Device Download'
+      method: phone ? 'WhatsApp & Direct Download' : 'Email & Direct Download'
     };
 
     saveLead(leadRecord);
     saveUser({ name, email, phone, org });
-    logTelemetryEvent('download', tool.id, { title: tool.title, method: deliveryMode, leadName: name, contact: email || phone });
+    logTelemetryEvent('download', tool.id, { title: tool.title, leadName: name, contact: email || phone });
 
-    if (deliveryMode === 'whatsapp') {
-      let cleanPhone = phone.replace(/[^0-9]/g, '');
-      if (cleanPhone.length === 10 && /^[6-9]/.test(cleanPhone)) {
-        cleanPhone = '91' + cleanPhone;
-      }
+    // 1. TRIGGER IMMEDIATE REAL FILE DOWNLOAD (Forces .lsp or file save directly to disk)
+    triggerRealFileDownload(tool, defaultFileName);
 
-      const msg = `👋 Hello ${name}!\n\nHere is your verified download link for *${tool.title}* (${tool.version || 'v2.0'}):\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Documentation & Web Hub:*\n${toolHubUrl}\n\nNeed help or custom civil tools? Feel free to reply directly to this message.\n— *Ludarp Civil Tools*`;
-
-      const waUrl = cleanPhone 
-        ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`
-        : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-
-      // Safe anchor click triggers WhatsApp without popup blocking
-      const waAnchor = document.createElement('a');
-      waAnchor.href = waUrl;
-      waAnchor.target = '_blank';
-      waAnchor.rel = 'noopener noreferrer';
-      document.body.appendChild(waAnchor);
-      waAnchor.click();
-      setTimeout(() => {
-        if (waAnchor.parentNode) waAnchor.parentNode.removeChild(waAnchor);
-      }, 300);
-
-      closeDownloadVerification();
-      showToast(email && email !== 'N/A' 
-        ? `Link sent to ${email} & opening WhatsApp!` 
-        : `Opening WhatsApp with download link for ${phone}!`, 'fa-brands fa-whatsapp');
-      return;
+    // 2. Prepare WhatsApp Direct Link
+    let cleanPhone = phone.replace(/[^0-9]/g, '');
+    if (cleanPhone.length === 10 && /^[6-9]/.test(cleanPhone)) {
+      cleanPhone = '91' + cleanPhone;
     }
 
-    if (deliveryMode === 'email') {
-      closeDownloadVerification();
-      showToast(`Automated download email dispatched to ${email}!`, 'fa-envelope-circle-check');
-      return;
+    const msg = `👋 Hello ${name}!\n\nHere is your verified download link for *${tool.title}* (${tool.version || 'v2.0'}):\n\n⚡ *Download Link:*\n${directDlUrl}\n\n🌐 *Tool Documentation & Web Hub:*\n${toolHubUrl}\n\nNeed help or custom civil tools? Feel free to reply directly to this message.\n— *Ludarp Civil Tools*`;
+
+    const waUrl = cleanPhone 
+      ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+
+    // 3. Update Success View in Modal
+    const form = document.getElementById('downloadAccessForm');
+    const successView = document.getElementById('verifySuccessView');
+    const successFileName = document.getElementById('verifySuccessFileName');
+    const successWaBtn = document.getElementById('successWhatsAppBtn');
+    const successWaText = document.getElementById('successWhatsAppText');
+
+    if (successFileName) successFileName.textContent = `File: ${defaultFileName}`;
+    if (successWaBtn) {
+      successWaBtn.href = waUrl;
+    }
+    if (successWaText) {
+      successWaText.textContent = cleanPhone ? `Open in WhatsApp (+${cleanPhone})` : 'Open Download Link in WhatsApp';
     }
 
-    // Default: 'device' (Instant Download to This Device)
-    if (tool.downloadGithubOnly) {
-      window.open(tool.downloadUrl || 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe', '_blank');
-    } else if (tool.downloadUrl) {
-      const link = document.createElement('a');
-      link.href = tool.downloadUrl;
-      link.download = defaultFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    if (form) form.classList.add('hidden');
+    if (successView) successView.classList.remove('hidden');
+
+    if (email && email.includes('@')) {
+      showToast(`Downloading ${defaultFileName}! Verified link dispatched to your email.`, 'fa-circle-check');
     } else {
-      const blob = new Blob([tool.codeSnippet || '; LUDARP Civil Tool'], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = defaultFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      showToast(`Downloading ${defaultFileName}! Backup link prepared.`, 'fa-circle-check');
     }
-
-    closeDownloadVerification();
-    showToast(`Access granted! Downloading ${defaultFileName}...`, 'fa-circle-check');
   };
 
   // Ask Pradul on WhatsApp for the file or link

@@ -745,7 +745,7 @@
       </div>
 
       <!-- Lead Capture Form for Automated Download -->
-      <form id="downloadAccessForm" onsubmit="handleDownloadAccessSubmit(event, 'whatsapp')" class="mt-4 space-y-3.5">
+      <form id="downloadAccessForm" onsubmit="handleDownloadAccessSubmit(event)" class="mt-4 space-y-3.5">
         
         <!-- Name Field -->
         <div>
@@ -784,7 +784,7 @@
           </div>
         </div>
         <div class="text-[10px] text-slate-400 font-mono -mt-1">
-          * Enter at least an Email or Phone/WhatsApp to receive or unlock the file.
+          * Enter at least an Email or Phone/WhatsApp to unlock your download file.
         </div>
 
         <!-- Company / Role (Optional) -->
@@ -799,37 +799,49 @@
           </div>
         </div>
 
-        <!-- Choose Delivery Method -->
-        <div class="mt-4 pt-3 border-t border-slate-800 space-y-2.5">
-          <label class="block text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider">
-            Choose Delivery Option:
-          </label>
-          <div class="grid grid-cols-2 gap-2">
-            <!-- 1. Send via WhatsApp -->
-            <button type="button" onclick="handleDownloadAccessSubmit(event, 'whatsapp')" 
-                    class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-emerald-600/20 hover:scale-[1.02] active:scale-95"
-                    title="Send verified download link directly to your WhatsApp">
-              <i class="fa-brands fa-whatsapp text-base"></i>
-              <span>Send to WhatsApp</span>
-            </button>
+        <!-- PRIMARY SUBMIT BUTTON -->
+        <button type="submit" id="submitLeadDownloadBtn" 
+                class="w-full mt-2 py-3 px-4 rounded-xl bg-brand-cyan hover:bg-sky-400 text-brand-dark font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-brand-cyan/25 transition-all hover:scale-[1.01] active:scale-95">
+          <i class="fa-solid fa-download text-sm"></i>
+          <span>Submit &amp; Download File</span>
+        </button>
+      </form>
 
-            <!-- 2. Send via Email -->
-            <button type="button" onclick="handleDownloadAccessSubmit(event, 'email')" 
-                    class="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95"
-                    title="Send verified download link directly to your Email">
-              <i class="fa-solid fa-envelope text-sm"></i>
-              <span>Send to Email</span>
-            </button>
+      <!-- SUCCESS & INSTANT DELIVERY VIEW (SHOWN AFTER SUBMITTING DETAILS) -->
+      <div id="verifySuccessView" class="hidden mt-4 space-y-4">
+        <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-2">
+          <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl mx-auto shadow-md">
+            <i class="fa-solid fa-circle-check"></i>
           </div>
+          <h4 class="text-sm font-bold text-white">Download Started &amp; Link Prepared!</h4>
+          <p id="verifySuccessFileName" class="text-xs font-mono text-emerald-300 font-semibold"></p>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Your file download has started. We also prepared verified link backups below:
+          </p>
+        </div>
 
-          <!-- 3. Direct Download to this device -->
-          <button type="button" onclick="handleDownloadAccessSubmit(event, 'device')" id="submitLeadDownloadBtn" 
-                  class="w-full mt-1.5 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-brand-cyan font-semibold text-xs border border-slate-700 hover:border-brand-cyan/40 flex items-center justify-center gap-2 transition-all">
-            <i class="fa-solid fa-download text-xs text-brand-cyan"></i>
-            <span>or Download Instantly to this Device</span>
+        <!-- Direct Link Backup Buttons -->
+        <div class="space-y-2">
+          <!-- WhatsApp Link Button -->
+          <a id="successWhatsAppBtn" href="#" target="_blank" rel="noopener noreferrer" 
+             class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all hover:scale-[1.01]">
+            <i class="fa-brands fa-whatsapp text-base"></i>
+            <span id="successWhatsAppText">Open Download Link in WhatsApp</span>
+          </a>
+
+          <!-- Download Again Button -->
+          <button type="button" onclick="handleRedownload()" 
+                  class="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-download text-brand-cyan"></i>
+            <span>Click to Download Again</span>
           </button>
         </div>
-      </form>
+
+        <button type="button" onclick="resetVerificationModalView()" 
+                class="w-full text-center text-[11px] font-mono text-slate-400 hover:text-slate-200 underline pt-1">
+          &larr; Back to form
+        </button>
+      </div>
 
       <!-- Direct Ask Options Divider -->
       <div class="relative flex items-center justify-center my-3.5">
