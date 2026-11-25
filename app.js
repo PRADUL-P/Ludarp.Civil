@@ -1210,8 +1210,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = 'auto';
   };
 
-  // Submit Details & Instant Automated Download
-  window.handleDownloadAccessSubmit = function(event) {
+  // Submit Details & Instant Automated Download or Delivery via WhatsApp / Email
+  window.handleDownloadAccessSubmit = function(event, deliveryMode = 'device') {
     if (event) event.preventDefault();
     const tool = state.verifyingTool;
     if (!tool) return;
@@ -1232,14 +1232,102 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (!email && !phone) {
-      showToast('Please provide either an Email or Phone (WhatsApp) to receive or unlock the file.', 'fa-circle-exclamation');
-      if (emailInput) emailInput.focus();
+    if (deliveryMode === 'whatsapp') {
+      if (!phone) {
+        showToast('Please enter your Phone / WhatsApp number to receive the link.', 'fa-brands fa-whatsapp');
+        if (phoneInput) phoneInput.focus();
+        return;
+      }
+    } else if (deliveryMode === 'email') {
+      if (!email) {
+        showToast('Please enter your Email address to receive the link.', 'fa-regular fa-envelope');
+        if (emailInput) emailInput.focus();
+        return;
+      }
+    } else {
+      // mode === 'device'
+      if (!email && !phone) {
+        showToast('Please provide either an Email or Phone (WhatsApp) to unlock download.', 'fa-circle-exclamation');
+        if (emailInput) emailInput.focus();
+        return;
+      }
+    }
+
+    // Determine filename and URLs
+    const isOther = tool.category === 'Other';
+    const isPyRevit = tool.category === 'pyRevit';
+    let defaultFileName = isOther ? 'LUDARP.Drawing.Packager.exe' :
+                          isPyRevit ? 'Ludarp_pyRevit_Extension_Full.zip' :
+                          `${tool.id}.lsp`;
+    if (tool.downloadFilename) defaultFileName = tool.downloadFilename;
+
+    const toolHubUrl = `${window.location.origin}${window.location.pathname}?tool=${encodeURIComponent(tool.id)}`;
+    let directDlUrl = tool.downloadUrl;
+    if (tool.downloadGithubOnly) {
+      directDlUrl = 'https://github.com/PRADUL-P/Drawing-Packager/releases/download/v2.0/LUDARP.Drawing.Packager.exe';
+    } else if (!directDlUrl) {
+      directDlUrl = toolHubUrl;
+    }
+
+    const now = new Date().toISOString();
+
+    if (deliveryMode === 'whatsapp') {
+      let cleanPhone = phone.replace(/[^0-9]/g, '');
+      if (cleanPhone.length === 10 && /^[6-9]/.test(cleanPhone)) {
+        cleanPhone = '91' + cleanPhone;
+      }
+
+      const leadRecord = {
+        name,
+        email: email || 'N/A',
+        phone: phone || 'N/A',
+        org: org || 'Independent',
+        toolId: tool.id,
+        toolTitle: tool.title,
+        timestamp: now,
+        method: 'WhatsApp Delivery'
+      };
+      saveLead(leadRecord);
+      saveUser({ name, email, phone, org });
+      logTelemetryEvent('download', tool.id, { title: tool.title, method: 'whatsapp', leadName: name, contact: phone });
+
+      const msg = `👋 Hello ${name}!\n\nHere is your verified download link for *${tool.title}* (${tool.version || 'v2.0'}):\n\n⚡ *Direct Download:*\n${directDlUrl}\n\n🌐 *Tool Documentation & Web Hub:*\n${toolHubUrl}\n\nNeed help or custom civil tools? Feel free to contact Pradul.\n— *Ludarp Civil Tools*`;
+
+      const waUrl = cleanPhone 
+        ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`
+        : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+
+      window.open(waUrl, '_blank');
+      closeDownloadVerification();
+      showToast(`Sending download link to WhatsApp (${phone})!`, 'fa-brands fa-whatsapp');
       return;
     }
 
-    // Save lead record
-    const now = new Date().toISOString();
+    if (deliveryMode === 'email') {
+      const leadRecord = {
+        name,
+        email: email || 'N/A',
+        phone: phone || 'N/A',
+        org: org || 'Independent',
+        toolId: tool.id,
+        toolTitle: tool.title,
+        timestamp: now,
+        method: 'Email Delivery'
+      };
+      saveLead(leadRecord);
+      saveUser({ name, email, phone, org });
+      logTelemetryEvent('download', tool.id, { title: tool.title, method: 'email', leadName: name, contact: email });
+
+      const subject = `Download Link: ${tool.title} (${tool.version || 'v2.0'}) - Ludarp Civil`;
+      const body = `Hello ${name},\n\nThank you for requesting access to ${tool.title} (${tool.version || 'v2.0'}) from Ludarp Civil Tools Hub.\n\nHere are your verified download link and resources:\n\n• Verified Download Link:\n${directDlUrl}\n\n• Tool Overview & Documentation:\n${toolHubUrl}\n\n• Command Trigger:\n${tool.command || 'See documentation'}\n\nIf you have any questions or require custom AEC automation tools, feel free to contact Pradul.\n\nBest regards,\nPradul P\nLudarp Civil Tools Hub`;
+
+      window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      closeDownloadVerification();
+      showToast(`Opening email client with download link for ${email}!`, 'fa-regular fa-envelope');
+      return;
+    }
+
+    // Default: 'device' (Instant Download to This Device)
     const leadRecord = {
       name,
       email: email || 'N/A',
@@ -1248,19 +1336,11 @@ document.addEventListener('DOMContentLoaded', () => {
       toolId: tool.id,
       toolTitle: tool.title,
       timestamp: now,
-      method: 'Automated Unlock'
+      method: 'Instant Device Download'
     };
     saveLead(leadRecord);
     saveUser({ name, email, phone, org });
-    logTelemetryEvent('download', tool.id, { title: tool.title, leadName: name, contact: email || phone });
-
-    // Determine filename
-    const isOther = tool.category === 'Other';
-    const isPyRevit = tool.category === 'pyRevit';
-    let defaultFileName = isOther ? 'LUDARP.Drawing.Packager.exe' :
-                          isPyRevit ? 'Ludarp_pyRevit_Extension_Full.zip' :
-                          `${tool.id}.lsp`;
-    if (tool.downloadFilename) defaultFileName = tool.downloadFilename;
+    logTelemetryEvent('download', tool.id, { title: tool.title, method: 'device', leadName: name, contact: email || phone });
 
     // Trigger instant automated download
     if (tool.downloadGithubOnly) {
@@ -1473,7 +1553,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <td class="p-2.5 font-bold text-white">${escapeHtml(lead.name)}</td>
             <td class="p-2.5 text-emerald-400">${escapeHtml(lead.phone !== 'N/A' ? lead.phone : lead.email)}</td>
             <td class="p-2.5 text-slate-200 truncate max-w-[150px]">${escapeHtml(lead.toolTitle || lead.toolId)}</td>
-            <td class="p-2.5 text-right"><span class="px-2 py-0.5 rounded text-[10px] font-mono ${lead.method === 'WhatsApp Request' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-brand-cyan/20 text-brand-cyan'}">${escapeHtml(lead.method)}</span></td>
+            <td class="p-2.5 text-right"><span class="px-2 py-0.5 rounded text-[10px] font-mono ${
+              lead.method.includes('WhatsApp') ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+              lead.method.includes('Email') ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+              'bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30'
+            }">${escapeHtml(lead.method)}</span></td>
           </tr>
         `).join('');
       }

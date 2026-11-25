@@ -799,34 +799,52 @@
           </div>
         </div>
 
-        <!-- Primary Action: Automated Instant Unlock & Download -->
-        <button type="submit" id="submitLeadDownloadBtn" 
-                class="w-full mt-2 py-3 px-4 rounded-xl bg-brand-cyan hover:bg-sky-400 text-brand-dark font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-brand-cyan/20 transition-all hover:scale-[1.02] active:scale-95">
-          <i class="fa-solid fa-unlock-keyhole text-sm"></i>
-          <span id="submitLeadBtnLabel">Submit Details &amp; Unlock Download</span>
-        </button>
+        <!-- Delivery Options -->
+        <div class="mt-4 pt-3 border-t border-slate-800 space-y-2.5">
+          <div class="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-arrow-down-to-bracket text-brand-cyan"></i> Choose How to Receive Download Link:
+            </span>
+          </div>
+
+          <!-- 1. Instant Download to this device -->
+          <button type="button" onclick="handleDownloadAccessSubmit(event, 'device')" id="submitLeadDownloadBtn" 
+                  class="w-full py-2.5 px-4 rounded-xl bg-brand-cyan hover:bg-sky-400 text-brand-dark font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-brand-cyan/20 transition-all hover:scale-[1.01] active:scale-95">
+            <i class="fa-solid fa-download text-sm"></i>
+            <span>Instant Download to This Device</span>
+          </button>
+
+          <!-- 2. Send via WhatsApp / Email Buttons -->
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="handleDownloadAccessSubmit(event, 'whatsapp')" 
+                    class="py-2.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm"
+                    title="Send download link to your WhatsApp">
+              <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i>
+              <span>Send Link to WhatsApp</span>
+            </button>
+
+            <button type="button" onclick="handleDownloadAccessSubmit(event, 'email')" 
+                    class="py-2.5 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-105 shadow-sm"
+                    title="Send download link to your Email">
+              <i class="fa-solid fa-envelope text-blue-400 text-xs"></i>
+              <span>Send Link to Email</span>
+            </button>
+          </div>
+        </div>
       </form>
 
       <!-- Direct Ask Options Divider -->
-      <div class="relative flex items-center justify-center my-4">
+      <div class="relative flex items-center justify-center my-3.5">
         <div class="border-t border-slate-800 w-full"></div>
-        <span class="bg-slate-900 px-3 text-[10px] font-mono text-slate-500 uppercase tracking-wider">or ask me directly for file / link</span>
+        <span class="bg-slate-900 px-3 text-[10px] font-mono text-slate-500 uppercase tracking-wider">or ask me to send the file directly</span>
       </div>
 
-      <!-- Ask Pradul on WhatsApp or Email Buttons -->
-      <div class="grid grid-cols-2 gap-2.5">
-        <button type="button" onclick="askPradulOnWhatsApp()" 
-                class="py-2.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-sm">
-          <i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i>
-          <span>Ask on WhatsApp</span>
-        </button>
-
-        <button type="button" onclick="askPradulViaEmail()" 
-                class="py-2.5 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-semibold flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-sm">
-          <i class="fa-solid fa-envelope text-blue-400 text-sm"></i>
-          <span>Ask via Email</span>
-        </button>
-      </div>
+      <!-- Ask Pradul directly on WhatsApp -->
+      <button type="button" onclick="askPradulOnWhatsApp()" 
+              class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+        <i class="fa-brands fa-whatsapp text-base"></i>
+        <span>Ask Pradul on WhatsApp for Direct File (.exe / .zip)</span>
+      </button>
 
       <!-- File Details Footer -->
       <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
